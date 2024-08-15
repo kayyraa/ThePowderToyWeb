@@ -1,0 +1,14 @@
+@import url("fonts.css");
+
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: "TptFont";
+    overflow: hidden;
+}
+
+#ParticleContainer div {
+    position: absolute;
+    width: 10px;
+    aspect-ratio: 1 / 1;
+}
