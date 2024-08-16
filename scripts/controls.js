@@ -1,12 +1,6 @@
 const ActionLabel = document.getElementById("ActionLabel");
 
-const Displays = [
-    "Heat",
-    "Default",
-];
-
 let SpeedIsZero = false;
-let Display = document.body.getAttribute("display");
 
 document.addEventListener("keydown", (Event) => {
     if (Event.key === " " || Event.key === "Space") {
@@ -15,7 +9,13 @@ document.addEventListener("keydown", (Event) => {
     }
 
     if (Event.keyCode === 68) {
-        Display = Displays[(Displays.indexOf(Display) + 1) % Displays.length];
+        const Displays = ["Heat", "Default"];
+
+        let Display = document.body.getAttribute("display") || Displays[0];
+        
+        const NextIndex = (Displays.indexOf(Display.charAt(0).toUpperCase() + Display.slice(1)) + 1) % Displays.length;
+        Display = Displays[NextIndex];
+        
         document.body.setAttribute("display", Display.toLowerCase());
         ActionLabel.textContent = `${Display} Display`;
     }
