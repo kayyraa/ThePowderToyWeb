@@ -20,7 +20,7 @@ document.addEventListener("pointermove", (Event) => {
     MouseY = Event.clientY;
 
     if (IsDragging && ParticleContainer) {
-        const GridSize = 50;
+        const GridSize = parseInt(document.body.getAttribute("grid-size"));
         const CursorSize = parseInt(document.body.getAttribute("cursor-size"));
         const Radius = CursorSize / 2;
 
@@ -45,6 +45,10 @@ document.addEventListener("pointermove", (Event) => {
                             Element.style.pointerEvents = 'none';
                             Element.style.backgroundColor = ElementColor;
                             Element.dataset.type = ElementType;
+                            Element.dataset.color = ElementColor;
+                            Element.dataset.flammable = SelectedElement.dataset.flammable;
+                            Element.dataset.caustic = SelectedElement.dataset.caustic;
+                            Element.dataset.temp = 22;
                             Element.id = document.body.getAttribute("selected");
                             ParticleContainer.appendChild(Element);
                         }
@@ -60,6 +64,10 @@ document.addEventListener("pointermove", (Event) => {
                 Element.style.pointerEvents = 'none';
                 Element.style.backgroundColor = ElementColor;
                 Element.dataset.type = ElementType;
+                Element.dataset.color = ElementColor;
+                Element.dataset.flammable = SelectedElement.dataset.flammable;
+                Element.dataset.caustic = SelectedElement.dataset.caustic;
+                Element.dataset.temp = 22;
                 Element.style.zIndex = -9999;
                 Element.id = document.body.getAttribute("selected");
                 ParticleContainer.appendChild(Element);

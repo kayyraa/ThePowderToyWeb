@@ -9,6 +9,4 @@ body {
 
 #ParticleContainer div {
     position: absolute;
-    width: 10px;
-    aspect-ratio: 1 / 1;
 }
