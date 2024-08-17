@@ -1,3 +1,5 @@
+import { Settings } from "./settings.js";
+
 const Cursor = document.createElement("div");
 Cursor.style.position = "fixed";
 Cursor.style.border = "2px solid #fff";
@@ -7,8 +9,6 @@ Cursor.style.transition = "width 0.0625s";
 Cursor.style.pointerEvents = "none";
 Cursor.draggable = false;
 document.body.appendChild(Cursor);
-
-const Clamp = (Val, Min, Max) => Math.min(Math.max(Val, Min), Max);
 
 let MouseX = 0;
 let MouseY = 0;
@@ -30,19 +30,6 @@ function handleDragEnd() {
 
 document.addEventListener("pointermove", (Event) => {
     updateCursorPosition(Event.clientX, Event.clientY);
-});
-
-document.addEventListener("wheel", (Event) => {
-    if (Event.ctrlKey) {
-        Event.preventDefault();
-        const CurrentGameSpeed = parseInt(document.body.getAttribute("speed"));
-        const NewGameSpeed = Clamp(CurrentGameSpeed + Math.sign(-Event.deltaY), -8, 8);
-        document.body.setAttribute("speed", NewGameSpeed);
-    }
-}, { passive: false });
-
-document.addEventListener("contextmenu", (Event) => {
-    Event.preventDefault();
 });
 
 document.addEventListener("mousedown", (Event) => {
@@ -89,24 +76,28 @@ function Loop() {
 
         let SelectedElement = document.getElementById(document.body.getAttribute("selected"));
         if (SelectedElement !== null) {
-            let ElementColor = SelectedElement.style.backgroundColor;
-            let ElementType = SelectedElement.dataset.type;
+            const ElementColor = SelectedElement.style.backgroundColor;
+            const ElementType = SelectedElement.dataset.type;
+            const Flammable = SelectedElement.dataset.flammable;
+            const Caustic = SelectedElement.dataset.caustic;
 
-            const Element = document.createElement("div");
-            Element.style.position = "absolute";
-            Element.style.left = `${SnappedX}px`;
-            Element.style.top = `${SnappedY}px`;
-            Element.style.width = `${GridSize}px`;
-            Element.style.height = `${GridSize}px`;
-            Element.style.pointerEvents = 'none';
-            Element.style.backgroundColor = ElementColor;
-            Element.dataset.type = ElementType;
-            Element.dataset.color = ElementColor;
-            Element.dataset.flammable = SelectedElement.dataset.flammable;
-            Element.dataset.caustic = SelectedElement.dataset.caustic;
-            Element.dataset.temp = 22;
-            Element.id = document.body.getAttribute("selected");
-            ParticleContainer.appendChild(Element);
+            if (ParticleContainer.children.length < Settings.MaxParticleCount && SelectedElement.id.toUpperCase() !== "NONE") {
+                const Element = document.createElement("div");
+                Element.style.position = "absolute";
+                Element.style.left = `${SnappedX}px`;
+                Element.style.top = `${SnappedY}px`;
+                Element.style.width = `${GridSize}px`;
+                Element.style.height = `${GridSize}px`;
+                Element.style.pointerEvents = 'none';
+                Element.style.backgroundColor = ElementColor;
+                Element.dataset.type = ElementType;
+                Element.dataset.color = ElementColor;
+                Element.dataset.flammable = Flammable;
+                Element.dataset.caustic = Caustic;
+                Element.dataset.temp = 22;
+                Element.id = SelectedElement.id;
+                ParticleContainer.appendChild(Element);
+            }
         }
     }
 

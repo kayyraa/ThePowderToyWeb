@@ -3,20 +3,19 @@ const ParticleContainer = document.getElementById("ParticleContainer");
 if (ParticleContainer) {
     function Loop() {
         const BaseSimulationSpeed = 0;
-        const SimulationSpeed = BaseSimulationSpeed / (parseInt(document.body.getAttribute("speed")) || 1);
+        const SimulationSpeed = BaseSimulationSpeed * -(parseFloat(document.body.getAttribute("speed")));
 
         const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
         const GravityEnabled = document.body.getAttribute("gravity") === "true";
-
+        
         if (GravityEnabled) {
             Particles.forEach(Particle => {
-                if (Particle.dataset.type === "Solid") {
-                    return;
-                }
-
                 const ParticleRect = Particle.getBoundingClientRect();
                 const NewTop = ParticleRect.top + (12 * parseInt(document.body.getAttribute("speed")));
                 const MaxHeight = window.innerHeight - ParticleRect.height;
+
+                const IsCaustic = Particle.dataset.caustic === "true";
+                const IsFlammable = Particle.dataset.flammable === "true";
 
                 let CollisionDetected = false;
                 let CollisionTop = MaxHeight;
@@ -34,24 +33,34 @@ if (ParticleContainer) {
                             CollisionDetected = true;
                             CollisionTop = Math.min(CollisionTop, OtherRect.top - ParticleRect.height);
 
-                            // Resolve overlap by moving the particle upwards
-                            if (ParticleRect.bottom > OtherRect.top) {
-                                const Overlap = ParticleRect.bottom - OtherRect.top;
-                                Particle.style.top = `${Particle.offsetTop - Overlap}px`;
+                            const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
+                            const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
+
+                            if (IsCaustic && OtherIsFlammable) {
+                                OtherParticle.dataset.type = "Gas";
+                                OtherParticle.dataset.caustic = "false";
+                                OtherParticle.dataset.flammable = "false";
+                                OtherParticle.style.backgroundColor = "rgb(100, 100, 100)";
+
+                                Particle.remove()
                             }
                         }
                     }
                 });
 
-                if (!CollisionDetected) {
-                    if (Particle.dataset.type === "Powder" || Particle.dataset.type === "Liquid") {
+                if (CollisionDetected) {
+                    Particle.style.top = `${CollisionTop}px`;
+                } else {
+                    if (Particle.dataset.type === "Powder") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
                     } else if (Particle.dataset.type === "Gas") {
                         Particle.style.top = `${Particle.offsetTop - (8 * parseInt(document.body.getAttribute("speed")))}px`;
+                    } else if (Particle.dataset.type === "Liquid") {
+                        Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
                     }
                 }
 
-                if (Math.abs(Particle.offsetTop) > (window.innerHeight)) {
+                if (Math.abs(Particle.offsetTop) > window.innerHeight) {
                     Particle.remove();
                 }
             });

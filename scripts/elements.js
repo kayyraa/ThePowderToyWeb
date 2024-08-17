@@ -57,7 +57,7 @@ export const Elements = [
     },
     {
         Name: "OXYG",
-        Color: "rgba(225, 225, 255, 0.5)",
+        Color: "rgb(200, 200, 255)",
         Flammable: true,
         Caustic: false,
         Temp: 22,
@@ -65,7 +65,7 @@ export const Elements = [
     },
     {
         Name: "FIRE",
-        Color: "rgba(255, 175, 175, 0.975)",
+        Color: "rgb(255, 125, 125)",
         Flammable: false,
         Caustic: true,
         Temp: 500,
@@ -78,5 +78,13 @@ export const Elements = [
         Caustic: false,
         Temp: 250,
         Type: "Gas"
+    },
+    {
+        Name: "NONE",
+        Color: "rgb(0, 0, 0)",
+        Flammable: false,
+        Caustic: false,
+        Temp: 0,
+        Type: "None"
     }
 ];

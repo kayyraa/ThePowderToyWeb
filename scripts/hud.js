@@ -1,4 +1,5 @@
 import { Elements } from "./elements.js";
+import { Settings } from "./settings.js";
 
 const ParticleContainer = document.getElementById("ParticleContainer");
 
@@ -102,6 +103,22 @@ ElementLabel.style.userSelect = "none";
 ElementLabel.style.pointerEvents = "none";
 ElementContainer.appendChild(ElementLabel);
 
+const HoverLabel = document.createElement("span");
+HoverLabel.innerHTML = "NONE";
+HoverLabel.style.position = "fixed";
+HoverLabel.style.color = "rgb(172, 172, 172)";
+HoverLabel.style.width = "200px";
+HoverLabel.style.height = "50px";
+HoverLabel.style.bottom = "10px";
+HoverLabel.style.left = "100px";
+HoverLabel.style.fontSize = "24px";
+HoverLabel.style.paddingLeft = "10px";
+HoverLabel.style.paddingRight = "10px";
+HoverLabel.style.textAlign = "center";
+HoverLabel.style.userSelect = "none";
+HoverLabel.style.pointerEvents = "none";
+ElementContainer.appendChild(HoverLabel);
+
 function IsMobile() {
     const userAgent = navigator.userAgent.toLowerCase();
     return /android|webos|iphone|ipad|ipod|blackberry|windows phone|opera mini/i.test(userAgent);
@@ -141,10 +158,10 @@ if (IsMobile()) {
     StatsContainer.appendChild(DisplayButton);
 
     GameSpeedUpButton.addEventListener("click", () => {
-        document.body.setAttribute("speed", (parseInt(document.body.getAttribute("speed")) + 1));
+        document.body.setAttribute("speed", (parseFloat(document.body.getAttribute("speed")) + Settings.SpeedChange));
     });
     GameSpeedDownButton.addEventListener("click", () => {
-        document.body.setAttribute("speed", (parseInt(document.body.getAttribute("speed")) - 1));
+        document.body.setAttribute("speed", (parseFloat(document.body.getAttribute("speed")) - Settings.SpeedChange));
     });
     DisplayButton.addEventListener("click", () => {
         const Displays = ["Heat", "Default"];
@@ -183,6 +200,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.dataset.type = Element.Type;
     ElementDiv.dataset.flammable = Element.Flammable;
     ElementDiv.dataset.caustic = Element.Caustic;
+    ElementDiv.dataset.name = Element.Name;
     ElementDiv.style.zIndex = 9999;
     ElementDiv.id = Element.Name;
 
@@ -193,14 +211,71 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementContainer.appendChild(ElementDiv);
 }
 
+document.addEventListener("pointermove", (Event) => {
+    document.body.setAttribute("hover", Event.target.id !== "" ? Event.target.id : "none")
+});
+
 ClearButton.addEventListener("click", () => {
     ParticleContainer.innerHTML = "";
     document.body.setAttribute("selected", "none");
 });
 
+let MouseX = 0;
+let MouseY = 0;
+let Target = null;
+let IsDragging = false;
+
+document.addEventListener("pointermove", (Event) => {
+    MouseX = Event.clientX;
+    MouseY = Event.clientY;
+    Target = Event.target;
+
+    if (IsDragging && ParticleContainer) {
+        if (Event.button === 2 && Target !== null) {
+            Event.currentTarget.remove();
+        }
+    }
+});
+
+document.addEventListener("mousedown", (Event) => {
+    if (Event.button === 0) {
+        IsDragging = true;
+    }
+});
+
+document.addEventListener("mouseup", (Event) => {
+    if (Event.button === 0) {
+        IsDragging = false;
+    }
+});
+
+document.addEventListener("touchstart", (Event) => {
+    if (Event.touches.length === 1) {
+        IsDragging = true;
+    }
+});
+
+document.addEventListener("touchend", () => {
+    IsDragging = false;
+});
+
+document.addEventListener("touchmove", (Event) => {
+    if (Event.touches.length === 1) {
+        const Touch = Event.touches[0];
+        MouseX = Touch.clientX;
+        MouseY = Touch.clientY;
+    }
+});
+
 function UpdateFps() {
-    ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length}`;
-    GameSpeedLabel.innerHTML = `SPD: ${document.body.getAttribute("speed")}`;
+    ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
+    GameSpeedLabel.innerHTML = `SPD: ${parseFloat(document.body.getAttribute("speed")) % 1 === 0 ? parseFloat(document.body.getAttribute("speed")) + ".0" : parseFloat(document.body.getAttribute("speed"))}`;
+
+    Cursor.style.top = `${MouseY - (Cursor.offsetHeight / 2)}px`;
+    Cursor.style.left = `${MouseX - (Cursor.offsetWidth / 2)}px`;
+    Cursor.style.width = `${parseInt(document.body.getAttribute("cursor-size"))}px`;
+
+    HoverLabel.innerHTML = `/ ${document.body.getAttribute("hover").toUpperCase().substring(0, 4)}`;
 
     const CurrentTime = performance.now();
     const ElapsedTime = CurrentTime - LastTime;
@@ -226,75 +301,3 @@ function UpdateFps() {
 }
 
 UpdateFps();
-
-let MouseX = 0;
-let MouseY = 0;
-let IsDragging = false;
-
-document.addEventListener("pointermove", (Event) => {
-    MouseX = Event.clientX;
-    MouseY = Event.clientY;
-});
-
-document.addEventListener("wheel", (Event) => {
-    if (Event.ctrlKey) {
-        Event.preventDefault();
-        const CurrentGameSpeed = parseInt(document.body.getAttribute("speed"));
-        const NewGameSpeed = Math.min(Math.max(CurrentGameSpeed + Math.sign(-Event.deltaY), -8), 8);
-        document.body.setAttribute("speed", NewGameSpeed);
-    }
-}, { passive: false });
-
-document.addEventListener("contextmenu", (Event) => {
-    Event.preventDefault();
-});
-
-document.addEventListener("mousedown", (Event) => {
-    if (Event.button === 0) {
-        IsDragging = true;
-    }
-});
-
-document.addEventListener("mouseup", (Event) => {
-    if (Event.button === 0) {
-        IsDragging = false;
-    }
-});
-
-document.addEventListener("touchstart", (Event) => {
-    if (Event.touches.length === 1) {
-        IsDragging = true;
-    }
-});
-
-document.addEventListener("touchend", (Event) => {
-    IsDragging = false;
-});
-
-document.addEventListener("touchmove", (Event) => {
-    if (Event.touches.length === 1) {
-        const Touch = Event.touches[0];
-        MouseX = Touch.clientX;
-        MouseY = Touch.clientY;
-    }
-});
-
-function Loop() {
-    Cursor.style.top = `${MouseY - (Cursor.offsetHeight / 2)}px`;
-    Cursor.style.left = `${MouseX - (Cursor.offsetWidth / 2)}px`;
-    Cursor.style.width = `${parseInt(document.body.getAttribute("cursor-size"))}px`;
-
-    if (IsDragging && ParticleContainer) {
-        const GridSize = parseInt(document.body.getAttribute("grid-size"));
-        const SnappedX = Math.floor(MouseX / GridSize) * GridSize;
-        const SnappedY = Math.floor(MouseY / GridSize) * GridSize;
-
-        if (Event.button === 2 && Event.currentTarget !== null) {
-            Event.currentTarget.remove();
-        }
-    }
-
-    requestAnimationFrame(Loop);
-}
-
-Loop();
