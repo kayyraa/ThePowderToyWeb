@@ -8,7 +8,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Powder",
-        Category: "Powder"
+        Category: "Powder",
+        Description: "Granular material."
     },
     {
         Name: "WATR",
@@ -19,7 +20,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Liquid",
-        Category: "Liquid"
+        Category: "Liquid",
+        Description: "Essential liquid."
     },
     {
         Name: "COAL",
@@ -30,7 +32,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Solid",
-        Category: "Solid"
+        Category: "Solid",
+        Description: "Combustible rock."
     },
     {
         Name: "WOOD",
@@ -41,7 +44,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Solid",
-        Category: "Solid"
+        Category: "Solid",
+        Description: "Flammable tree material."
     },
     {
         Name: "IRON",
@@ -52,7 +56,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Solid",
-        Category: "Solid"
+        Category: "Solid",
+        Description: "Strong metal."
     },
     {
         Name: "BRCK",
@@ -63,7 +68,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Solid",
-        Category: "Solid"
+        Category: "Solid",
+        Description: "Clay brick."
     },
     {
         Name: "URAN",
@@ -74,7 +80,8 @@ export const Elements = [
         Light: false,
         Temp: 46,
         Type: "Powder",
-        Category: "Powder"
+        Category: "Powder",
+        Description: "Radioactive metal powder."
     },
     {
         Name: "ROEN",
@@ -85,7 +92,8 @@ export const Elements = [
         Light: false,
         Temp: 46,
         Type: "Powder",
-        Category: "Powder"
+        Category: "Powder",
+        Description: "Radioactive powder."
     },
     {
         Name: "PLUT",
@@ -96,7 +104,8 @@ export const Elements = [
         Light: false,
         Temp: 46,
         Type: "Powder",
-        Category: "Powder"
+        Category: "Powder",
+        Description: "Highly radioactive powder."
     },
     {
         Name: "NEUT",
@@ -107,7 +116,8 @@ export const Elements = [
         Light: true,
         Temp: 22,
         Type: "None",
-        Category: "None"
+        Category: "None",
+        Description: "Radioactive and glowing."
     },
     {
         Name: "PHOT",
@@ -118,7 +128,8 @@ export const Elements = [
         Light: true,
         Temp: 500,
         Type: "None",
-        Category: "None"
+        Category: "None",
+        Description: "High-temperature light."
     },
     {
         Name: "STNE",
@@ -129,7 +140,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Powder",
-        Category: "Powder"
+        Category: "Powder",
+        Description: "Stone-like powder."
     },
     {
         Name: "SALT",
@@ -140,7 +152,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Powder",
-        Category: "Powder"
+        Category: "Powder",
+        Description: "Seasoning powder."
     },
     {
         Name: "OXYG",
@@ -151,7 +164,8 @@ export const Elements = [
         Light: false,
         Temp: 22,
         Type: "Gas",
-        Category: "Gas"
+        Category: "Gas",
+        Description: "Supports combustion."
     },
     {
         Name: "FIRE",
@@ -162,7 +176,8 @@ export const Elements = [
         Light: false,
         Temp: 500,
         Type: "Gas",
-        Category: "Gas"
+        Category: "Gas",
+        Description: "Hot, caustic gas."
     },
     {
         Name: "SMKE",
@@ -173,7 +188,8 @@ export const Elements = [
         Light: false,
         Temp: 250,
         Type: "Gas",
-        Category: "Gas"
+        Category: "Gas",
+        Description: "Dense smoke."
     },
     {
         Name: "NONE",
@@ -184,6 +200,7 @@ export const Elements = [
         Light: false,
         Temp: 0,
         Type: "None",
-        Category: "None"
+        Category: "None",
+        Description: "No substance."
     }
 ];

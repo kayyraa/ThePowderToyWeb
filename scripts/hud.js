@@ -1,6 +1,7 @@
 import { Elements } from "./elements.js";
 import { Settings } from "./settings.js";
 import { Displays } from "./displays.js";
+import * as TPTW from "./tptw.js";
 
 const ParticleContainer = document.getElementById("ParticleContainer");
 
@@ -106,7 +107,6 @@ HoverLabel.style.fontSize = "24px";
 HoverLabel.style.paddingLeft = "10px";
 HoverLabel.style.paddingRight = "10px";
 HoverLabel.style.textAlign = "center";
-HoverLabel.style.userSelect = "none";
 HoverLabel.style.pointerEvents = "none";
 ElementContainer.appendChild(HoverLabel);
 
@@ -121,8 +121,8 @@ const ExperimentalTooltip = document.createElement("span");
 ExperimentalTooltip.innerHTML = "Experimental Version";
 ExperimentalTooltip.style.visibility = "hidden";
 ExperimentalTooltip.style.position = "relative";
-ExperimentalTooltip.style.left = "10px";
-ExperimentalTooltip.style.top = "-20px";
+ExperimentalTooltip.style.left = "5px";
+ExperimentalTooltip.style.top = "-15px";
 ExperimentalTooltip.style.fontSize = "100%";
 ExperimentalTooltip.style.textAlign = "center";
 ExperimentalTooltip.style.pointerEvents = "none";
@@ -137,6 +137,57 @@ TooltipEventPointer.style.height = "64px";
 TooltipEventPointer.style.zIndex = "9999";
 document.body.appendChild(TooltipEventPointer);
 
+const ConsoleButton = document.createElement("div");
+ConsoleButton.innerHTML = "C";
+ConsoleButton.style.position = "relative";
+ConsoleButton.style.bottom = "60px";
+ConsoleButton.style.boxSizing = "border-box";
+ConsoleButton.style.border = "2px solid white";
+ConsoleButton.style.alignContent = "center";
+ConsoleButton.style.justifyContent = "center";
+ConsoleButton.style.textAlign = "center";
+ConsoleButton.style.fontSize = "32px";
+ConsoleButton.style.width = "48px";
+ConsoleButton.style.height = "48px";
+ConsoleButton.style.cursor = "pointer";
+document.body.appendChild(ConsoleButton);
+
+const Console = document.createElement("div");
+Console.style.visibility = "hidden";
+Console.style.position = "absolute";
+Console.style.top = "0%";
+Console.style.left = "0%";
+Console.style.width = "100%";
+Console.style.height = "20%";
+Console.style.backgroundColor = "rgb(0, 0, 0)";
+Console.style.overflowY = "scroll";
+Console.style.overflowX = "hidden";
+Console.id = "Console";
+document.body.appendChild(Console);
+
+const LogContainer = document.createElement("div");
+LogContainer.style.position = "absolute";
+LogContainer.style.width = "100%";
+LogContainer.style.height = "100%";
+LogContainer.id = "LogContainer";
+Console.appendChild(LogContainer);
+
+ConsoleButton.addEventListener("click", () => {
+    Console.style.visibility = Console.style.visibility === "visible" ? "hidden" : "visible";
+});
+
+ConsoleButton.addEventListener("mouseenter", () => {
+    ConsoleButton.style.color = "black";
+    ConsoleButton.style.backgroundColor = "white";
+    ConsoleButton.style.border = "2px solid black";
+});
+
+ConsoleButton.addEventListener("mouseleave", () => {
+    ConsoleButton.style.color = "white";
+    ConsoleButton.style.backgroundColor = "black";
+    ConsoleButton.style.border = "2px solid white";
+});
+
 TooltipEventPointer.addEventListener("mouseenter", () => {
     ExperimentalTooltip.style.visibility = "visible";
 });
@@ -149,7 +200,7 @@ if (Settings.ExperimentalVersion) {
     ExperimentalTooltip.innerHTML = `Experimental Version: ${Settings.Version}`;
     ExperimentalIcon.src = "../images/Experiments.png";
 } else {
-    ExperimentalTooltip.innerHTML = `Non-Experimental Version: ${Settings.Version}`;
+    ExperimentalTooltip.innerHTML = `Version: ${Settings.Version}`;
     ExperimentalIcon.src = "../images/ExperimentsOff.png";
 }
 
@@ -232,6 +283,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
     const Element = Elements[Index];
 
     const ElementDiv = document.createElement("div");
+    ElementDiv.innerHTML = Element.Name.toUpperCase().substring(0, 4);
     ElementDiv.style.display = "flex";
     ElementDiv.style.flexDirection = "column";
     ElementDiv.style.width = "100%";
@@ -253,28 +305,41 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.style.zIndex = "9999";
     ElementDiv.id = Element.Name;
 
-    const ElementLabel = document.createElement("span");
-    ElementLabel.innerHTML = Element.Name.toUpperCase().substring(0, 4);
-    ElementLabel.style.pointerEvents = "none";
-    ElementDiv.appendChild(ElementLabel);
+    const DescriptionLabel = document.createElement("span");
+    DescriptionLabel.innerHTML = Element.Description;
+    DescriptionLabel.style.position = "relative";
+    DescriptionLabel.style.color = "white";
+    DescriptionLabel.style.right = "150px";
+    DescriptionLabel.style.bottom = "12px";
+    DescriptionLabel.style.pointerEvents = "none";
+    DescriptionLabel.style.width = "512px";
+    DescriptionLabel.style.opacity = "0";
+    DescriptionLabel.style.transition = "opacity 0.25s ease";
+    DescriptionLabel.id = "DescriptionLabel";
+    ElementDiv.appendChild(DescriptionLabel);
 
     ElementDiv.addEventListener("mouseenter", function() {
-        this.style.boxSizing = "border-box";
-        this.style.border = `3px solid ${InvertColor(ElementDiv.style.backgroundColor, true)}`;
         this.style.height = "10%";
-    
+        DescriptionLabel.style.opacity = "1";
+
         Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
             if (OtherElement !== this) {
                 OtherElement.style.boxSizing = "border-box";
                 OtherElement.style.border = "";
                 OtherElement.style.height = "5%";
+
+                const OtherDescriptionLabel = OtherElement.querySelector("#DescriptionLabel");
+                if (OtherDescriptionLabel) {
+                    OtherDescriptionLabel.style.opacity = "0";
+                }
             }
         });
-    });    
+    });
 
     ElementDiv.addEventListener("mouseleave", () => {
         ElementDiv.style.boxSizing = "border-box";
         ElementDiv.style.border = "";
+        DescriptionLabel.style.opacity = "0";
         ElementDiv.style.height = "5%";
     });
 
@@ -344,6 +409,8 @@ document.addEventListener("touchmove", (Event) => {
 });
 
 function UpdateFps() {
+    Console.scrollTop = Console.scrollHeight;
+
     ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
     GameSpeedLabel.innerHTML = `SPD: ${parseFloat(document.body.getAttribute("speed")) % 1 === 0 ? parseFloat(document.body.getAttribute("speed")) + ".0" : parseFloat(document.body.getAttribute("speed"))}`;
 

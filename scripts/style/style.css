@@ -5,6 +5,14 @@ body {
     color: #fff;
     font-family: "TptFont";
     overflow: hidden;
+    user-select: none !important;
+    -moz-user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+input {
+    color: #fff;
+    font-family: "TptFont";
 }
 
 #ParticleContainer div {

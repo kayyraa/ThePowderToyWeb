@@ -1,6 +1,29 @@
 import { Settings } from "./settings.js";
 
-function RGBSG(RgbString) {
+export function LogMessage(Message) {
+    const Console = document.getElementById("LogContainer");
+    if (Console) {
+        const Entry = document.createElement("pre");
+        Entry.innerHTML = Message;
+        Entry.style.width = "100%";
+        Entry.style.height = "12px";
+        Entry.style.fontSize = "12px";
+        Console.appendChild(Entry);
+
+        return Entry;
+    }
+}
+
+export function ClearLog() {
+    const Console = document.getElementById("LogContainer");
+    if (Console) {
+        Array.from(Console.getElementsByTagName("pre")).forEach(Entry => {
+            Entry.remove();
+        });
+    }
+}
+
+export function RGBSG(RgbString) {
     const Match = RgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
 
     if (Match) {
@@ -14,7 +37,7 @@ function RGBSG(RgbString) {
     return null;
 }
 
-function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Light, Temp, Type, Category}, PositionX, PositionY) {
+export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Light, Temp, Type, Category}, PositionX, PositionY) {
     const ParticleContainer = document.getElementById("ParticleContainer");
     const PowderEffect = document.body.getAttribute("powder")
     const GridSize = parseFloat(document.body.getAttribute("grid-size"));
@@ -38,9 +61,4 @@ function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Light, Tem
         Element.id = Name;
         ParticleContainer.appendChild(Element);
     }
-}
-
-export {
-    CreateElement,
-    RGBSG
 }

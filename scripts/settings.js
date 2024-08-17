@@ -1,7 +1,7 @@
 export const Settings = {
     SpeedChange: 1,
-    MaxParticleCount: 500,
+    MaxParticleCount: 750,
     PowderEffectStrength: 32,
     ExperimentalVersion: true,
-    Version: "v22.12.5"
+    Version: "v27.14.5"
 }
