@@ -7,7 +7,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Powder"
+        Type: "Powder",
+        Category: "Powder"
     },
     {
         Name: "WATR",
@@ -17,7 +18,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Liquid"
+        Type: "Liquid",
+        Category: "Liquid"
     },
     {
         Name: "COAL",
@@ -27,7 +29,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Solid"
+        Type: "Solid",
+        Category: "Solid"
     },
     {
         Name: "WOOD",
@@ -37,7 +40,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Solid"
+        Type: "Solid",
+        Category: "Solid"
     },
     {
         Name: "IRON",
@@ -47,7 +51,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Solid"
+        Type: "Solid",
+        Category: "Solid"
     },
     {
         Name: "BRCK",
@@ -57,7 +62,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Solid"
+        Type: "Solid",
+        Category: "Solid"
     },
     {
         Name: "URAN",
@@ -67,7 +73,8 @@ export const Elements = [
         Radioactive: true,
         Light: false,
         Temp: 46,
-        Type: "Powder"
+        Type: "Powder",
+        Category: "Powder"
     },
     {
         Name: "ROEN",
@@ -77,7 +84,8 @@ export const Elements = [
         Radioactive: true,
         Light: false,
         Temp: 46,
-        Type: "Powder"
+        Type: "Powder",
+        Category: "Powder"
     },
     {
         Name: "PLUT",
@@ -87,7 +95,8 @@ export const Elements = [
         Radioactive: true,
         Light: false,
         Temp: 46,
-        Type: "Powder"
+        Type: "Powder",
+        Category: "Powder"
     },
     {
         Name: "NEUT",
@@ -97,7 +106,19 @@ export const Elements = [
         Radioactive: true,
         Light: true,
         Temp: 22,
-        Type: "None"
+        Type: "None",
+        Category: "None"
+    },
+    {
+        Name: "PHOT",
+        Color: "rgb(255, 255, 255)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: true,
+        Temp: 500,
+        Type: "None",
+        Category: "None"
     },
     {
         Name: "STNE",
@@ -107,7 +128,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Powder"
+        Type: "Powder",
+        Category: "Powder"
     },
     {
         Name: "SALT",
@@ -117,7 +139,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Powder"
+        Type: "Powder",
+        Category: "Powder"
     },
     {
         Name: "OXYG",
@@ -127,7 +150,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        Type: "Gas"
+        Type: "Gas",
+        Category: "Gas"
     },
     {
         Name: "FIRE",
@@ -137,7 +161,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 500,
-        Type: "Gas"
+        Type: "Gas",
+        Category: "Gas"
     },
     {
         Name: "SMKE",
@@ -147,7 +172,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 250,
-        Type: "Gas"
+        Type: "Gas",
+        Category: "Gas"
     },
     {
         Name: "NONE",
@@ -157,6 +183,7 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 0,
-        Type: "None"
+        Type: "None",
+        Category: "None"
     }
 ];

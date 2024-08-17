@@ -49,18 +49,18 @@ document.addEventListener("mouseup", (Event) => {
 document.addEventListener("touchstart", (Event) => {
     if (Event.touches.length === 1) {
         const touch = Event.touches[0];
-        handleDragStart(touch.clientX, touch.clientY);
+        HandleDragStart(touch.clientX, touch.clientY);
     }
 });
 
 document.addEventListener("touchend", () => {
-    handleDragEnd();
+    HandleDragEnd();
 });
 
 document.addEventListener("touchmove", (Event) => {
     if (Event.touches.length === 1) {
         const touch = Event.touches[0];
-        updateCursorPosition(touch.clientX, touch.clientY);
+        UpdateCursorPosition(touch.clientX, touch.clientY);
         Event.preventDefault();
     }
 }, { passive: false });

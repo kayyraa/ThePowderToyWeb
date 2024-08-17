@@ -9,7 +9,7 @@ function Loop() {
         if (LastDisplay === "heat") {
             Particle.style.backgroundColor = `rgb(${OriginalColor.R + Temp}, ${OriginalColor.G}, ${OriginalColor.B})`;
             Particle.style.filter = "";
-        } else if (Display === "blob") {
+        } else if (LastDisplay === "blob") {
             Particle.style.filter = "blur(1px)";
         }
 

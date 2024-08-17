@@ -1,3 +1,6 @@
+import * as TPTW from "./tptw.js";
+import { Elements } from "./elements.js";
+
 const ParticleContainer = document.getElementById("ParticleContainer");
 
 function Random(Max, Min) {
@@ -8,35 +11,39 @@ function InitializeParticle(Particle) {
     const Direction = Math.floor(Math.random() * 4);
     const GridSize = parseInt(document.body.getAttribute("grid-size"), 10);
 
-    let OffsetX = 0;
-    let OffsetY = 0;
-
-    switch (Direction) {
-        case 0:
-            OffsetX = GridSize;
-            break;
-        case 1:
-            OffsetY = GridSize;
-            break;
-        case 2:
-            OffsetX = -GridSize;
-            break;
-        case 3:
-            OffsetY = -GridSize;
-            break;
-    }
+    const OffsetX = (Direction === 0) ? GridSize : (Direction === 2) ? -GridSize : 0;
+    const OffsetY = (Direction === 1) ? GridSize : (Direction === 3) ? -GridSize : 0;
 
     Particle.dataset.offsetX = OffsetX;
     Particle.dataset.offsetY = OffsetY;
 }
 
+function React() {
+    const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
+
+    Particles.forEach(Particle => {
+        if (Particle.dataset.radioactive === "true") {
+            const Element = Elements.find(element => element.Name === "NEUT");
+            if (Element) {
+                TPTW.CreateElement(Element, Particle.offsetLeft + 10, Particle.offsetTop + 10);
+            }
+        }
+    });
+
+    setTimeout(React, Random(10000, 1000));
+}
+
 if (ParticleContainer) {
     function Loop() {
         const BaseSimulationSpeed = 0;
-        const SimulationSpeed = BaseSimulationSpeed * -(parseFloat(document.body.getAttribute("speed")));
+        const SimulationSpeed = BaseSimulationSpeed * -parseFloat(document.body.getAttribute("speed"));
 
         const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
         const GravityEnabled = document.body.getAttribute("gravity") === "true";
+        const GridSize = parseInt(document.body.getAttribute("grid-size"), 10);
+        const Speed = parseInt(document.body.getAttribute("speed"), 10);
+        const MaxHeight = window.innerHeight;
+        const MaxWidth = window.innerWidth;
 
         if (GravityEnabled) {
             Particles.forEach(Particle => {
@@ -45,26 +52,20 @@ if (ParticleContainer) {
                 }
 
                 const ParticleRect = Particle.getBoundingClientRect();
-                const NewTop = ParticleRect.top + (12 * parseInt(document.body.getAttribute("speed")));
-                const MaxHeight = window.innerHeight - ParticleRect.height;
-
+                const NewTop = ParticleRect.top + (12 * Speed);
                 const IsCaustic = Particle.dataset.caustic === "true";
                 const IsLight = Particle.dataset.light === "true";
-                const IsRadioactive = Particle.dataset.radioactive === "true";
-
-                let CollisionDetected = false;
-                let CollisionTop = MaxHeight;
 
                 if (IsLight) {
                     const OffsetX = parseInt(Particle.dataset.offsetX, 10);
                     const OffsetY = parseInt(Particle.dataset.offsetY, 10);
 
-                    const CurrentLeft = parseFloat(Particle.style.left) || Particle.offsetLeft;
-                    const CurrentTop = parseFloat(Particle.style.top) || Particle.offsetTop;
-
-                    Particle.style.left = `${CurrentLeft + OffsetX}px`;
-                    Particle.style.top = `${CurrentTop + OffsetY}px`;
+                    Particle.style.left = `${Particle.offsetLeft + OffsetX}px`;
+                    Particle.style.top = `${Particle.offsetTop + OffsetY}px`;
                 }
+
+                let CollisionDetected = false;
+                let CollisionTop = MaxHeight;
 
                 Particles.forEach(OtherParticle => {
                     if (OtherParticle !== Particle) {
@@ -79,10 +80,7 @@ if (ParticleContainer) {
                             CollisionDetected = true;
                             CollisionTop = Math.min(CollisionTop, OtherRect.top - ParticleRect.height);
 
-                            const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
-                            const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
-
-                            if (IsCaustic && OtherIsFlammable) {
+                            if (IsCaustic && OtherParticle.dataset.flammable === "true") {
                                 OtherParticle.dataset.type = "Gas";
                                 OtherParticle.dataset.caustic = "false";
                                 OtherParticle.dataset.flammable = "false";
@@ -100,13 +98,14 @@ if (ParticleContainer) {
                     if (Particle.dataset.type === "Powder") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
                     } else if (Particle.dataset.type === "Gas") {
-                        Particle.style.top = `${Particle.offsetTop - (8 * parseInt(document.body.getAttribute("speed")))}px`;
+                        Particle.style.top = `${Particle.offsetTop - (8 * Speed)}px`;
                     } else if (Particle.dataset.type === "Liquid") {
+                        Particle.style.left = `${Particle.offsetLeft + (Random(8, -8) * Speed)}px`;
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
                     }
                 }
 
-                if (Math.abs(Particle.offsetTop) > window.innerHeight) {
+                if (Particle.offsetTop > MaxHeight) {
                     Particle.remove();
                 }
             });
@@ -117,3 +116,5 @@ if (ParticleContainer) {
 
     Loop();
 }
+
+React();

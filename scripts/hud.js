@@ -110,6 +110,50 @@ HoverLabel.style.userSelect = "none";
 HoverLabel.style.pointerEvents = "none";
 ElementContainer.appendChild(HoverLabel);
 
+const ExperimentalIcon = document.createElement("img");
+ExperimentalIcon.style.width = "48px";
+ExperimentalIcon.className = "Tooltip";
+ExperimentalIcon.style.pointerEvents = "none";
+ExperimentalIcon.style.zIndex = "-9999";
+document.body.appendChild(ExperimentalIcon);
+
+const ExperimentalTooltip = document.createElement("span");
+ExperimentalTooltip.innerHTML = "Experimental Version";
+ExperimentalTooltip.style.visibility = "hidden";
+ExperimentalTooltip.style.position = "relative";
+ExperimentalTooltip.style.left = "10px";
+ExperimentalTooltip.style.top = "-20px";
+ExperimentalTooltip.style.fontSize = "100%";
+ExperimentalTooltip.style.textAlign = "center";
+ExperimentalTooltip.style.pointerEvents = "none";
+ExperimentalTooltip.style.zIndex = "-9999";
+document.body.appendChild(ExperimentalTooltip);
+
+const TooltipEventPointer = document.createElement("div");
+TooltipEventPointer.style.position = "relative";
+TooltipEventPointer.style.bottom = "50px";
+TooltipEventPointer.style.width = "64px";
+TooltipEventPointer.style.height = "64px";
+TooltipEventPointer.style.zIndex = "9999";
+document.body.appendChild(TooltipEventPointer);
+
+TooltipEventPointer.addEventListener("mouseenter", () => {
+    ExperimentalTooltip.style.visibility = "visible";
+});
+
+TooltipEventPointer.addEventListener("mouseleave", () => {
+    ExperimentalTooltip.style.visibility = "hidden";
+});
+
+if (Settings.ExperimentalVersion) {
+    ExperimentalTooltip.innerHTML = `Experimental Version: ${Settings.Version}`;
+    ExperimentalIcon.src = "../images/Experiments.png";
+} else {
+    ExperimentalTooltip.innerHTML = `Non-Experimental Version: ${Settings.Version}`;
+    ExperimentalIcon.src = "../images/ExperimentsOff.png";
+}
+
+
 function IsMobile() {
     const userAgent = navigator.userAgent.toLowerCase();
     return /android|webos|iphone|ipad|ipod|blackberry|windows phone|opera mini/i.test(userAgent);
@@ -188,6 +232,8 @@ for (let Index = 0; Index < Elements.length; Index++) {
     const Element = Elements[Index];
 
     const ElementDiv = document.createElement("div");
+    ElementDiv.style.display = "flex";
+    ElementDiv.style.flexDirection = "column";
     ElementDiv.style.width = "100%";
     ElementDiv.style.height = "5%";
     ElementDiv.style.fontSize = "100%";
@@ -211,10 +257,6 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementLabel.innerHTML = Element.Name.toUpperCase().substring(0, 4);
     ElementLabel.style.pointerEvents = "none";
     ElementDiv.appendChild(ElementLabel);
-
-    const Flair = document.createElement("img");
-    Flair.style.pointerEvents = "none";
-    ElementDiv.appendChild(Flair);
 
     ElementDiv.addEventListener("mouseenter", function() {
         this.style.boxSizing = "border-box";
@@ -248,8 +290,10 @@ document.addEventListener("pointermove", (Event) => {
 });
 
 ClearButton.addEventListener("click", () => {
-    ParticleContainer.innerHTML = "";
     document.body.setAttribute("selected", "none");
+    Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
+        Particle.remove();
+    });
 });
 
 let MouseX = 0;
