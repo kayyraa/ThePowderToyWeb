@@ -3,44 +3,46 @@ import { Settings } from "./settings.js";
 const Cursor = document.createElement("div");
 Cursor.style.position = "fixed";
 Cursor.style.border = "2px solid #fff";
+Cursor.style.width = "4px";
 Cursor.style.borderRadius = "100%";
 Cursor.style.aspectRatio = "1 / 1";
-Cursor.style.transition = "width 0.0625s";
+Cursor.style.transition = "left 125ms, top 125ms, opacity 250ms";
 Cursor.style.pointerEvents = "none";
 Cursor.draggable = false;
+Cursor.id = "Cursor";
 document.body.appendChild(Cursor);
 
 let MouseX = 0;
 let MouseY = 0;
 let IsDragging = false;
 
-function updateCursorPosition(x, y) {
+function UpdateCursorPosition(x, y) {
     MouseX = x;
     MouseY = y;
 }
 
-function handleDragStart(x, y) {
+function HandleDragStart(x, y) {
     IsDragging = true;
-    updateCursorPosition(x, y);
+    UpdateCursorPosition(x, y);
 }
 
-function handleDragEnd() {
+function HandleDragEnd() {
     IsDragging = false;
 }
 
 document.addEventListener("pointermove", (Event) => {
-    updateCursorPosition(Event.clientX, Event.clientY);
+    UpdateCursorPosition(Event.clientX, Event.clientY);
 });
 
 document.addEventListener("mousedown", (Event) => {
     if (Event.button === 0) {
-        handleDragStart(Event.clientX, Event.clientY);
+        HandleDragStart(Event.clientX, Event.clientY);
     }
 });
 
 document.addEventListener("mouseup", (Event) => {
     if (Event.button === 0) {
-        handleDragEnd();
+        HandleDragEnd();
     }
 });
 
@@ -63,6 +65,20 @@ document.addEventListener("touchmove", (Event) => {
     }
 }, { passive: false });
 
+function RGBSG(RgbString) {
+    const Match = RgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+
+    if (Match) {
+        return {
+            R: parseInt(Match[1], 10),
+            G: parseInt(Match[2], 10),
+            B: parseInt(Match[3], 10)
+        };
+    }
+
+    return null;
+}
+
 function Loop() {
     Cursor.style.top = `${MouseY - (Cursor.offsetHeight / 2)}px`;
     Cursor.style.left = `${MouseX - (Cursor.offsetWidth / 2)}px`;
@@ -71,8 +87,9 @@ function Loop() {
     if (IsDragging && ParticleContainer) {
         const GridSize = parseInt(document.body.getAttribute("grid-size"));
 
-        const SnappedX = Math.floor(MouseX / GridSize) * GridSize;
-        const SnappedY = Math.floor(MouseY / GridSize) * GridSize;
+        const SnappedX = Math.floor(Cursor.offsetLeft / GridSize) * GridSize;
+        const SnappedY = Math.floor(Cursor.offsetTop / GridSize) * GridSize;
+        const PowderEffect = document.body.getAttribute("powder");
 
         let SelectedElement = document.getElementById(document.body.getAttribute("selected"));
         if (SelectedElement !== null) {
@@ -80,6 +97,8 @@ function Loop() {
             const ElementType = SelectedElement.dataset.type;
             const Flammable = SelectedElement.dataset.flammable;
             const Caustic = SelectedElement.dataset.caustic;
+            const Radioactive = SelectedElement.dataset.radioactive;
+            const Light = SelectedElement.dataset.light;
 
             if (ParticleContainer.children.length < Settings.MaxParticleCount && SelectedElement.id.toUpperCase() !== "NONE") {
                 const Element = document.createElement("div");
@@ -89,11 +108,13 @@ function Loop() {
                 Element.style.width = `${GridSize}px`;
                 Element.style.height = `${GridSize}px`;
                 Element.style.pointerEvents = 'none';
-                Element.style.backgroundColor = ElementColor;
+                Element.style.backgroundColor = PowderEffect ? `rgb(${RGBSG(ElementColor).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : ElementColor;
                 Element.dataset.type = ElementType;
-                Element.dataset.color = ElementColor;
+                Element.dataset.color = Element.style.backgroundColor;
                 Element.dataset.flammable = Flammable;
                 Element.dataset.caustic = Caustic;
+                Element.dataset.radioactive = Radioactive;
+                Element.dataset.light = Light;
                 Element.dataset.temp = 22;
                 Element.id = SelectedElement.id;
                 ParticleContainer.appendChild(Element);

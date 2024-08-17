@@ -2,14 +2,16 @@
 <html>
     <head>
         <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>ThePowderToy</title>
+        <script type="module" src="scripts/displays.js"></script>
         <script type="module" src="scripts/settings.js"></script>
         <script type="module" src="scripts/hud.js"></script>
         <script type="module" src="scripts/display.js"></script>
         <script type="module" src="scripts/controls.js"></script>
         <script type="module" src="scripts/particle.js"></script>
         <script type="module" src="scripts/cursor.js"></script>
+        <link rel="shortcut icon" href="images/Favicon.png" type="image/x-icon">
         <link rel="stylesheet" href="scripts/style/style.css">
     </head>
     <body
@@ -18,7 +20,8 @@
     selected="none"
     hover="none"
     grid-size="8"
-    display="default">
+    display="default"
+    powder="true">
         <div id="ParticleContainer"></div>
     </body>
 </html>

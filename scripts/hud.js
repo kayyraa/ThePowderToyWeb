@@ -1,17 +1,8 @@
 import { Elements } from "./elements.js";
 import { Settings } from "./settings.js";
+import { Displays } from "./displays.js";
 
 const ParticleContainer = document.getElementById("ParticleContainer");
-
-const Cursor = document.createElement("div");
-Cursor.style.position = "fixed";
-Cursor.style.border = "2px solid #fff";
-Cursor.style.borderRadius = "100%";
-Cursor.style.aspectRatio = "1 / 1";
-Cursor.style.transition = "width 0.0625s";
-Cursor.style.pointerEvents = "none";
-Cursor.draggable = false;
-document.body.appendChild(Cursor);
 
 const ActionLabel = document.createElement("span");
 ActionLabel.innerHTML = "Default Display";
@@ -94,7 +85,7 @@ ElementLabel.style.color = "rgb(172, 172, 172)";
 ElementLabel.style.width = "200px";
 ElementLabel.style.height = "50px";
 ElementLabel.style.bottom = "10px";
-ElementLabel.style.left = "10px";
+ElementLabel.style.left = "-10px";
 ElementLabel.style.fontSize = "24px";
 ElementLabel.style.paddingLeft = "10px";
 ElementLabel.style.paddingRight = "10px";
@@ -110,7 +101,7 @@ HoverLabel.style.color = "rgb(172, 172, 172)";
 HoverLabel.style.width = "200px";
 HoverLabel.style.height = "50px";
 HoverLabel.style.bottom = "10px";
-HoverLabel.style.left = "100px";
+HoverLabel.style.left = "75px";
 HoverLabel.style.fontSize = "24px";
 HoverLabel.style.paddingLeft = "10px";
 HoverLabel.style.paddingRight = "10px";
@@ -164,7 +155,6 @@ if (IsMobile()) {
         document.body.setAttribute("speed", (parseFloat(document.body.getAttribute("speed")) - Settings.SpeedChange));
     });
     DisplayButton.addEventListener("click", () => {
-        const Displays = ["Heat", "Default"];
         let Display = document.body.getAttribute("display") || Displays[0];
         const NextIndex = (Displays.indexOf(Display.charAt(0).toUpperCase() + Display.slice(1)) + 1) % Displays.length;
         Display = Displays[NextIndex];
@@ -176,35 +166,77 @@ if (IsMobile()) {
 let LastTime = performance.now();
 let FrameCount = 0;
 
-function InvertColor(RgbString) {
+function InvertColor(RgbString, TrueColor) {
     let Match = RgbString.match(/\d+/g);
-    let R = 255 - parseInt(Match[0]);
-    let G = 255 - parseInt(Match[1]);
-    let B = 255 - parseInt(Match[2]);
-    return `rgb(${R}, ${G}, ${B})`;
+    let R = parseInt(Match[0]);
+    let G = parseInt(Match[1]);
+    let B = parseInt(Match[2]);
+
+    if (TrueColor) {
+        return `rgb(${R}, ${G}, ${B})`;
+    } else {
+        let Average = (R + G + B) / 3;
+        if (Average > 128) {
+            return 'rgb(0, 0, 0)';
+        } else {
+            return 'rgb(255, 255, 255)';
+        }
+    }
 }
 
 for (let Index = 0; Index < Elements.length; Index++) {
     const Element = Elements[Index];
+
     const ElementDiv = document.createElement("div");
     ElementDiv.style.width = "100%";
-    ElementDiv.style.height = "7.5%";
+    ElementDiv.style.height = "5%";
     ElementDiv.style.fontSize = "100%";
     ElementDiv.style.textAlign = "center";
     ElementDiv.style.justifyContent = "center";
     ElementDiv.style.alignContent = "center";
     ElementDiv.style.alignItems = "center";
+    ElementDiv.style.transition = "height 0.25s ease";
     ElementDiv.style.backgroundColor = Element.Color;
-    ElementDiv.style.color = InvertColor(Element.Color);
-    ElementDiv.innerHTML = Element.Name.toUpperCase();
+    ElementDiv.style.color = InvertColor(Element.Color, false);
     ElementDiv.dataset.type = Element.Type;
-    ElementDiv.dataset.flammable = Element.Flammable;
-    ElementDiv.dataset.caustic = Element.Caustic;
+    ElementDiv.dataset.flammable = Element.Flammable.toString();
+    ElementDiv.dataset.caustic = Element.Caustic.toString();
+    ElementDiv.dataset.radioactive = Element.Radioactive.toString();
+    ElementDiv.dataset.light = Element.Light.toString();
     ElementDiv.dataset.name = Element.Name;
-    ElementDiv.style.zIndex = 9999;
+    ElementDiv.style.zIndex = "9999";
     ElementDiv.id = Element.Name;
 
-    ElementDiv.addEventListener("mousemove", (Event) => {
+    const ElementLabel = document.createElement("span");
+    ElementLabel.innerHTML = Element.Name.toUpperCase().substring(0, 4);
+    ElementLabel.style.pointerEvents = "none";
+    ElementDiv.appendChild(ElementLabel);
+
+    const Flair = document.createElement("img");
+    Flair.style.pointerEvents = "none";
+    ElementDiv.appendChild(Flair);
+
+    ElementDiv.addEventListener("mouseenter", function() {
+        this.style.boxSizing = "border-box";
+        this.style.border = `3px solid ${InvertColor(ElementDiv.style.backgroundColor, true)}`;
+        this.style.height = "10%";
+    
+        Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
+            if (OtherElement !== this) {
+                OtherElement.style.boxSizing = "border-box";
+                OtherElement.style.border = "";
+                OtherElement.style.height = "5%";
+            }
+        });
+    });    
+
+    ElementDiv.addEventListener("mouseleave", () => {
+        ElementDiv.style.boxSizing = "border-box";
+        ElementDiv.style.border = "";
+        ElementDiv.style.height = "5%";
+    });
+
+    ElementDiv.addEventListener("click", (Event) => {
         document.body.setAttribute("selected", Event.target.id);
     });
 
@@ -270,10 +302,6 @@ document.addEventListener("touchmove", (Event) => {
 function UpdateFps() {
     ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
     GameSpeedLabel.innerHTML = `SPD: ${parseFloat(document.body.getAttribute("speed")) % 1 === 0 ? parseFloat(document.body.getAttribute("speed")) + ".0" : parseFloat(document.body.getAttribute("speed"))}`;
-
-    Cursor.style.top = `${MouseY - (Cursor.offsetHeight / 2)}px`;
-    Cursor.style.left = `${MouseX - (Cursor.offsetWidth / 2)}px`;
-    Cursor.style.width = `${parseInt(document.body.getAttribute("cursor-size"))}px`;
 
     HoverLabel.innerHTML = `/ ${document.body.getAttribute("hover").toUpperCase().substring(0, 4)}`;
 

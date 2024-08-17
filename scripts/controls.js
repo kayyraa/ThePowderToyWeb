@@ -1,9 +1,24 @@
 import { Settings } from "./settings.js";
+import { Displays } from "./displays.js";
 
 const ActionLabel = document.getElementById("ActionLabel");
 const Clamp = (Val, Min, Max) => Math.min(Math.max(Val, Min), Max);
 
 let SpeedIsZero = false;
+
+document.addEventListener("touchend", () => {
+    const Cursor = document.getElementById("Cursor");
+    if (Cursor !== null) {
+        Cursor.style.opacity = "0";
+    }
+});
+
+document.addEventListener("touchstart", () => {
+    const Cursor = document.getElementById("Cursor");
+    if (Cursor !== null) {
+        Cursor.style.opacity = "1";
+    }
+});
 
 document.addEventListener("keydown", (Event) => {
     if (Event.key === " " || Event.key === "Space") {
@@ -12,8 +27,6 @@ document.addEventListener("keydown", (Event) => {
     }
 
     if (Event.keyCode === 68) {
-        const Displays = ["Heat", "Default"];
-
         let Display = document.body.getAttribute("display") || Displays[0];
         
         const NextIndex = (Displays.indexOf(Display.charAt(0).toUpperCase() + Display.slice(1)) + 1) % Displays.length;

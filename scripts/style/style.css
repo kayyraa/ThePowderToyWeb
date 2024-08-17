@@ -9,4 +9,5 @@ body {
 
 #ParticleContainer div {
     position: absolute;
+    pointer-events: none;
 }
