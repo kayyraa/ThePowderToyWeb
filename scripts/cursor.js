@@ -1,16 +1,5 @@
 import { Settings } from "./settings.js";
-
-const Cursor = document.createElement("div");
-Cursor.style.position = "fixed";
-Cursor.style.border = "2px solid #fff";
-Cursor.style.width = "4px";
-Cursor.style.borderRadius = "100%";
-Cursor.style.aspectRatio = "1 / 1";
-Cursor.style.transition = "left 125ms, top 125ms, opacity 250ms";
-Cursor.style.pointerEvents = "none";
-Cursor.draggable = false;
-Cursor.id = "Cursor";
-document.body.appendChild(Cursor);
+import * as tptw from "./tptw.js";
 
 let MouseX = 0;
 let MouseY = 0;
@@ -20,68 +9,46 @@ function Random(Max, Min) {
     return Math.floor(Math.random() * (Max - Min + 1)) + Min;
 }
 
-function UpdateCursorPosition(x, y) {
-    MouseX = x;
-    MouseY = y;
-}
-
-function HandleDragStart(x, y) {
-    IsDragging = true;
-    UpdateCursorPosition(x, y);
-}
-
-function HandleDragEnd() {
-    IsDragging = false;
-}
-
 document.addEventListener("pointermove", (Event) => {
-    UpdateCursorPosition(Event.clientX, Event.clientY);
+    MouseX = Event.clientX;
+    MouseY = Event.clientY;
 });
 
 document.addEventListener("mousedown", (Event) => {
     if (Event.button === 0) {
-        HandleDragStart(Event.clientX, Event.clientY);
+        IsDragging = true;
+        MouseX = Event.clientX;
+        MouseY = Event.clientY;
     }
 });
 
 document.addEventListener("mouseup", (Event) => {
     if (Event.button === 0) {
-        HandleDragEnd();
+        IsDragging = false;
     }
 });
 
 document.addEventListener("touchstart", (Event) => {
     if (Event.touches.length === 1) {
         const touch = Event.touches[0];
-        HandleDragStart(touch.clientX, touch.clientY);
+        IsDragging = true;
+        MouseX = touch.clientX;
+        MouseY = touch.clientY;
     }
 });
 
 document.addEventListener("touchend", () => {
-    HandleDragEnd();
+    IsDragging = false;
 });
 
 document.addEventListener("touchmove", (Event) => {
     if (Event.touches.length === 1) {
         const touch = Event.touches[0];
-        UpdateCursorPosition(touch.clientX, touch.clientY);
+        MouseX = touch.clientX;
+        MouseY = touch.clientY;
         Event.preventDefault();
     }
-}, { passive: false });
-
-function RGBSG(RgbString) {
-    const Match = RgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-
-    if (Match) {
-        return {
-            R: parseInt(Match[1], 10),
-            G: parseInt(Match[2], 10),
-            B: parseInt(Match[3], 10)
-        };
-    }
-
-    return null;
-}
+}, { passive: false }); 
 
 function IsPlaceOccupied(x, y, gridSize) {
     const Particles = Array.from(ParticleContainer.children);
@@ -94,10 +61,6 @@ function IsPlaceOccupied(x, y, gridSize) {
 }
 
 function Loop() {
-    Cursor.style.top = `${MouseY - (Cursor.offsetHeight / 2)}px`;
-    Cursor.style.left = `${MouseX - (Cursor.offsetWidth / 2)}px`;
-    Cursor.style.width = `${parseInt(document.body.getAttribute("cursor-size"))}px`;
-
     if (IsDragging && ParticleContainer) {
         let SelectedElement = document.getElementById(document.body.getAttribute("selected"));
 
@@ -105,8 +68,8 @@ function Loop() {
         const PowderEffect = document.body.getAttribute("powder");
 
         if (SelectedElement !== null) {
-            const SnappedX = Math.floor((Cursor.offsetLeft + (SelectedElement.dataset.type !== "Solid" ? Random(10, -10) : 0)) / GridSize) * GridSize;
-            const SnappedY = Math.floor((Cursor.offsetTop + (SelectedElement.dataset.type !== "Solid" ? Random(10, -10) : 0)) / GridSize) * GridSize;
+            const SnappedX = Math.floor((MouseX + (SelectedElement.dataset.type !== "Solid" ? Random(10, -10) : 0)) / GridSize) * GridSize;
+            const SnappedY = Math.floor((MouseY + (SelectedElement.dataset.type !== "Solid" ? Random(10, -10) : 0)) / GridSize) * GridSize;
             
             if (!IsPlaceOccupied(SnappedX, SnappedY, GridSize)) {
                 const ElementColor = SelectedElement.style.backgroundColor;
@@ -124,7 +87,7 @@ function Loop() {
                     Element.style.width = `${GridSize}px`;
                     Element.style.height = `${GridSize}px`;
                     Element.style.pointerEvents = 'none';
-                    Element.style.backgroundColor = PowderEffect ? `rgb(${RGBSG(ElementColor).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : ElementColor;
+                    Element.style.backgroundColor = PowderEffect ? `rgb(${tptw.RgbString(ElementColor).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${tptw.RgbString(ElementColor).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${tptw.RgbString(ElementColor).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : ElementColor;
                     Element.dataset.type = ElementType;
                     Element.dataset.color = Element.style.backgroundColor;
                     Element.dataset.flammable = Flammable;

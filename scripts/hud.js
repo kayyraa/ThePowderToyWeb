@@ -1,7 +1,7 @@
 import { Elements } from "./elements.js";
 import { Settings } from "./settings.js";
 import { Displays } from "./displays.js";
-import * as TPTW from "./tptw.js";
+import * as tptw from "./tptw.js";
 
 const LogContainer = document.getElementById("LogContainer");
 const ParticleContainer = document.getElementById("ParticleContainer");
@@ -290,6 +290,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
 
     ElementDiv.addEventListener("click", (Event) => {
         document.body.setAttribute("selected", Event.target.id);
+        SelectSound.play();
     });
 
     ElementContainer.appendChild(ElementDiv);
@@ -300,10 +301,7 @@ document.addEventListener("pointermove", (Event) => {
 });
 
 ClearButton.addEventListener("click", () => {
-    document.body.setAttribute("selected", "none");
-    Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
-        Particle.remove();
-    });
+    tptw.Clear();
 });
 
 let MouseX = 0;
@@ -315,12 +313,6 @@ document.addEventListener("pointermove", (Event) => {
     MouseX = Event.clientX;
     MouseY = Event.clientY;
     Target = Event.target;
-
-    if (IsDragging && ParticleContainer) {
-        if (Event.button === 2 && Target !== null) {
-            Event.currentTarget.remove();
-        }
-    }
 });
 
 document.addEventListener("mousedown", (Event) => {
@@ -357,8 +349,7 @@ function UpdateFps() {
     LogContainer.scrollTop = LogContainer.scrollHeight;
 
     ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
-    GameSpeedLabel.innerHTML = `Speed: ${parseFloat(document.body.getAttribute("speed")) % 1 === 0 ? parseFloat(document.body.getAttribute("speed")) + ".0" : parseFloat(document.body.getAttribute("speed"))}`;
-
+    GameSpeedLabel.innerHTML = `Speed: ${(parseFloat(document.body.getAttribute("speed"))).toFixed(Settings.SpeedChange.toString().slice(2).length)} ${document.body.getAttribute("speed") === "0" ? "[STOP]": "[PLAY]"}`;
     HoverLabel.innerHTML = `/ ${document.body.getAttribute("hover").toUpperCase().substring(0, 4)}`;
 
     const CurrentTime = performance.now();

@@ -44,16 +44,14 @@ function React() {
             if (Particle.dataset.radioactive === "true") {
                 const Element = Elements.find(element => element.Name === "NEUT");
                 if (Element) {
-                    setTimeout(() => {
-                        Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(32, 8);
-                        TPTW.CreateElement(Element, Particle.offsetLeft + Random(40, 20), Particle.offsetTop - Random(40, 20)); 
-                    }, Random(2500, 500 / Random(2, 1.25)));
+                    Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(32, 8);
+                    TPTW.CreateElement(Element, Particle.offsetLeft + 20, Particle.offsetTop / 1.25);
                 }
             }
         });
     }
 
-    setTimeout(React, Random(30000, 2500 / Random(2, 1.25)));
+    setTimeout(React, Random(20000, 1000));
 }
 
 if (ParticleContainer) {
@@ -61,24 +59,22 @@ if (ParticleContainer) {
         const BaseSimulationSpeed = 0;
         const SimulationSpeed = BaseSimulationSpeed * -(parseFloat(document.body.getAttribute("speed")));
 
+        const GameSpeed = parseFloat(document.body.getAttribute("speed"));
+
         const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
         const GravityEnabled = document.body.getAttribute("gravity") === "true";
 
-        if (GravityEnabled) {
+        if (GravityEnabled && GameSpeed) {
             if (Particles.length > 0) {
                 Particles.forEach(Particle => {
                     if (IgnoreList.has(Particle)) return;
-
-                    if (Math.abs(Particle.offsetTop) > window.innerHeight || Math.abs(Particle.offsetLeft) > window.innerWidth) {
-                        Particle.remove();
-                    }
 
                     if (!Particle.dataset.offsetX || !Particle.dataset.offsetY) {
                         InitializeParticle(Particle);
                     }
 
                     const ParticleRect = Particle.getBoundingClientRect();
-                    const NewTop = ParticleRect.top + 12;
+                    const NewTop = ParticleRect.top + (12 * (GameSpeed !== 0 ? 1 : 0));
                     const MaxHeight = window.innerHeight - ParticleRect.height;
 
                     const IsCaustic = Particle.dataset.caustic === "true";
@@ -96,9 +92,7 @@ if (ParticleContainer) {
                         const CurrentTop = parseFloat(Particle.style.top) || Particle.offsetTop;
 
                         Particle.style.left = `${CurrentLeft + OffsetX}px`;
-                        Particle.style.top = `${CurrentTop + -Math.abs(OffsetY)}px`;
-
-                        return;
+                        Particle.style.top = `${CurrentTop + OffsetY}px`;
                     }
 
                     Particles.forEach(OtherParticle => {
@@ -175,6 +169,10 @@ if (ParticleContainer) {
 
                     Particle.dataset.previousTop = Particle.offsetTop;
                     Particle.dataset.previousLeft = Particle.offsetLeft;
+
+                    if (Math.abs(Particle.offsetTop) > window.innerHeight || Math.abs(Particle.offsetLeft) > window.innerWidth) {
+                        Particle.remove();
+                    }
                 });
 
                 IgnoreList.forEach(Particle => {

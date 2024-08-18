@@ -1,5 +1,6 @@
 import { Settings } from "./settings.js";
 import { Displays } from "./displays.js";
+import * as tptw from "./tptw.js";
 
 const ActionLabel = document.getElementById("ActionLabel");
 const Clamp = (Val, Min, Max) => Math.min(Math.max(Val, Min), Max);
@@ -26,6 +27,10 @@ document.addEventListener("keydown", (Event) => {
         document.body.setAttribute("speed", SpeedIsZero ? "0" : "1");
     }
 
+    if (Event.key === "c") {
+        tptw.Clear();
+    }
+
     if (Event.keyCode === 68) {
         let Display = document.body.getAttribute("display") || Displays[0];
         
@@ -43,10 +48,10 @@ document.addEventListener("wheel", (Event) => {
         var CurrentGameSpeed = parseFloat(document.body.getAttribute("speed"));
         
         if (Event.deltaY < 0) {
-            const NewGameSpeed = Clamp(CurrentGameSpeed + Settings.SpeedChange, -8, 8);
+            const NewGameSpeed = Clamp(CurrentGameSpeed + Settings.SpeedChange, -Settings.MaxSpeed, Settings.MaxSpeed);
             document.body.setAttribute("speed", NewGameSpeed.toString());
         } else if (Event.deltaY > 0) {
-            const NewGameSpeed = Clamp(CurrentGameSpeed - Settings.SpeedChange, -8, 8);
+            const NewGameSpeed = Clamp(CurrentGameSpeed - Settings.SpeedChange, -Settings.MaxSpeed, Settings.MaxSpeed);
             document.body.setAttribute("speed", NewGameSpeed.toString());
         }
     }

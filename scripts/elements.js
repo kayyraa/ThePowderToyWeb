@@ -18,19 +18,7 @@ export const Elements = [
         Caustic: false,
         Radioactive: false,
         Light: false,
-        Temp: 22,
-        Type: "Liquid",
-        Category: "Liquid",
-        Flair: "Liquid"
-    },
-    {
-        Name: "OIL",
-        Color: "rgb(55, 58, 54)",
-        Flammable: true,
-        Caustic: false,
-        Radioactive: false,
-        Light: false,
-        Temp: 22,
+        Temp: 32,
         Type: "Liquid",
         Category: "Liquid",
         Flair: "Liquid"
@@ -108,16 +96,28 @@ export const Elements = [
         Flair: "Solid"
     },
     {
-        Name: "ICE",
+        Name: "SNOW",
         Color: "rgb(134, 214, 216)",
         Flammable: false,
         Caustic: false,
         Radioactive: false,
         Light: false,
+        Temp: 0,
+        Type: "Powder",
+        Category: "Powder",
+        Flair: "Powder"
+    },
+    {
+        Name: "BCOL",
+        Color: "rgb(69, 69, 69)",
+        Flammable: true,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
         Temp: 22,
-        Type: "Solid",
-        Category: "Solid",
-        Flair: "Solid"
+        Type: "Powder",
+        Category: "Powder",
+        Flair: "Powder"
     },
     {
         Name: "URAN",
@@ -216,13 +216,25 @@ export const Elements = [
         Flair: "Gas"
     },
     {
+        Name: "HYGN",
+        Color: "rgb(80, 112, 255)",
+        Flammable: true,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        Type: "Gas",
+        Category: "Gas",
+        Flair: "Gas"
+    },
+    {
         Name: "FIRE",
         Color: "rgb(255, 50, 50)",
         Flammable: false,
         Caustic: true,
         Radioactive: false,
         Light: false,
-        Temp: 500,
+        Temp: 1100,
         Type: "Gas",
         Category: "Gas",
         Flair: "Caustic Gas"
@@ -234,7 +246,7 @@ export const Elements = [
         Caustic: false,
         Radioactive: false,
         Light: false,
-        Temp: 250,
+        Temp: 149,
         Type: "Gas",
         Category: "Gas",
         Flair: "Dense Gas"

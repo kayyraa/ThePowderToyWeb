@@ -1,6 +1,13 @@
 import { Settings } from "./settings.js";
 
-export function print(x) {
+export function Clear() {
+    document.body.setAttribute("selected", "none");
+    Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
+        Particle.remove();
+    });
+}
+
+export function Print(x) {
     const LogContainer = document.getElementById("LogContainer");
 
     if (LogContainer) {
@@ -17,7 +24,7 @@ export function print(x) {
     }
 }
 
-export function RGBSG(RgbString) {
+export function RgbString(RgbString) {
     const Match = RgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
 
     if (Match) {
@@ -44,7 +51,7 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Lig
         Element.style.width = `${GridSize}px`;
         Element.style.height = `${GridSize}px`;
         Element.style.pointerEvents = 'none';
-        Element.style.backgroundColor = PowderEffect ? `rgb(${RGBSG(Color).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(Color).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(Color).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : Color;
+        Element.style.backgroundColor = PowderEffect ? `rgb(${RgbString(Color).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RgbString(Color).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RgbString(Color).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : Color;
         Element.dataset.type = Type;
         Element.dataset.color = Element.style.backgroundColor;
         Element.dataset.flammable = Flammable;
