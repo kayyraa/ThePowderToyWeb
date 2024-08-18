@@ -9,7 +9,7 @@ export const Elements = [
         Temp: 22,
         Type: "Powder",
         Category: "Powder",
-        Description: "Granular material."
+        Flair: "Powder"
     },
     {
         Name: "WATR",
@@ -21,7 +21,19 @@ export const Elements = [
         Temp: 22,
         Type: "Liquid",
         Category: "Liquid",
-        Description: "Essential liquid."
+        Flair: "Liquid"
+    },
+    {
+        Name: "OIL",
+        Color: "rgb(55, 58, 54)",
+        Flammable: true,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        Type: "Liquid",
+        Category: "Liquid",
+        Flair: "Liquid"
     },
     {
         Name: "COAL",
@@ -33,7 +45,7 @@ export const Elements = [
         Temp: 22,
         Type: "Solid",
         Category: "Solid",
-        Description: "Combustible rock."
+        Flair: "Solid"
     },
     {
         Name: "WOOD",
@@ -45,7 +57,7 @@ export const Elements = [
         Temp: 22,
         Type: "Solid",
         Category: "Solid",
-        Description: "Flammable tree material."
+        Flair: "Solid"
     },
     {
         Name: "IRON",
@@ -57,7 +69,7 @@ export const Elements = [
         Temp: 22,
         Type: "Solid",
         Category: "Solid",
-        Description: "Strong metal."
+        Flair: "Solid"
     },
     {
         Name: "BRCK",
@@ -69,7 +81,7 @@ export const Elements = [
         Temp: 22,
         Type: "Solid",
         Category: "Solid",
-        Description: "Clay brick."
+        Flair: "Solid"
     },
     {
         Name: "GOLD",
@@ -81,7 +93,7 @@ export const Elements = [
         Temp: 22,
         Type: "Solid",
         Category: "Solid",
-        Description: "Precious metal, valuable and shiny."
+        Flair: "Solid"
     },
     {
         Name: "TTAN",
@@ -93,7 +105,19 @@ export const Elements = [
         Temp: 22,
         Type: "Solid",
         Category: "Solid",
-        Description: "Strong, lightweight metal."
+        Flair: "Solid"
+    },
+    {
+        Name: "ICE",
+        Color: "rgb(134, 214, 216)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        Type: "Solid",
+        Category: "Solid",
+        Flair: "Solid"
     },
     {
         Name: "URAN",
@@ -105,7 +129,7 @@ export const Elements = [
         Temp: 46,
         Type: "Powder",
         Category: "Powder",
-        Description: "Radioactive metal powder."
+        Flair: "Radioactive Powder"
     },
     {
         Name: "ROEN",
@@ -117,11 +141,11 @@ export const Elements = [
         Temp: 46,
         Type: "Powder",
         Category: "Powder",
-        Description: "Radioactive powder."
+        Flair: "Radioactive Powder"
     },
     {
         Name: "PLUT",
-        Color: "rgb(100, 100, 44)",
+        Color: "rgb(70, 150, 22)",
         Flammable: false,
         Caustic: false,
         Radioactive: true,
@@ -129,7 +153,7 @@ export const Elements = [
         Temp: 46,
         Type: "Powder",
         Category: "Powder",
-        Description: "Highly radioactive powder."
+        Flair: "Radioactive Powder"
     },
     {
         Name: "NEUT",
@@ -141,7 +165,7 @@ export const Elements = [
         Temp: 22,
         Type: "None",
         Category: "None",
-        Description: "Radioactive and glowing."
+        Flair: "Radioactive Light"
     },
     {
         Name: "PHOT",
@@ -153,7 +177,7 @@ export const Elements = [
         Temp: 500,
         Type: "None",
         Category: "None",
-        Description: "High-temperature light."
+        Flair: "Visible Light"
     },
     {
         Name: "STNE",
@@ -165,7 +189,7 @@ export const Elements = [
         Temp: 22,
         Type: "Powder",
         Category: "Powder",
-        Description: "Stone-like powder."
+        Flair: "Powder"
     },
     {
         Name: "SALT",
@@ -177,7 +201,7 @@ export const Elements = [
         Temp: 22,
         Type: "Powder",
         Category: "Powder",
-        Description: "Seasoning powder."
+        Flair: "Powder"
     },
     {
         Name: "OXYG",
@@ -189,7 +213,7 @@ export const Elements = [
         Temp: 22,
         Type: "Gas",
         Category: "Gas",
-        Description: "Supports combustion."
+        Flair: "Gas"
     },
     {
         Name: "FIRE",
@@ -201,7 +225,7 @@ export const Elements = [
         Temp: 500,
         Type: "Gas",
         Category: "Gas",
-        Description: "Hot, caustic gas."
+        Flair: "Caustic Gas"
     },
     {
         Name: "SMKE",
@@ -213,7 +237,7 @@ export const Elements = [
         Temp: 250,
         Type: "Gas",
         Category: "Gas",
-        Description: "Dense smoke."
+        Flair: "Dense Gas"
     },
     {
         Name: "NONE",
@@ -225,6 +249,6 @@ export const Elements = [
         Temp: 0,
         Type: "None",
         Category: "None",
-        Description: "No substance."
+        Flair: "None"
     }
 ];

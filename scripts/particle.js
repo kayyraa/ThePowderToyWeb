@@ -44,14 +44,16 @@ function React() {
             if (Particle.dataset.radioactive === "true") {
                 const Element = Elements.find(element => element.Name === "NEUT");
                 if (Element) {
-                    Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(32, 8);
-                    TPTW.CreateElement(Element, Particle.offsetLeft + 20, Particle.offsetTop / 1.25);
+                    setTimeout(() => {
+                        Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(32, 8);
+                        TPTW.CreateElement(Element, Particle.offsetLeft + Random(40, 20), Particle.offsetTop - Random(40, 20)); 
+                    }, Random(2500, 500 / Random(2, 1.25)));
                 }
             }
         });
     }
 
-    setTimeout(React, Random(20000, 1000));
+    setTimeout(React, Random(30000, 2500 / Random(2, 1.25)));
 }
 
 if (ParticleContainer) {
@@ -66,6 +68,10 @@ if (ParticleContainer) {
             if (Particles.length > 0) {
                 Particles.forEach(Particle => {
                     if (IgnoreList.has(Particle)) return;
+
+                    if (Math.abs(Particle.offsetTop) > window.innerHeight || Math.abs(Particle.offsetLeft) > window.innerWidth) {
+                        Particle.remove();
+                    }
 
                     if (!Particle.dataset.offsetX || !Particle.dataset.offsetY) {
                         InitializeParticle(Particle);
@@ -90,7 +96,9 @@ if (ParticleContainer) {
                         const CurrentTop = parseFloat(Particle.style.top) || Particle.offsetTop;
 
                         Particle.style.left = `${CurrentLeft + OffsetX}px`;
-                        Particle.style.top = `${CurrentTop + OffsetY}px`;
+                        Particle.style.top = `${CurrentTop + -Math.abs(OffsetY)}px`;
+
+                        return;
                     }
 
                     Particles.forEach(OtherParticle => {
@@ -167,10 +175,6 @@ if (ParticleContainer) {
 
                     Particle.dataset.previousTop = Particle.offsetTop;
                     Particle.dataset.previousLeft = Particle.offsetLeft;
-
-                    if (Math.abs(Particle.offsetTop) > window.innerHeight || Math.abs(Particle.offsetLeft) > window.innerWidth) {
-                        Particle.remove();
-                    }
                 });
 
                 IgnoreList.forEach(Particle => {

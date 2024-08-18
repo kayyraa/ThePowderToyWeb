@@ -2,22 +2,36 @@ const ParticleContainer = document.getElementById("ParticleContainer");
 let LastDisplay
 
 function Loop() {
-    Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
-        const OriginalColor = StringToRgb(Particle.dataset.color);
-        const Temp = parseInt(Particle.dataset.temp) || 0;
+    const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
 
-        if (LastDisplay === "heat") {
-            Particle.style.backgroundColor = `rgb(${OriginalColor.R + Temp}, ${OriginalColor.G}, ${OriginalColor.B})`;
+    if (LastDisplay === "heat") {
+        Particles.forEach(Particle => {
+            const Temp = parseInt(Particle.dataset.temp) || 0;
+            const OriginalColor = StringToRgb(Particle.dataset.color);
+            Particle.style.backgroundColor = `rgb(${OriginalColor.R + (Temp * 2)}, ${OriginalColor.G}, ${OriginalColor.B})`;
             Particle.style.filter = "";
-        } else if (LastDisplay === "blob") {
+        });
+    } else if (LastDisplay === "blob") {
+        Particles.forEach(Particle => {
             Particle.style.filter = "blur(1px)";
-        }
+        });
+    } else if (LastDisplay === "fancy") {
+        Particles.forEach(Particle => {
+            Particle.style.filter = "";
+            if (Particle.dataset.radioactive === "true") {
+                Particle.style.filter = "brightness(2) drop-shadow(0 0 8px rgba(0, 255, 0, 0.75))";
+            } else if (Particle.dataset.light === "true") {
+                Particle.style.filter = "brightness(10) drop-shadow(0 0 64px rgb(255, 255, 255))";
+            }
+        });
+    }
 
-        else {
+    else {
+        Particles.forEach(Particle => {
             Particle.style.backgroundColor = Particle.dataset.color;
             Particle.style.filter = "";
-        }
-    });
+        });
+    }
 
     setTimeout(Loop, 0);
 }

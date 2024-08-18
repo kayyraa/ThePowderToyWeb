@@ -3,6 +3,7 @@ import { Settings } from "./settings.js";
 import { Displays } from "./displays.js";
 import * as TPTW from "./tptw.js";
 
+const LogContainer = document.getElementById("LogContainer");
 const ParticleContainer = document.getElementById("ParticleContainer");
 
 const ActionLabel = document.createElement("span");
@@ -236,7 +237,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.style.display = "flex";
     ElementDiv.style.flexDirection = "column";
     ElementDiv.style.width = "100%";
-    ElementDiv.style.height = "5%";
+    ElementDiv.style.height = `${Elements.length}px`;
     ElementDiv.style.fontSize = "100%";
     ElementDiv.style.textAlign = "left";
     ElementDiv.style.justifyContent = "center";
@@ -255,10 +256,10 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.id = Element.Name;
 
     const DescriptionLabel = document.createElement("span");
-    DescriptionLabel.innerHTML = Element.Description;
+    DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair}`;
     DescriptionLabel.style.position = "absolute";
     DescriptionLabel.style.color = "white";
-    DescriptionLabel.style.right = "-75px";
+    DescriptionLabel.style.right = "-200px";
     DescriptionLabel.style.pointerEvents = "none";
     DescriptionLabel.style.width = "512px";
     DescriptionLabel.style.opacity = "0";
@@ -267,14 +268,12 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.appendChild(DescriptionLabel);
 
     ElementDiv.addEventListener("mouseenter", function() {
-        this.style.height = "10%";
+        this.style.height = `${this.offsetHeight * 2}px`;
         DescriptionLabel.style.opacity = "1";
 
         Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
             if (OtherElement !== this) {
-                OtherElement.style.boxSizing = "border-box";
-                OtherElement.style.border = "";
-                OtherElement.style.height = "5%";
+                OtherElement.style.height = `${Elements.length}px`;
 
                 const OtherDescriptionLabel = OtherElement.querySelector("#DescriptionLabel");
                 if (OtherDescriptionLabel) {
@@ -285,8 +284,6 @@ for (let Index = 0; Index < Elements.length; Index++) {
     });
 
     ElementDiv.addEventListener("mouseleave", () => {
-        ElementDiv.style.boxSizing = "border-box";
-        ElementDiv.style.border = "";
         DescriptionLabel.style.opacity = "0";
         ElementDiv.style.height = "5%";
     });
@@ -357,6 +354,8 @@ document.addEventListener("touchmove", (Event) => {
 });
 
 function UpdateFps() {
+    LogContainer.scrollTop = LogContainer.scrollHeight;
+
     ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
     GameSpeedLabel.innerHTML = `Speed: ${parseFloat(document.body.getAttribute("speed")) % 1 === 0 ? parseFloat(document.body.getAttribute("speed")) + ".0" : parseFloat(document.body.getAttribute("speed"))}`;
 
@@ -369,7 +368,6 @@ function UpdateFps() {
     if (SelectedElement === null) {
         ElementLabel.innerHTML = "NONE";
     } else {
-        ElementLabel
         ElementLabel.innerHTML = SelectedElement.id;
     }
 

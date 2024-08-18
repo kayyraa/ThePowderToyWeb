@@ -16,6 +16,10 @@ let MouseX = 0;
 let MouseY = 0;
 let IsDragging = false;
 
+function Random(Max, Min) {
+    return Math.floor(Math.random() * (Max - Min + 1)) + Min;
+}
+
 function UpdateCursorPosition(x, y) {
     MouseX = x;
     MouseY = y;
@@ -95,39 +99,42 @@ function Loop() {
     Cursor.style.width = `${parseInt(document.body.getAttribute("cursor-size"))}px`;
 
     if (IsDragging && ParticleContainer) {
-        const GridSize = parseInt(document.body.getAttribute("grid-size"));
+        let SelectedElement = document.getElementById(document.body.getAttribute("selected"));
 
-        const SnappedX = Math.floor(Cursor.offsetLeft / GridSize) * GridSize;
-        const SnappedY = Math.floor(Cursor.offsetTop / GridSize) * GridSize;
+        const GridSize = parseInt(document.body.getAttribute("grid-size"));
         const PowderEffect = document.body.getAttribute("powder");
 
-        let SelectedElement = document.getElementById(document.body.getAttribute("selected"));
-        if (SelectedElement !== null && !IsPlaceOccupied(SnappedX, SnappedY, GridSize)) {
-            const ElementColor = SelectedElement.style.backgroundColor;
-            const ElementType = SelectedElement.dataset.type;
-            const Flammable = SelectedElement.dataset.flammable;
-            const Caustic = SelectedElement.dataset.caustic;
-            const Radioactive = SelectedElement.dataset.radioactive;
-            const Light = SelectedElement.dataset.light;
-
-            if (ParticleContainer.children.length < Settings.MaxParticleCount && SelectedElement.id.toUpperCase() !== "NONE") {
-                const Element = document.createElement("div");
-                Element.style.position = "absolute";
-                Element.style.left = `${SnappedX}px`;
-                Element.style.top = `${SnappedY}px`;
-                Element.style.width = `${GridSize}px`;
-                Element.style.height = `${GridSize}px`;
-                Element.style.pointerEvents = 'none';
-                Element.style.backgroundColor = PowderEffect ? `rgb(${RGBSG(ElementColor).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : ElementColor;
-                Element.dataset.type = ElementType;
-                Element.dataset.color = Element.style.backgroundColor;
-                Element.dataset.flammable = Flammable;
-                Element.dataset.caustic = Caustic;
-                Element.dataset.radioactive = Radioactive;
-                Element.dataset.light = Light;
-                Element.dataset.temp = 22;
-                Element.id = SelectedElement.id;
-                ParticleContainer.appendChild(Element);
+        if (SelectedElement !== null) {
+            const SnappedX = Math.floor((Cursor.offsetLeft + (SelectedElement.dataset.type !== "Solid" ? Random(10, -10) : 0)) / GridSize) * GridSize;
+            const SnappedY = Math.floor((Cursor.offsetTop + (SelectedElement.dataset.type !== "Solid" ? Random(10, -10) : 0)) / GridSize) * GridSize;
+            
+            if (!IsPlaceOccupied(SnappedX, SnappedY, GridSize)) {
+                const ElementColor = SelectedElement.style.backgroundColor;
+                const ElementType = SelectedElement.dataset.type;
+                const Flammable = SelectedElement.dataset.flammable;
+                const Caustic = SelectedElement.dataset.caustic;
+                const Radioactive = SelectedElement.dataset.radioactive;
+                const Light = SelectedElement.dataset.light;
+    
+                if (ParticleContainer.children.length < Settings.MaxParticleCount && SelectedElement.id.toUpperCase() !== "NONE") {
+                    const Element = document.createElement("div");
+                    Element.style.position = "absolute";
+                    Element.style.left = `${SnappedX}px`;
+                    Element.style.top = `${SnappedY}px`;
+                    Element.style.width = `${GridSize}px`;
+                    Element.style.height = `${GridSize}px`;
+                    Element.style.pointerEvents = 'none';
+                    Element.style.backgroundColor = PowderEffect ? `rgb(${RGBSG(ElementColor).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RGBSG(ElementColor).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : ElementColor;
+                    Element.dataset.type = ElementType;
+                    Element.dataset.color = Element.style.backgroundColor;
+                    Element.dataset.flammable = Flammable;
+                    Element.dataset.caustic = Caustic;
+                    Element.dataset.radioactive = Radioactive;
+                    Element.dataset.light = Light;
+                    Element.dataset.temp = 22;
+                    Element.id = SelectedElement.id;
+                    ParticleContainer.appendChild(Element);
+                }
             }
         }
     }

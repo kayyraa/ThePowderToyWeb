@@ -1,25 +1,19 @@
 import { Settings } from "./settings.js";
 
-export function LogMessage(Message) {
-    const Console = document.getElementById("LogContainer");
-    if (Console) {
-        const Entry = document.createElement("pre");
-        Entry.innerHTML = Message;
-        Entry.style.width = "100%";
-        Entry.style.height = "12px";
-        Entry.style.fontSize = "12px";
-        Console.appendChild(Entry);
+export function print(x) {
+    const LogContainer = document.getElementById("LogContainer");
 
-        return Entry;
-    }
-}
+    if (LogContainer) {
+        const Span = document.createElement("span");
+        Span.innerHTML = x;
+        LogContainer.appendChild(Span);
 
-export function ClearLog() {
-    const Console = document.getElementById("LogContainer");
-    if (Console) {
-        Array.from(Console.getElementsByTagName("pre")).forEach(Entry => {
-            Entry.remove();
-        });
+        setTimeout(() => {
+            Span.style.opacity = "0";
+            setTimeout(() => {
+                Span.remove();
+            }, 250);
+        }, 2500);
     }
 }
 
@@ -60,5 +54,7 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Lig
         Element.dataset.temp = Temp;
         Element.id = Name;
         ParticleContainer.appendChild(Element);
+
+        return Element;
     }
 }
