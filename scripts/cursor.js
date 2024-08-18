@@ -79,6 +79,16 @@ function RGBSG(RgbString) {
     return null;
 }
 
+function IsPlaceOccupied(x, y, gridSize) {
+    const Particles = Array.from(ParticleContainer.children);
+    return Particles.some(Particle => {
+        const ParticleRect = Particle.getBoundingClientRect();
+        const ParticleX = Math.floor(ParticleRect.left / gridSize) * gridSize;
+        const ParticleY = Math.floor(ParticleRect.top / gridSize) * gridSize;
+        return ParticleX === x && ParticleY === y;
+    });
+}
+
 function Loop() {
     Cursor.style.top = `${MouseY - (Cursor.offsetHeight / 2)}px`;
     Cursor.style.left = `${MouseX - (Cursor.offsetWidth / 2)}px`;
@@ -92,7 +102,7 @@ function Loop() {
         const PowderEffect = document.body.getAttribute("powder");
 
         let SelectedElement = document.getElementById(document.body.getAttribute("selected"));
-        if (SelectedElement !== null) {
+        if (SelectedElement !== null && !IsPlaceOccupied(SnappedX, SnappedY, GridSize)) {
             const ElementColor = SelectedElement.style.backgroundColor;
             const ElementType = SelectedElement.dataset.type;
             const Flammable = SelectedElement.dataset.flammable;

@@ -137,57 +137,6 @@ TooltipEventPointer.style.height = "64px";
 TooltipEventPointer.style.zIndex = "9999";
 document.body.appendChild(TooltipEventPointer);
 
-const ConsoleButton = document.createElement("div");
-ConsoleButton.innerHTML = "C";
-ConsoleButton.style.position = "relative";
-ConsoleButton.style.bottom = "60px";
-ConsoleButton.style.boxSizing = "border-box";
-ConsoleButton.style.border = "2px solid white";
-ConsoleButton.style.alignContent = "center";
-ConsoleButton.style.justifyContent = "center";
-ConsoleButton.style.textAlign = "center";
-ConsoleButton.style.fontSize = "32px";
-ConsoleButton.style.width = "48px";
-ConsoleButton.style.height = "48px";
-ConsoleButton.style.cursor = "pointer";
-document.body.appendChild(ConsoleButton);
-
-const Console = document.createElement("div");
-Console.style.visibility = "hidden";
-Console.style.position = "absolute";
-Console.style.top = "0%";
-Console.style.left = "0%";
-Console.style.width = "100%";
-Console.style.height = "20%";
-Console.style.backgroundColor = "rgb(0, 0, 0)";
-Console.style.overflowY = "scroll";
-Console.style.overflowX = "hidden";
-Console.id = "Console";
-document.body.appendChild(Console);
-
-const LogContainer = document.createElement("div");
-LogContainer.style.position = "absolute";
-LogContainer.style.width = "100%";
-LogContainer.style.height = "100%";
-LogContainer.id = "LogContainer";
-Console.appendChild(LogContainer);
-
-ConsoleButton.addEventListener("click", () => {
-    Console.style.visibility = Console.style.visibility === "visible" ? "hidden" : "visible";
-});
-
-ConsoleButton.addEventListener("mouseenter", () => {
-    ConsoleButton.style.color = "black";
-    ConsoleButton.style.backgroundColor = "white";
-    ConsoleButton.style.border = "2px solid black";
-});
-
-ConsoleButton.addEventListener("mouseleave", () => {
-    ConsoleButton.style.color = "white";
-    ConsoleButton.style.backgroundColor = "black";
-    ConsoleButton.style.border = "2px solid white";
-});
-
 TooltipEventPointer.addEventListener("mouseenter", () => {
     ExperimentalTooltip.style.visibility = "visible";
 });
@@ -289,7 +238,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.style.width = "100%";
     ElementDiv.style.height = "5%";
     ElementDiv.style.fontSize = "100%";
-    ElementDiv.style.textAlign = "center";
+    ElementDiv.style.textAlign = "left";
     ElementDiv.style.justifyContent = "center";
     ElementDiv.style.alignContent = "center";
     ElementDiv.style.alignItems = "center";
@@ -307,10 +256,9 @@ for (let Index = 0; Index < Elements.length; Index++) {
 
     const DescriptionLabel = document.createElement("span");
     DescriptionLabel.innerHTML = Element.Description;
-    DescriptionLabel.style.position = "relative";
+    DescriptionLabel.style.position = "absolute";
     DescriptionLabel.style.color = "white";
-    DescriptionLabel.style.right = "150px";
-    DescriptionLabel.style.bottom = "12px";
+    DescriptionLabel.style.right = "-75px";
     DescriptionLabel.style.pointerEvents = "none";
     DescriptionLabel.style.width = "512px";
     DescriptionLabel.style.opacity = "0";
@@ -409,10 +357,8 @@ document.addEventListener("touchmove", (Event) => {
 });
 
 function UpdateFps() {
-    Console.scrollTop = Console.scrollHeight;
-
     ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
-    GameSpeedLabel.innerHTML = `SPD: ${parseFloat(document.body.getAttribute("speed")) % 1 === 0 ? parseFloat(document.body.getAttribute("speed")) + ".0" : parseFloat(document.body.getAttribute("speed"))}`;
+    GameSpeedLabel.innerHTML = `Speed: ${parseFloat(document.body.getAttribute("speed")) % 1 === 0 ? parseFloat(document.body.getAttribute("speed")) + ".0" : parseFloat(document.body.getAttribute("speed"))}`;
 
     HoverLabel.innerHTML = `/ ${document.body.getAttribute("hover").toUpperCase().substring(0, 4)}`;
 

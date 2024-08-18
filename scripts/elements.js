@@ -72,6 +72,30 @@ export const Elements = [
         Description: "Clay brick."
     },
     {
+        Name: "GOLD",
+        Color: "rgb(255, 165, 0)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        Type: "Solid",
+        Category: "Solid",
+        Description: "Precious metal, valuable and shiny."
+    },
+    {
+        Name: "TTAN",
+        Color: "rgb(144, 144, 144)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        Type: "Solid",
+        Category: "Solid",
+        Description: "Strong, lightweight metal."
+    },
+    {
         Name: "URAN",
         Color: "rgb(112, 112, 32)",
         Flammable: false,
