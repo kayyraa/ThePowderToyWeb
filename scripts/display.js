@@ -10,6 +10,7 @@ function Loop() {
             const OriginalColor = StringToRgb(Particle.dataset.color);
             Particle.style.backgroundColor = `rgb(${OriginalColor.R + (Temp * 2)}, ${OriginalColor.G}, ${OriginalColor.B})`;
             Particle.style.filter = "";
+            Particle.style.boxShadow = "";
         });
     } else if (LastDisplay === "blob") {
         Particles.forEach(Particle => {
@@ -19,17 +20,19 @@ function Loop() {
         Particles.forEach(Particle => {
             Particle.style.filter = "";
             if (Particle.dataset.radioactive === "true") {
-                Particle.style.filter = "brightness(2) drop-shadow(0 0 8px rgba(0, 255, 0, 0.75))";
+                Particle.style.filter = `brightness(2) drop-shadow(0 0 8px ${Particle.dataset.color})`;
+                Particle.style.boxShadow = `0 0 8px 1px ${Particle.dataset.color}`;
             } else if (Particle.dataset.light === "true") {
-                Particle.style.filter = "brightness(10) drop-shadow(0 0 64px rgb(255, 255, 255))";
+                Particle.style.boxShadow = `0 0 16px 4px ${Particle.dataset.color}`;
             }
         });
     }
 
     else {
         Particles.forEach(Particle => {
-            Particle.style.backgroundColor = Particle.dataset.color;
             Particle.style.filter = "";
+            Particle.style.boxShadow = "";
+            Particle.style.backgroundColor = Particle.dataset.color;
         });
     }
 

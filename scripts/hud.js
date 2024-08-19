@@ -56,16 +56,6 @@ ParticlesLabel.style.textAlign = "center";
 ParticlesLabel.style.userSelect = "none";
 StatsContainer.appendChild(ParticlesLabel);
 
-const GameSpeedLabel = document.createElement("span");
-GameSpeedLabel.innerHTML = "SPD: 1";
-GameSpeedLabel.style.color = "rgb(23, 161, 191)";
-GameSpeedLabel.style.fontSize = "100%";
-GameSpeedLabel.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
-GameSpeedLabel.style.padding = "10px";
-GameSpeedLabel.style.textAlign = "center";
-GameSpeedLabel.style.userSelect = "none";
-StatsContainer.appendChild(GameSpeedLabel);
-
 const ElementContainer = document.createElement("div");
 ElementContainer.style.position = "fixed";
 ElementContainer.style.right = "20px";
@@ -161,27 +151,6 @@ function IsMobile() {
 }
 
 if (IsMobile()) {
-    const GameSpeedUpButton = document.createElement("span");
-    GameSpeedUpButton.innerHTML = "+";
-    GameSpeedUpButton.style.color = "rgb(23, 161, 191)";
-    GameSpeedUpButton.style.fontSize = "100%";
-    GameSpeedUpButton.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
-    GameSpeedUpButton.style.cursor = "pointer";
-    GameSpeedUpButton.style.textAlign = "center";
-    GameSpeedUpButton.style.userSelect = "none";
-    StatsContainer.appendChild(GameSpeedUpButton);
-
-    const GameSpeedDownButton = document.createElement("span");
-    GameSpeedDownButton.innerHTML = "-";
-    GameSpeedDownButton.style.color = "rgb(23, 161, 191)";
-    GameSpeedDownButton.style.fontSize = "100%";
-    GameSpeedDownButton.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
-    GameSpeedDownButton.style.padding = "10px";
-    GameSpeedDownButton.style.cursor = "pointer";
-    GameSpeedDownButton.style.textAlign = "center";
-    GameSpeedDownButton.style.userSelect = "none";
-    StatsContainer.appendChild(GameSpeedDownButton);
-
     const DisplayButton = document.createElement("span");
     DisplayButton.innerHTML = "Display";
     DisplayButton.style.color = "rgb(23, 161, 191)";
@@ -193,12 +162,6 @@ if (IsMobile()) {
     DisplayButton.style.userSelect = "none";
     StatsContainer.appendChild(DisplayButton);
 
-    GameSpeedUpButton.addEventListener("click", () => {
-        document.body.setAttribute("speed", (parseFloat(document.body.getAttribute("speed")) + Settings.SpeedChange));
-    });
-    GameSpeedDownButton.addEventListener("click", () => {
-        document.body.setAttribute("speed", (parseFloat(document.body.getAttribute("speed")) - Settings.SpeedChange));
-    });
     DisplayButton.addEventListener("click", () => {
         let Display = document.body.getAttribute("display") || Displays[0];
         const NextIndex = (Displays.indexOf(Display.charAt(0).toUpperCase() + Display.slice(1)) + 1) % Displays.length;
@@ -226,7 +189,7 @@ function InvertColor(RgbString, TrueColor) {
         } else {
             return 'rgb(255, 255, 255)';
         }
-    }
+    }f
 }
 
 for (let Index = 0; Index < Elements.length; Index++) {
@@ -246,20 +209,22 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.style.transition = "height 0.25s ease";
     ElementDiv.style.backgroundColor = Element.Color;
     ElementDiv.style.color = InvertColor(Element.Color, false);
+    
     ElementDiv.dataset.type = Element.Type;
     ElementDiv.dataset.flammable = Element.Flammable.toString();
     ElementDiv.dataset.caustic = Element.Caustic.toString();
     ElementDiv.dataset.radioactive = Element.Radioactive.toString();
+    ElementDiv.dataset.radioactivity = Element.Radioactivity !== undefined ? Element.Radioactivity.toString() : "";
     ElementDiv.dataset.light = Element.Light.toString();
     ElementDiv.dataset.name = Element.Name;
     ElementDiv.style.zIndex = "9999";
     ElementDiv.id = Element.Name;
 
     const DescriptionLabel = document.createElement("span");
-    DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair}`;
+    DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair} ${Element.Radioactive ? `- ${Element.Radioactivity}` : ""}`;
     DescriptionLabel.style.position = "absolute";
     DescriptionLabel.style.color = "white";
-    DescriptionLabel.style.right = "-200px";
+    DescriptionLabel.style.right = "-175px";
     DescriptionLabel.style.pointerEvents = "none";
     DescriptionLabel.style.width = "512px";
     DescriptionLabel.style.opacity = "0";
@@ -285,71 +250,24 @@ for (let Index = 0; Index < Elements.length; Index++) {
 
     ElementDiv.addEventListener("mouseleave", () => {
         DescriptionLabel.style.opacity = "0";
-        ElementDiv.style.height = "5%";
+        ElementDiv.style.height = `${Elements.length}px`;
     });
 
     ElementDiv.addEventListener("click", (Event) => {
         document.body.setAttribute("selected", Event.target.id);
-        SelectSound.play();
     });
 
     ElementContainer.appendChild(ElementDiv);
 }
 
-document.addEventListener("pointermove", (Event) => {
-    document.body.setAttribute("hover", Event.target.id !== "" ? Event.target.id : "none")
-});
-
 ClearButton.addEventListener("click", () => {
     tptw.Clear();
-});
-
-let MouseX = 0;
-let MouseY = 0;
-let Target = null;
-let IsDragging = false;
-
-document.addEventListener("pointermove", (Event) => {
-    MouseX = Event.clientX;
-    MouseY = Event.clientY;
-    Target = Event.target;
-});
-
-document.addEventListener("mousedown", (Event) => {
-    if (Event.button === 0) {
-        IsDragging = true;
-    }
-});
-
-document.addEventListener("mouseup", (Event) => {
-    if (Event.button === 0) {
-        IsDragging = false;
-    }
-});
-
-document.addEventListener("touchstart", (Event) => {
-    if (Event.touches.length === 1) {
-        IsDragging = true;
-    }
-});
-
-document.addEventListener("touchend", () => {
-    IsDragging = false;
-});
-
-document.addEventListener("touchmove", (Event) => {
-    if (Event.touches.length === 1) {
-        const Touch = Event.touches[0];
-        MouseX = Touch.clientX;
-        MouseY = Touch.clientY;
-    }
 });
 
 function UpdateFps() {
     LogContainer.scrollTop = LogContainer.scrollHeight;
 
     ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
-    GameSpeedLabel.innerHTML = `Speed: ${(parseFloat(document.body.getAttribute("speed"))).toFixed(Settings.SpeedChange.toString().slice(2).length)} ${document.body.getAttribute("speed") === "0" ? "[STOP]": "[PLAY]"}`;
     HoverLabel.innerHTML = `/ ${document.body.getAttribute("hover").toUpperCase().substring(0, 4)}`;
 
     const CurrentTime = performance.now();

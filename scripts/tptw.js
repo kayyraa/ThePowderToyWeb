@@ -1,5 +1,9 @@
 import { Settings } from "./settings.js";
 
+export function Random(Max, Min) {
+    return Math.floor(Math.random() * (Max - Min + 1)) + Min;
+}
+
 export function Clear() {
     document.body.setAttribute("selected", "none");
     Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
@@ -25,43 +29,52 @@ export function Print(x) {
 }
 
 export function RgbString(RgbString) {
-    const Match = RgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-
-    if (Match) {
-        return {
-            R: parseInt(Match[1], 10),
-            G: parseInt(Match[2], 10),
-            B: parseInt(Match[3], 10)
-        };
-    }
-
-    return null;
+    const RgbArray = RgbString.match(/\d+/g).map(Number);
+    return {
+        R: RgbArray[0],
+        G: RgbArray[1],
+        B: RgbArray[2]
+    };
 }
 
-export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Light, Temp, Type, Category}, PositionX, PositionY) {
-    const ParticleContainer = document.getElementById("ParticleContainer");
-    const PowderEffect = document.body.getAttribute("powder")
-    const GridSize = parseFloat(document.body.getAttribute("grid-size"));
-    
-    if (ParticleContainer) {
-        const Element = document.createElement("div");
-        Element.style.position = "absolute";
-        Element.style.left = `${PositionX}px`;
-        Element.style.top = `${PositionY}px`;
-        Element.style.width = `${GridSize}px`;
-        Element.style.height = `${GridSize}px`;
-        Element.style.pointerEvents = 'none';
-        Element.style.backgroundColor = PowderEffect ? `rgb(${RgbString(Color).R + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RgbString(Color).G + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))}, ${RgbString(Color).B + Math.floor(Math.random() * (Settings.PowderEffectStrength - (Settings.PowderEffectStrength / 4) + 1) + (Settings.PowderEffectStrength / 4))})` : Color;
-        Element.dataset.type = Type;
-        Element.dataset.color = Element.style.backgroundColor;
-        Element.dataset.flammable = Flammable;
-        Element.dataset.caustic = Caustic;
-        Element.dataset.radioactive = Radioactive;
-        Element.dataset.light = Light;
-        Element.dataset.temp = Temp;
-        Element.id = Name;
-        ParticleContainer.appendChild(Element);
+export function CombustElement(CausticPart, FlammablePart) {
+    const ChanceOfDestruction = Math.floor(Math.random());
 
-        return Element;
+    CreateElement(Elements.find(element => element.Name === "SMKE"), FlammablePart.offsetLeft, FlammablePart.offsetTop);
+    FlammablePart.remove();
+
+    if (ChanceOfDestruction === 1) {
+        CausticPart.remove();
+    }
+}
+
+export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, Type}, PositionX, PositionY) {
+    const ParticleContainer = document.getElementById("ParticleContainer");
+    const PowderStrength = Type !== "Solid" ? Settings.PowderEffectStrength : Settings.PowderEffectStrength / 4;
+    const GridSize = parseFloat(document.body.getAttribute("grid-size"));
+
+    if (ParticleContainer) {
+        const TargetColor = `rgb(${RgbString(Color).R + Random(PowderStrength, -PowderStrength) / 4}, ${RgbString(Color).G + Random(PowderStrength, -PowderStrength) / 4}, ${RgbString(Color).B + Random(PowderStrength, -PowderStrength) / 4})`;
+
+        const Particle = document.createElement("div");
+        Particle.style.position = "absolute";
+        Particle.style.left = `${PositionX}px`;
+        Particle.style.top = `${PositionY}px`;
+        Particle.style.width = `${GridSize}px`;
+        Particle.style.height = `${GridSize}px`;
+        Particle.style.pointerEvents = 'none';
+        Particle.style.backgroundColor = TargetColor;
+        Particle.dataset.type = Type;
+        Particle.dataset.color = TargetColor;
+        Particle.dataset.Flammable = Flammable;
+        Particle.dataset.caustic = Caustic;
+        Particle.dataset.radioactive = Radioactive;
+        Particle.dataset.radioactivity = Radioactivity;
+        Particle.dataset.light = Light;
+        Particle.dataset.temp = Temp;
+        Particle.id = Name;
+        ParticleContainer.appendChild(Particle);
+
+        return Particle;
     }
 }

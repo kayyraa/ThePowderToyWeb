@@ -108,16 +108,17 @@ export const Elements = [
         Flair: "Powder"
     },
     {
-        Name: "BCOL",
-        Color: "rgb(69, 69, 69)",
-        Flammable: true,
+        Name: "POLO",
+        Color: "rgb(80, 96, 48)",
+        Flammable: false,
         Caustic: false,
-        Radioactive: false,
+        Radioactive: true,
+        Radioactivity: 4,
         Light: false,
-        Temp: 22,
+        Temp: 46,
         Type: "Powder",
         Category: "Powder",
-        Flair: "Powder"
+        Flair: "Radioactive Powder"
     },
     {
         Name: "URAN",
@@ -125,6 +126,7 @@ export const Elements = [
         Flammable: false,
         Caustic: false,
         Radioactive: true,
+        Radioactivity: 1,
         Light: false,
         Temp: 46,
         Type: "Powder",
@@ -137,6 +139,7 @@ export const Elements = [
         Flammable: false,
         Caustic: false,
         Radioactive: true,
+        Radioactivity: 8,
         Light: false,
         Temp: 46,
         Type: "Powder",
@@ -149,6 +152,20 @@ export const Elements = [
         Flammable: false,
         Caustic: false,
         Radioactive: true,
+        Radioactivity: 2,
+        Light: false,
+        Temp: 46,
+        Type: "Powder",
+        Category: "Powder",
+        Flair: "Radioactive Powder"
+    },
+    {
+        Name: "OGAN",
+        Color: "rgb(57, 200, 20)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: true,
+        Radioactivity: 18,
         Light: false,
         Temp: 46,
         Type: "Powder",
@@ -160,12 +177,12 @@ export const Elements = [
         Color: "rgb(32, 224, 255)",
         Flammable: false,
         Caustic: false,
-        Radioactive: true,
+        Radioactive: false,
         Light: true,
         Temp: 22,
         Type: "None",
         Category: "None",
-        Flair: "Radioactive Light"
+        Flair: "Light"
     },
     {
         Name: "PHOT",
@@ -177,7 +194,7 @@ export const Elements = [
         Temp: 500,
         Type: "None",
         Category: "None",
-        Flair: "Visible Light"
+        Flair: "Light"
     },
     {
         Name: "STNE",
@@ -249,7 +266,7 @@ export const Elements = [
         Temp: 149,
         Type: "Gas",
         Category: "Gas",
-        Flair: "Dense Gas"
+        Flair: "Gas"
     },
     {
         Name: "NONE",

@@ -1,11 +1,7 @@
-import { Settings } from "./settings.js";
 import { Displays } from "./displays.js";
 import * as tptw from "./tptw.js";
 
 const ActionLabel = document.getElementById("ActionLabel");
-const Clamp = (Val, Min, Max) => Math.min(Math.max(Val, Min), Max);
-
-let SpeedIsZero = false;
 
 document.addEventListener("touchend", () => {
     const Cursor = document.getElementById("Cursor");
@@ -22,11 +18,6 @@ document.addEventListener("touchstart", () => {
 });
 
 document.addEventListener("keydown", (Event) => {
-    if (Event.key === " " || Event.key === "Space") {
-        SpeedIsZero = !SpeedIsZero;
-        document.body.setAttribute("speed", SpeedIsZero ? "0" : "1");
-    }
-
     if (Event.key === "c") {
         tptw.Clear();
     }
@@ -40,23 +31,4 @@ document.addEventListener("keydown", (Event) => {
         document.body.setAttribute("display", Display.toLowerCase());
         ActionLabel.textContent = `${Display} Display`;
     }
-});
-
-document.addEventListener("wheel", (Event) => {
-    if (Event.ctrlKey) {
-        Event.preventDefault();
-        var CurrentGameSpeed = parseFloat(document.body.getAttribute("speed"));
-        
-        if (Event.deltaY < 0) {
-            const NewGameSpeed = Clamp(CurrentGameSpeed + Settings.SpeedChange, -Settings.MaxSpeed, Settings.MaxSpeed);
-            document.body.setAttribute("speed", NewGameSpeed.toString());
-        } else if (Event.deltaY > 0) {
-            const NewGameSpeed = Clamp(CurrentGameSpeed - Settings.SpeedChange, -Settings.MaxSpeed, Settings.MaxSpeed);
-            document.body.setAttribute("speed", NewGameSpeed.toString());
-        }
-    }
-}, { passive: false });
-
-document.addEventListener("contextmenu", (Event) => {
-    Event.preventDefault();
 });

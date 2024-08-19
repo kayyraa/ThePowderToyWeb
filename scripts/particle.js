@@ -8,6 +8,16 @@ function Random(Max, Min) {
     return Math.floor(Math.random() * (Max - Min + 1)) + Min;
 }
 
+function IsPlaceOccupied(x, y, gridSize) {
+    const Particles = Array.from(ParticleContainer.children);
+    return Particles.some(Particle => {
+        const ParticleRect = Particle.getBoundingClientRect();
+        const ParticleX = Math.floor(ParticleRect.left / gridSize) * gridSize;
+        const ParticleY = Math.floor(ParticleRect.top / gridSize) * gridSize;
+        return ParticleX === x && ParticleY === y;
+    });
+}
+
 function InitializeParticle(Particle) {
     const Direction = Math.floor(Math.random() * 4);
     const GridSize = parseInt(document.body.getAttribute("grid-size"), 10);
@@ -38,167 +48,181 @@ function InitializeParticle(Particle) {
 
 function React() {
     const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
+    let RadioactiveParticles = [];
 
     if (Particles.length > 0) {
-        Particles.forEach(Particle => {
-            if (Particle.dataset.radioactive === "true") {
-                const Element = Elements.find(element => element.Name === "NEUT");
-                if (Element) {
-                    Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(32, 8);
-                    TPTW.CreateElement(Element, Particle.offsetLeft + 20, Particle.offsetTop / 1.25);
-                }
-            }
-        });
+        const RandomIndex = Math.floor(Math.random() * Particles.length);
+        const Particle = Particles[RandomIndex];
+
+        if (Particle.dataset.radioactive === "true") {
+            RadioactiveParticles.push(Particle);
+            setTimeout(() => {
+                Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(32, 8);
+                TPTW.CreateElement(Elements.find(element => element.Name === "NEUT"), Particle.offsetLeft, Particle.offsetTop); 
+            }, (RadioactiveParticles.length * 1000) - (parseFloat(Particle.dataset.radioactivity) * 1000));
+        }
     }
 
-    setTimeout(React, Random(20000, 1000));
+    setTimeout(React, 0);
 }
 
 if (ParticleContainer) {
     function Loop() {
-        const BaseSimulationSpeed = 0;
-        const SimulationSpeed = BaseSimulationSpeed * -(parseFloat(document.body.getAttribute("speed")));
-
-        const GameSpeed = parseFloat(document.body.getAttribute("speed"));
-
         const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
-        const GravityEnabled = document.body.getAttribute("gravity") === "true";
 
-        if (GravityEnabled && GameSpeed) {
-            if (Particles.length > 0) {
-                Particles.forEach(Particle => {
-                    if (IgnoreList.has(Particle)) return;
+        if (Particles.length > 0) {
+            Particles.forEach(Particle => {
+                if (IgnoreList.has(Particle)) return;
+            
+                if (
+                    Math.abs(Particle.offsetTop) > window.innerHeight || 
+                    Math.abs(Particle.offsetLeft) > (window.innerWidth - Particle.offsetWidth)
+                ) {
+                    Particle.remove();
+                    return;
+                }
+            
+                if (!Particle.dataset.offsetX || !Particle.dataset.offsetY) {
+                    InitializeParticle(Particle);
+                }
+            
+                const ParticleRect = Particle.getBoundingClientRect();
+                const NewTop = ParticleRect.top + 12;
 
-                    if (!Particle.dataset.offsetX || !Particle.dataset.offsetY) {
-                        InitializeParticle(Particle);
-                    }
+                const GridSize = parseInt(document.body.getAttribute("grid-size"));
+                const MaxHeight = window.innerHeight - ParticleRect.height;
+                const MaxWidth = window.innerWidth - ParticleRect.width;
 
-                    const ParticleRect = Particle.getBoundingClientRect();
-                    const NewTop = ParticleRect.top + (12 * (GameSpeed !== 0 ? 1 : 0));
-                    const MaxHeight = window.innerHeight - ParticleRect.height;
+                const IsCaustic = Particle.dataset.caustic === "true";
+                const IsLight = Particle.dataset.light === "true";
+            
+                let CollisionDetected = false;
+                let CollisionTop = MaxHeight;
+            
+                if (IsLight) {
+                    const OffsetX = parseInt(Particle.dataset.offsetX, 10);
+                    const OffsetY = parseInt(Particle.dataset.offsetY, 10);
+                    const CurrentLeft = parseFloat(Particle.style.left) || Particle.offsetLeft;
+                    const CurrentTop = parseFloat(Particle.style.top) || Particle.offsetTop;
+                    Particle.style.left = `${CurrentLeft + OffsetX}px`;
+                    Particle.style.top = `${CurrentTop + OffsetY}px`;
 
-                    const IsCaustic = Particle.dataset.caustic === "true";
-                    const IsLight = Particle.dataset.light === "true";
-                    const IsGas = Particle.dataset.type === "Gas";
-
-                    let CollisionDetected = false;
-                    let CollisionTop = MaxHeight;
-
-                    if (IsLight) {
-                        const OffsetX = parseInt(Particle.dataset.offsetX, 10);
-                        const OffsetY = parseInt(Particle.dataset.offsetY, 10);
-
-                        const CurrentLeft = parseFloat(Particle.style.left) || Particle.offsetLeft;
-                        const CurrentTop = parseFloat(Particle.style.top) || Particle.offsetTop;
-
-                        Particle.style.left = `${CurrentLeft + OffsetX}px`;
-                        Particle.style.top = `${CurrentTop + OffsetY}px`;
-                    }
-
-                    Particles.forEach(OtherParticle => {
-                        if (OtherParticle !== Particle) {
-                            const OtherRect = OtherParticle.getBoundingClientRect();
-
-                            if (
-                                NewTop < OtherRect.bottom &&
-                                NewTop + ParticleRect.height > OtherRect.top &&
-                                ParticleRect.right > OtherRect.left &&
-                                ParticleRect.left < OtherRect.right
-                            ) {
-                                CollisionDetected = true;
-                                CollisionTop = Math.min(CollisionTop, OtherRect.top - ParticleRect.height);
-
-                                const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
-                                const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
-
-                                if (IsCaustic && OtherIsFlammable) {
-                                    if (!OtherIsCaustic) {
-                                        const Element = Elements.find(element => element.Name === "SMKE");
-                                        if (Element) {
-                                            TPTW.CreateElement(Element, OtherParticle.offsetLeft, OtherParticle.offsetTop);
-                                        }
-                                    }
-
-                                    OtherParticle.remove();
-                                    Particle.remove();
-                                }
-                            }
+                    return;
+                }
+            
+                Particles.forEach(OtherParticle => {
+                    if (OtherParticle !== Particle) {
+                        if (Particle.dataset.light === "true" || OtherParticle.dataset.light === "true") {
+                            return;
                         }
-                    });
 
-                    if (CollisionDetected) {
-                        Particle.style.top = `${CollisionTop}px`;
-                    } else {
-                        if (IsGas) {
-                            let DisplacementAllowed = true;
-                            Particles.forEach(OtherParticle => {
-                                if (OtherParticle !== Particle && !IgnoreList.has(OtherParticle)) {
-                                    const OtherType = OtherParticle.dataset.type;
-                                    if (OtherType === "Powder" || OtherType === "Solid") {
-                                        const OtherRect = OtherParticle.getBoundingClientRect();
-                                        if (
-                                            NewTop < OtherRect.bottom &&
-                                            NewTop + ParticleRect.height > OtherRect.top &&
-                                            ParticleRect.right > OtherRect.left &&
-                                            ParticleRect.left < OtherRect.right
-                                        ) {
-                                            DisplacementAllowed = false;
-                                        }
+                        const OtherRect = OtherParticle.getBoundingClientRect();
+                        if (
+                            NewTop < OtherRect.bottom &&
+                            NewTop + ParticleRect.height > OtherRect.top &&
+                            ParticleRect.right > OtherRect.left &&
+                            ParticleRect.left < OtherRect.right
+                        ) {
+                            CollisionDetected = true;
+                            CollisionTop = Math.min(CollisionTop, OtherRect.top - ParticleRect.height);
+            
+                            const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
+                            const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
+            
+                            if (IsCaustic && OtherIsFlammable) {
+                                if (!OtherIsCaustic) {
+                                    const Element = Elements.find(element => element.Name === "SMKE");
+                                    if (Element) {
+                                        TPTW.CreateElement(Element, OtherParticle.offsetLeft, OtherParticle.offsetTop);
                                     }
                                 }
-                            });
-
-                            if (DisplacementAllowed) {
-                                Particle.style.top = `${Particle.offsetTop - (8 * parseInt(document.body.getAttribute("speed")))}px`;
-                            }
-                        } else if (Particle.dataset.type === "Powder") {
-                            Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
-                        } else if (Particle.dataset.type === "Liquid") {
-                            Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
-                        }
-                    }
-
-                    const IsMoving = (
-                        Particle.offsetTop !== parseFloat(Particle.dataset.previousTop) ||
-                        Particle.offsetLeft !== parseFloat(Particle.dataset.previousLeft)
-                    );
-
-                    if (!IsMoving && Particle.dataset.type !== "Gas") {
-                        IgnoreList.add(Particle);
-                    }
-
-                    Particle.dataset.previousTop = Particle.offsetTop;
-                    Particle.dataset.previousLeft = Particle.offsetLeft;
-
-                    if (Math.abs(Particle.offsetTop) > window.innerHeight || Math.abs(Particle.offsetLeft) > window.innerWidth) {
-                        Particle.remove();
-                    }
-                });
-
-                IgnoreList.forEach(Particle => {
-                    const ParticleRect = Particle.getBoundingClientRect();
-                    let SurroundingClear = true;
-
-                    Particles.forEach(OtherParticle => {
-                        if (OtherParticle !== Particle) {
-                            const OtherRect = OtherParticle.getBoundingClientRect();
-                            if (
-                                (ParticleRect.top < OtherRect.bottom && ParticleRect.bottom > OtherRect.top &&
-                                ParticleRect.left < OtherRect.right && ParticleRect.right > OtherRect.left)
-                            ) {
-                                SurroundingClear = false;
+                                OtherParticle.remove();
+                                Particle.remove();
                             }
                         }
-                    });
-
-                    if (SurroundingClear) {
-                        IgnoreList.delete(Particle);
                     }
                 });
-            }
+            
+                if (CollisionDetected) {
+                    Particle.style.top = `${CollisionTop}px`;
+                } else {
+                    if (Particle.dataset.type === "Gas") {
+                        let DisplacementAllowed = true;
+            
+                        Particles.forEach(OtherParticle => {
+                            if (OtherParticle !== Particle && !IgnoreList.has(OtherParticle)) {
+                                const OtherType = OtherParticle.dataset.type;
+                                if (OtherType === "Powder" || OtherType === "Solid") {
+                                    const OtherRect = OtherParticle.getBoundingClientRect();
+                                    if (
+                                        NewTop < OtherRect.bottom &&
+                                        NewTop + ParticleRect.height > OtherRect.top &&
+                                        ParticleRect.right > OtherRect.left &&
+                                        ParticleRect.left < OtherRect.right
+                                    ) {
+                                        if (OtherParticle.dataset.flammable === "true") {
+                                            TPTW.CombustElement(Particle, OtherParticle);
+                                        }
+            
+                                        DisplacementAllowed = false;
+                                    }
+                                }
+                            }
+                        });
+            
+                        if (DisplacementAllowed) {
+                            Particle.style.top = `${Particle.offsetTop - (8 * parseInt(document.body.getAttribute("speed")))}px`;
+                        }
+                    } else if (Particle.dataset.type === "Powder") {
+                        Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
+                    } else if (Particle.dataset.type === "Liquid") {
+                        Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
+
+                        const NewLeft = Math.min(Math.round((Particle.offsetLeft + Random(25, -25)) / GridSize) * GridSize, MaxWidth);
+                        if (!IsPlaceOccupied(NewLeft, Particle.offsetTop, GridSize)) {
+                            Particle.style.left = `${NewLeft}px`;
+                        }
+                    }
+                }
+            
+                const IsMoving = (
+                    Particle.offsetTop !== parseFloat(Particle.dataset.previousTop) ||
+                    Particle.offsetLeft !== parseFloat(Particle.dataset.previousLeft)
+                );
+            
+                if (!IsMoving && Particle.dataset.type !== "Gas") {
+                    IgnoreList.add(Particle);
+                }
+            
+                Particle.dataset.previousTop = Particle.offsetTop;
+                Particle.dataset.previousLeft = Particle.offsetLeft;
+            });
+            
+            IgnoreList.forEach(Particle => {
+                const ParticleRect = Particle.getBoundingClientRect();
+                let SurroundingClear = true;
+            
+                Particles.forEach(OtherParticle => {
+                    if (OtherParticle !== Particle) {
+                        const OtherRect = OtherParticle.getBoundingClientRect();
+                        if (
+                            ParticleRect.top < OtherRect.bottom &&
+                            ParticleRect.bottom > OtherRect.top &&
+                            ParticleRect.left < OtherRect.right &&
+                            ParticleRect.right > OtherRect.left
+                        ) {
+                            SurroundingClear = false;
+                        }
+                    }
+                });
+            
+                if (SurroundingClear) {
+                    IgnoreList.delete(Particle);
+                }
+            });            
         }
 
-        setTimeout(Loop, SimulationSpeed);
+        requestAnimationFrame(Loop);
     }
 
     Loop();
