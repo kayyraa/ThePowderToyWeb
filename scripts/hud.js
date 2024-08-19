@@ -6,6 +6,9 @@ import * as tptw from "./tptw.js";
 const LogContainer = document.getElementById("LogContainer");
 const ParticleContainer = document.getElementById("ParticleContainer");
 
+let MouseX = 0;
+let MouseY = 0;
+
 const ActionLabel = document.createElement("span");
 ActionLabel.innerHTML = "Default Display";
 ActionLabel.style.fontSize = "24px";
@@ -86,64 +89,13 @@ ElementLabel.style.userSelect = "none";
 ElementLabel.style.pointerEvents = "none";
 ElementContainer.appendChild(ElementLabel);
 
-const HoverLabel = document.createElement("span");
-HoverLabel.innerHTML = "NONE";
-HoverLabel.style.position = "fixed";
-HoverLabel.style.color = "rgb(172, 172, 172)";
-HoverLabel.style.width = "200px";
-HoverLabel.style.height = "50px";
-HoverLabel.style.bottom = "10px";
-HoverLabel.style.left = "75px";
-HoverLabel.style.fontSize = "24px";
-HoverLabel.style.paddingLeft = "10px";
-HoverLabel.style.paddingRight = "10px";
-HoverLabel.style.textAlign = "center";
-HoverLabel.style.pointerEvents = "none";
-ElementContainer.appendChild(HoverLabel);
-
-const ExperimentalIcon = document.createElement("img");
-ExperimentalIcon.style.width = "48px";
-ExperimentalIcon.className = "Tooltip";
-ExperimentalIcon.style.pointerEvents = "none";
-ExperimentalIcon.style.zIndex = "-9999";
-document.body.appendChild(ExperimentalIcon);
-
-const ExperimentalTooltip = document.createElement("span");
-ExperimentalTooltip.innerHTML = "Experimental Version";
-ExperimentalTooltip.style.visibility = "hidden";
-ExperimentalTooltip.style.position = "relative";
-ExperimentalTooltip.style.left = "5px";
-ExperimentalTooltip.style.top = "-15px";
-ExperimentalTooltip.style.fontSize = "100%";
-ExperimentalTooltip.style.textAlign = "center";
-ExperimentalTooltip.style.pointerEvents = "none";
-ExperimentalTooltip.style.zIndex = "-9999";
-document.body.appendChild(ExperimentalTooltip);
-
-const TooltipEventPointer = document.createElement("div");
-TooltipEventPointer.style.position = "relative";
-TooltipEventPointer.style.bottom = "50px";
-TooltipEventPointer.style.width = "64px";
-TooltipEventPointer.style.height = "64px";
-TooltipEventPointer.style.zIndex = "9999";
-document.body.appendChild(TooltipEventPointer);
-
-TooltipEventPointer.addEventListener("mouseenter", () => {
-    ExperimentalTooltip.style.visibility = "visible";
-});
-
-TooltipEventPointer.addEventListener("mouseleave", () => {
-    ExperimentalTooltip.style.visibility = "hidden";
-});
-
-if (Settings.ExperimentalVersion) {
-    ExperimentalTooltip.innerHTML = `Experimental Version: ${Settings.Version}`;
-    ExperimentalIcon.src = "../images/Experiments.png";
-} else {
-    ExperimentalTooltip.innerHTML = `Version: ${Settings.Version}`;
-    ExperimentalIcon.src = "../images/ExperimentsOff.png";
-}
-
+const TempLabel = document.createElement("span");
+TempLabel.innerHTML = "43°C";
+TempLabel.style.position = "fixed";
+TempLabel.style.opacity = "0";
+TempLabel.style.transition = "opacity 0.25s ease";
+TempLabel.style.pointerEvents = "none";
+document.body.appendChild(TempLabel);
 
 function IsMobile() {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -216,6 +168,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.dataset.radioactive = Element.Radioactive.toString();
     ElementDiv.dataset.radioactivity = Element.Radioactivity !== undefined ? Element.Radioactivity.toString() : "";
     ElementDiv.dataset.light = Element.Light.toString();
+    ElementDiv.dataset.temp = Element.Temp.toString();
     ElementDiv.dataset.name = Element.Name;
     ElementDiv.style.zIndex = "9999";
     ElementDiv.id = Element.Name;
@@ -264,11 +217,26 @@ ClearButton.addEventListener("click", () => {
     tptw.Clear();
 });
 
+document.addEventListener("pointermove", (Event) => {
+    MouseX = Event.clientX;
+    MouseY = Event.clientY
+});
+
 function UpdateFps() {
     LogContainer.scrollTop = LogContainer.scrollHeight;
-
     ParticlesLabel.innerHTML = `Parts: ${ParticleContainer.children.length} / ${Settings.MaxParticleCount}`;
-    HoverLabel.innerHTML = `/ ${document.body.getAttribute("hover").toUpperCase().substring(0, 4)}`;
+ 
+    TempLabel.style.left = `${MouseX - 50}px`;
+    TempLabel.style.top = `${MouseY - 25}px`;
+
+    const Target = document.elementFromPoint(MouseX, MouseY);
+
+    if (Target && Target.dataset.particle === "true" && Target.dataset.temp) {
+        TempLabel.innerHTML = `${parseFloat(Target.dataset.temp).toFixed(1)}°C`;
+        TempLabel.style.opacity = "1";
+    } else {
+        TempLabel.style.opacity = "0";
+    }
 
     const CurrentTime = performance.now();
     const ElapsedTime = CurrentTime - LastTime;

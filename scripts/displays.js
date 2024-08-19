@@ -1,6 +1,6 @@
 export const Displays = [
-    "Heat",
     "Default",
+    "Heat",
     "Blob",
     "Fancy"
 ];

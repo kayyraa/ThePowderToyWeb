@@ -175,6 +175,22 @@ if (ParticleContainer) {
                         }
                     } else if (Particle.dataset.type === "Powder") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
+
+                        Particles.forEach(OtherParticle => {
+                            if (OtherParticle !== Particle && !IgnoreList.has(OtherParticle)) {
+                                const OtherType = OtherParticle.dataset.type;
+                                if (OtherType === "Powder" || OtherType === "Solid") {
+                                    const Temp = parseFloat(Particle.dataset.temp);
+                                    const OtherTemp = parseFloat(OtherParticle.dataset.temp);
+
+                                    if (Temp !== OtherTemp) {
+                                        const AverageTemp = (Temp + OtherTemp) / 2;
+                                        Particle.dataset.temp = AverageTemp;
+                                        OtherParticle.dataset.temp = AverageTemp;
+                                    }
+                                }
+                            }
+                        });
                     } else if (Particle.dataset.type === "Liquid") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
 

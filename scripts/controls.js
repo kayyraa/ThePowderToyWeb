@@ -22,7 +22,7 @@ document.addEventListener("keydown", (Event) => {
         tptw.Clear();
     }
 
-    if (Event.keyCode === 68) {
+    if (Event.key === "d") {
         let Display = document.body.getAttribute("display") || Displays[0];
         
         const NextIndex = (Displays.indexOf(Display.charAt(0).toUpperCase() + Display.slice(1)) + 1) % Displays.length;

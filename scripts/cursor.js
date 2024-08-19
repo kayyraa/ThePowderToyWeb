@@ -88,7 +88,7 @@ function Loop() {
                         Radioactive: Radioactive,
                         Radioactivity: Radioactivity !== null ? Radioactivity : 0,
                         Light: Light,
-                        Temp: SelectedElement.dataset.temp !== undefined ? SelectedElement.dataset.temp : 22,
+                        Temp: SelectedElement.dataset.temp,
                         Type: ElementType,
                     }
 

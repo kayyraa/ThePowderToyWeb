@@ -43,7 +43,6 @@ input {
     overflow-x: hidden;
 }
 
-
 #LogContainer span {
     margin-bottom: 5px;
     width: 100%;
@@ -54,5 +53,6 @@ input {
 
 #ParticleContainer div {
     position: absolute;
-    pointer-events: none;
+    width: 100%;
+    height: 100%;
 }

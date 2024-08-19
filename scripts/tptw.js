@@ -62,8 +62,10 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
         Particle.style.top = `${PositionY}px`;
         Particle.style.width = `${GridSize}px`;
         Particle.style.height = `${GridSize}px`;
-        Particle.style.pointerEvents = 'none';
         Particle.style.backgroundColor = TargetColor;
+
+        Particle.className = Name.toUpperCase();
+        Particle.dataset.particle = "true";
         Particle.dataset.type = Type;
         Particle.dataset.color = TargetColor;
         Particle.dataset.Flammable = Flammable;
