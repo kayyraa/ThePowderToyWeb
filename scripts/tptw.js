@@ -48,7 +48,7 @@ export function CombustElement(CausticPart, FlammablePart) {
     }
 }
 
-export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, Type}, PositionX, PositionY) {
+export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MeltingPoint, BoilingPoint, Type}, PositionX, PositionY) {
     const ParticleContainer = document.getElementById("ParticleContainer");
     const PowderStrength = Type !== "Solid" ? Settings.PowderEffectStrength : Settings.PowderEffectStrength / 4;
     const GridSize = parseFloat(document.body.getAttribute("grid-size"));
@@ -64,6 +64,8 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
         Particle.style.height = `${GridSize}px`;
         Particle.style.backgroundColor = TargetColor;
 
+        Particle.style.pointerEvents = `${Type === "None" ? "none" : ""}`;
+
         Particle.className = Name.toUpperCase();
         Particle.dataset.particle = "true";
         Particle.dataset.type = Type;
@@ -74,6 +76,8 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
         Particle.dataset.radioactivity = Radioactivity;
         Particle.dataset.light = Light;
         Particle.dataset.temp = Temp;
+        Particle.dataset.meltingPoint = MeltingPoint;
+        Particle.dataset.boilingPoint = BoilingPoint;
         Particle.id = Name;
         ParticleContainer.appendChild(Particle);
 

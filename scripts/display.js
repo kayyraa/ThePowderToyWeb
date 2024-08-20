@@ -11,10 +11,10 @@ function Loop() {
 
     if (Display === "heat") {
         Particles.forEach(Particle => {
-            const Temp = parseInt(Particle.dataset.temp) || 0;
-            const OriginalColor = StringToRgb(getComputedStyle(Particle).backgroundColor);
+            const Temp = parseFloat(Particle.dataset.temp) || 0;
+            const CurrentColor = StringToRgb(getComputedStyle(Particle).backgroundColor);
 
-            Particle.style.backgroundColor = `rgb(${OriginalColor.R + Temp}, ${OriginalColor.G}, ${OriginalColor.B})`;
+            Particle.style.backgroundColor = `rgb(${CurrentColor.R + Temp}, ${CurrentColor.G}, ${CurrentColor.B})`;
             Particle.style.filter = "";
             Particle.style.boxShadow = "";
         });

@@ -7,6 +7,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
+        MeltingPoint: 1700,
+        BoilingPoint: 2230,
         Type: "Powder",
         Category: "Powder",
         Flair: "Powder"
@@ -19,6 +21,7 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 32,
+        BoilingPoint: 100,
         Type: "Liquid",
         Category: "Liquid",
         Flair: "Liquid"
@@ -55,6 +58,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
+        MeltingPoint: 1538,
+        BoilingPoint: 2862,
         Type: "Solid",
         Category: "Solid",
         Flair: "Solid"
@@ -67,6 +72,22 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
+        MeltingPoint: 1600,
+        BoilingPoint: 2980,
+        Type: "Solid",
+        Category: "Solid",
+        Flair: "Solid"
+    },
+    {
+        Name: "GLAS",
+        Color: "rgb(60, 60, 60)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        MeltingPoint: 1500,
+        BoilingPoint: 2230,
         Type: "Solid",
         Category: "Solid",
         Flair: "Solid"
@@ -79,6 +100,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
+        MeltingPoint: 1064,
+        BoilingPoint: 2836,
         Type: "Solid",
         Category: "Solid",
         Flair: "Solid"
@@ -91,6 +114,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
+        MeltingPoint: 1668,
+        BoilingPoint: 3287,
         Type: "Solid",
         Category: "Solid",
         Flair: "Solid"
@@ -103,6 +128,7 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 0,
+        BoilingPoint: 100,
         Type: "Powder",
         Category: "Powder",
         Flair: "Powder"
@@ -116,6 +142,8 @@ export const Elements = [
         Radioactivity: 4,
         Light: false,
         Temp: 46,
+        MeltingPoint: 254,
+        BoilingPoint: 962,
         Type: "Powder",
         Category: "Powder",
         Flair: "Radioactive Powder"
@@ -129,6 +157,8 @@ export const Elements = [
         Radioactivity: 1,
         Light: false,
         Temp: 46,
+        MeltingPoint: 1132,
+        BoilingPoint: 4131,
         Type: "Powder",
         Category: "Powder",
         Flair: "Radioactive Powder"
@@ -142,6 +172,8 @@ export const Elements = [
         Radioactivity: 8,
         Light: false,
         Temp: 46,
+        MeltingPoint: 822,
+        BoilingPoint: 1527,
         Type: "Powder",
         Category: "Powder",
         Flair: "Radioactive Powder"
@@ -155,6 +187,8 @@ export const Elements = [
         Radioactivity: 2,
         Light: false,
         Temp: 46,
+        MeltingPoint: 639.4,
+        BoilingPoint: 3232,
         Type: "Powder",
         Category: "Powder",
         Flair: "Radioactive Powder"
@@ -204,6 +238,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
+        MeltingPoint: 1100,
+        BoilingPoint: 1648.9,
         Type: "Powder",
         Category: "Powder",
         Flair: "Powder"
@@ -216,6 +252,8 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
+        MeltingPoint: 801,
+        BoilingPoint: 1413,
         Type: "Powder",
         Category: "Powder",
         Flair: "Powder"

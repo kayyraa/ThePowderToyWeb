@@ -169,6 +169,8 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.dataset.radioactivity = Element.Radioactivity !== undefined ? Element.Radioactivity.toString() : "";
     ElementDiv.dataset.light = Element.Light.toString();
     ElementDiv.dataset.temp = Element.Temp.toString();
+    ElementDiv.dataset.meltingPoint = Element.MeltingPoint !== undefined ? Element.MeltingPoint.toString() : 9780;
+    ElementDiv.dataset.boilingPoint = Element.BoilingPoint !== undefined ? Element.BoilingPoint.toString() : 9780;
     ElementDiv.dataset.name = Element.Name;
     ElementDiv.style.zIndex = "9999";
     ElementDiv.id = Element.Name;
@@ -232,7 +234,7 @@ function UpdateFps() {
     const Target = document.elementFromPoint(MouseX, MouseY);
 
     if (Target && Target.dataset.particle === "true" && Target.dataset.temp) {
-        TempLabel.innerHTML = `${parseFloat(Target.dataset.temp).toFixed(1)}°C`;
+        TempLabel.innerHTML = `${parseFloat(Target.dataset.temp).toFixed(1)}°C ${Target.dataset.meltingPoint !== undefined ? "/" : ""} ${Target.dataset.meltingPoint !== undefined ? parseFloat(Target.dataset.meltingPoint).toFixed(1) : ""}${Target.dataset.meltingPoint !== undefined ? "°C" : ""}`;
         TempLabel.style.opacity = "1";
     } else {
         TempLabel.style.opacity = "0";

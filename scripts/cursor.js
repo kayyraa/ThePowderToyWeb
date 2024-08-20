@@ -89,6 +89,8 @@ function Loop() {
                         Radioactivity: Radioactivity !== null ? Radioactivity : 0,
                         Light: Light,
                         Temp: SelectedElement.dataset.temp,
+                        MeltingPoint: SelectedElement.dataset.meltingPoint,
+                        BoilingPoint: SelectedElement.dataset.boilingPoint,
                         Type: ElementType,
                     }
 

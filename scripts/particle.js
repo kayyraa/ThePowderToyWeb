@@ -93,6 +93,7 @@ if (ParticleContainer) {
                 const MaxHeight = window.innerHeight - ParticleRect.height;
                 const MaxWidth = window.innerWidth - ParticleRect.width;
 
+                const MeltingPoint = Particle.dataset.meltingPoint;
                 const IsCaustic = Particle.dataset.caustic === "true";
                 const IsLight = Particle.dataset.light === "true";
             
@@ -108,6 +109,28 @@ if (ParticleContainer) {
                     Particle.style.top = `${CurrentTop + OffsetY}px`;
 
                     return;
+                }
+
+                if (MeltingPoint !== undefined) {
+                    const Temp = parseFloat(Particle.dataset.temp);
+                    if (Temp >= parseFloat(MeltingPoint)) {
+                        const NewParticle = {
+                            Name: `MOLTEN ${Particle.dataset.name}`,
+                            Color: Particle.dataset.color,
+                            Flammable: false,
+                            Caustic: true,
+                            Radioactive: false,
+                            Radioactivity: parseFloat(Particle.dataset.radioactivity),
+                            Light: Particle.dataset.light,
+                            Temp: parseFloat(Particle.dataset.meltingPoint),
+                            MeltingPoint: parseFloat(Particle.dataset.meltingPoint),
+                            BoilingPoint: parseFloat(Particle.dataset.boilingPoint),
+                            Type: "Liquid"
+                        };
+
+                        TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
+                        Particle.remove();
+                    }
                 }
             
                 Particles.forEach(OtherParticle => {
@@ -129,6 +152,15 @@ if (ParticleContainer) {
                             const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
                             const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
             
+                            const Temp = parseFloat(Particle.dataset.temp);
+                            const OtherTemp = parseFloat(OtherParticle.dataset.temp);
+                                
+                            if (Temp !== OtherTemp) {
+                                const AverageTemp = (Temp + OtherTemp) / 2;
+                                Particle.dataset.temp = AverageTemp;
+                                OtherParticle.dataset.temp = AverageTemp;
+                            }
+
                             if (IsCaustic && OtherIsFlammable) {
                                 if (!OtherIsCaustic) {
                                     const Element = Elements.find(element => element.Name === "SMKE");
@@ -175,22 +207,6 @@ if (ParticleContainer) {
                         }
                     } else if (Particle.dataset.type === "Powder") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
-
-                        Particles.forEach(OtherParticle => {
-                            if (OtherParticle !== Particle && !IgnoreList.has(OtherParticle)) {
-                                const OtherType = OtherParticle.dataset.type;
-                                if (OtherType === "Powder" || OtherType === "Solid") {
-                                    const Temp = parseFloat(Particle.dataset.temp);
-                                    const OtherTemp = parseFloat(OtherParticle.dataset.temp);
-
-                                    if (Temp !== OtherTemp) {
-                                        const AverageTemp = (Temp + OtherTemp) / 2;
-                                        Particle.dataset.temp = AverageTemp;
-                                        OtherParticle.dataset.temp = AverageTemp;
-                                    }
-                                }
-                            }
-                        });
                     } else if (Particle.dataset.type === "Liquid") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
 
