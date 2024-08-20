@@ -8,16 +8,6 @@ function Random(Max, Min) {
     return Math.floor(Math.random() * (Max - Min + 1)) + Min;
 }
 
-function IsPlaceOccupied(x, y, gridSize) {
-    const Particles = Array.from(ParticleContainer.children);
-    return Particles.some(Particle => {
-        const ParticleRect = Particle.getBoundingClientRect();
-        const ParticleX = Math.floor(ParticleRect.left / gridSize) * gridSize;
-        const ParticleY = Math.floor(ParticleRect.top / gridSize) * gridSize;
-        return ParticleX === x && ParticleY === y;
-    });
-}
-
 function InitializeParticle(Particle) {
     const Direction = Math.floor(Math.random() * 4);
     const GridSize = parseInt(document.body.getAttribute("grid-size"), 10);
@@ -57,13 +47,13 @@ function React() {
         if (Particle.dataset.radioactive === "true") {
             RadioactiveParticles.push(Particle);
             setTimeout(() => {
-                Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(32, 8);
+                Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(64, 8);
                 TPTW.CreateElement(Elements.find(element => element.Name === "NEUT"), Particle.offsetLeft, Particle.offsetTop); 
             }, (RadioactiveParticles.length * 1000) - (parseFloat(Particle.dataset.radioactivity) * 1000));
         }
     }
 
-    setTimeout(React, 0);
+    requestAnimationFrame(React);
 }
 
 if (ParticleContainer) {
@@ -116,7 +106,7 @@ if (ParticleContainer) {
                     if (Temp >= parseFloat(MeltingPoint)) {
                         const NewParticle = {
                             Name: `MOLTEN ${Particle.dataset.name}`,
-                            Color: Particle.dataset.color,
+                            Color: `rgb(${TPTW.RgbString(Particle.dataset.color).R + Temp}, ${TPTW.RgbString(Particle.dataset.color).G}, ${TPTW.RgbString(Particle.dataset.color).B})`,
                             Flammable: false,
                             Caustic: true,
                             Radioactive: false,
@@ -128,7 +118,8 @@ if (ParticleContainer) {
                             Type: "Liquid"
                         };
 
-                        TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
+                        const MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
+                        MoltenParticle.dataset.molten = "true";
                         Particle.remove();
                     }
                 }
@@ -163,7 +154,7 @@ if (ParticleContainer) {
 
                             if (IsCaustic && OtherIsFlammable) {
                                 if (!OtherIsCaustic) {
-                                    const Element = Elements.find(element => element.Name === "SMKE");
+                                    const Element = TPTW.GetElement("SMKE");
                                     if (Element) {
                                         TPTW.CreateElement(Element, OtherParticle.offsetLeft, OtherParticle.offsetTop);
                                     }
@@ -203,15 +194,23 @@ if (ParticleContainer) {
                         });
             
                         if (DisplacementAllowed) {
-                            Particle.style.top = `${Particle.offsetTop - (8 * parseInt(document.body.getAttribute("speed")))}px`;
+                            Particle.style.top = `${Particle.offsetTop - 8}px`;
                         }
                     } else if (Particle.dataset.type === "Powder") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
                     } else if (Particle.dataset.type === "Liquid") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
 
-                        const NewLeft = Math.min(Math.round((Particle.offsetLeft + Random(25, -25)) / GridSize) * GridSize, MaxWidth);
-                        if (!IsPlaceOccupied(NewLeft, Particle.offsetTop, GridSize)) {
+                        const NewLeft = Math.min(Math.round((Particle.offsetLeft + Random(GridSize, -GridSize)) / GridSize) * GridSize, MaxWidth);
+                        
+                        if (!Particles.some(OtherParticle => {
+                            const OtherRect = OtherParticle.getBoundingClientRect();
+                            return (
+                                OtherRect.left === NewLeft &&
+                                OtherRect.top === Particle.offsetTop &&
+                                OtherParticle.dataset.type === "Liquid"
+                            );
+                        })) {
                             Particle.style.left = `${NewLeft}px`;
                         }
                     }
@@ -222,7 +221,7 @@ if (ParticleContainer) {
                     Particle.offsetLeft !== parseFloat(Particle.dataset.previousLeft)
                 );
             
-                if (!IsMoving && Particle.dataset.type !== "Gas") {
+                if (!IsMoving) {
                     IgnoreList.add(Particle);
                 }
             

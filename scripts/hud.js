@@ -10,7 +10,7 @@ let MouseX = 0;
 let MouseY = 0;
 
 const ActionLabel = document.createElement("span");
-ActionLabel.innerHTML = "Default Display";
+ActionLabel.innerHTML = "Fire Display";
 ActionLabel.style.fontSize = "24px";
 ActionLabel.style.color = "rgb(172, 172, 172)";
 ActionLabel.style.transition = "opacity 0.25s ease";
@@ -63,7 +63,7 @@ const ElementContainer = document.createElement("div");
 ElementContainer.style.position = "fixed";
 ElementContainer.style.right = "20px";
 ElementContainer.style.top = "50px";
-ElementContainer.style.width = "50px";
+ElementContainer.style.width = "100px";
 ElementContainer.style.height = "600px";
 ElementContainer.style.textAlign = "center";
 ElementContainer.style.userSelect = "none";
@@ -151,14 +151,14 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.innerHTML = Element.Name.toUpperCase().substring(0, 4);
     ElementDiv.style.display = "flex";
     ElementDiv.style.flexDirection = "column";
-    ElementDiv.style.width = "100%";
-    ElementDiv.style.height = `${Elements.length}px`;
+    ElementDiv.style.width = "75%";
+    ElementDiv.style.height = `20px`;
     ElementDiv.style.fontSize = "100%";
     ElementDiv.style.textAlign = "left";
     ElementDiv.style.justifyContent = "center";
     ElementDiv.style.alignContent = "center";
     ElementDiv.style.alignItems = "center";
-    ElementDiv.style.transition = "height 0.25s ease";
+    ElementDiv.style.transition = "width 0.25s ease";
     ElementDiv.style.backgroundColor = Element.Color;
     ElementDiv.style.color = InvertColor(Element.Color, false);
     
@@ -179,7 +179,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
     DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair} ${Element.Radioactive ? `- ${Element.Radioactivity}` : ""}`;
     DescriptionLabel.style.position = "absolute";
     DescriptionLabel.style.color = "white";
-    DescriptionLabel.style.right = "-175px";
+    DescriptionLabel.style.right = "-125px";
     DescriptionLabel.style.pointerEvents = "none";
     DescriptionLabel.style.width = "512px";
     DescriptionLabel.style.opacity = "0";
@@ -188,12 +188,12 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.appendChild(DescriptionLabel);
 
     ElementDiv.addEventListener("mouseenter", function() {
-        this.style.height = `${this.offsetHeight * 2}px`;
+        this.style.width = "100%";
         DescriptionLabel.style.opacity = "1";
 
         Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
             if (OtherElement !== this) {
-                OtherElement.style.height = `${Elements.length}px`;
+                OtherElement.style.width = "75%";
 
                 const OtherDescriptionLabel = OtherElement.querySelector("#DescriptionLabel");
                 if (OtherDescriptionLabel) {
@@ -205,7 +205,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
 
     ElementDiv.addEventListener("mouseleave", () => {
         DescriptionLabel.style.opacity = "0";
-        ElementDiv.style.height = `${Elements.length}px`;
+        ElementDiv.style.width = "75%";
     });
 
     ElementDiv.addEventListener("click", (Event) => {

@@ -1,5 +1,7 @@
 import { Settings } from "./settings.js";
 
+export const ParticleContainer = document.getElementById("ParticleContainer");
+
 export function Random(Max, Min) {
     return Math.floor(Math.random() * (Max - Min + 1)) + Min;
 }
@@ -38,14 +40,9 @@ export function RgbString(RgbString) {
 }
 
 export function CombustElement(CausticPart, FlammablePart) {
-    const ChanceOfDestruction = Math.floor(Math.random());
-
     CreateElement(Elements.find(element => element.Name === "SMKE"), FlammablePart.offsetLeft, FlammablePart.offsetTop);
     FlammablePart.remove();
-
-    if (ChanceOfDestruction === 1) {
-        CausticPart.remove();
-    }
+    CausticPart.remove();
 }
 
 export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MeltingPoint, BoilingPoint, Type}, PositionX, PositionY) {
@@ -83,4 +80,18 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
 
         return Particle;
     }
+}
+
+export function GetElement(Name) {
+    return Elements.find(element => element.Name === Name.toUpperCase());
+}
+
+export function IsPlaceOccupied(X, Y, GridSize) {
+    const Particles = Array.from(ParticleContainer.children);
+    return Particles.some(Particle => {
+        const ParticleRect = Particle.getBoundingClientRect();
+        const ParticleX = Math.floor(ParticleRect.left / GridSize) * GridSize;
+        const ParticleY = Math.floor(ParticleRect.top / GridSize) * GridSize;
+        return ParticleX === X && ParticleY === Y;
+    });
 }

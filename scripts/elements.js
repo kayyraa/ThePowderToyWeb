@@ -72,7 +72,7 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 22,
-        MeltingPoint: 1600,
+        MeltingPoint: 780,
         BoilingPoint: 2980,
         Type: "Solid",
         Category: "Solid",
@@ -202,6 +202,8 @@ export const Elements = [
         Radioactivity: 18,
         Light: false,
         Temp: 46,
+        MeltingPoint: 343,
+        BoilingPoint: 912,
         Type: "Powder",
         Category: "Powder",
         Flair: "Radioactive Powder"
