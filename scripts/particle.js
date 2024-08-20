@@ -103,26 +103,49 @@ if (ParticleContainer) {
 
                 if (MeltingPoint !== undefined) {
                     const Temp = parseFloat(Particle.dataset.temp);
+                    let MoltenParticle;
+                
                     if (Temp >= parseFloat(MeltingPoint)) {
                         const NewParticle = {
                             Name: `MOLTEN ${Particle.dataset.name}`,
-                            Color: `rgb(${TPTW.RgbString(Particle.dataset.color).R + Temp}, ${TPTW.RgbString(Particle.dataset.color).G}, ${TPTW.RgbString(Particle.dataset.color).B})`,
+                            Color: `rgb(${TPTW.RgbString(Particle.dataset.color).R}, ${TPTW.RgbString(Particle.dataset.color).G}, ${TPTW.RgbString(Particle.dataset.color).B})`,
                             Flammable: false,
                             Caustic: true,
-                            Radioactive: false,
+                            Radioactive: Particle.dataset.radioactive === "true",
                             Radioactivity: parseFloat(Particle.dataset.radioactivity),
                             Light: Particle.dataset.light,
-                            Temp: parseFloat(Particle.dataset.meltingPoint),
-                            MeltingPoint: parseFloat(Particle.dataset.meltingPoint),
+                            Temp: parseFloat(MeltingPoint),
+                            MeltingPoint: parseFloat(MeltingPoint),
                             BoilingPoint: parseFloat(Particle.dataset.boilingPoint),
                             Type: "Liquid"
                         };
-
-                        const MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
+                
+                        MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
                         MoltenParticle.dataset.molten = "true";
+                        MoltenParticle.dataset.wasRadioactive = Particle.dataset.radioactive === "true" ? "true" : "false";
+                        MoltenParticle.dataset.pastType = Particle.dataset.type;
                         Particle.remove();
+                    } else if (MoltenParticle) {
+                        const NewParticle = {
+                            Name: MoltenParticle.dataset.name.replace("MOLTEN ", ""),
+                            Color: `rgb(${TPTW.RgbString(Particle.dataset.color).R}, ${TPTW.RgbString(Particle.dataset.color).G}, ${TPTW.RgbString(Particle.dataset.color).B})`,
+                            Flammable: false,
+                            Caustic: true,
+                            Radioactive: MoltenParticle.dataset.wasRadioactive === "true",
+                            Radioactivity: parseFloat(Particle.dataset.radioactivity),
+                            Light: Particle.dataset.light,
+                            Temp: parseFloat(MeltingPoint),
+                            MeltingPoint: parseFloat(MeltingPoint),
+                            BoilingPoint: parseFloat(Particle.dataset.boilingPoint),
+                            Type: MoltenParticle.dataset.pastType
+                        };
+                
+                        const ColdParticle = TPTW.CreateElement(NewParticle, MoltenParticle.offsetLeft, MoltenParticle.offsetTop);
+                        ColdParticle.dataset.molten = "false";
+                        MoltenParticle.remove();
                     }
                 }
+                
             
                 Particles.forEach(OtherParticle => {
                     if (OtherParticle !== Particle) {
@@ -146,7 +169,7 @@ if (ParticleContainer) {
                             const Temp = parseFloat(Particle.dataset.temp);
                             const OtherTemp = parseFloat(OtherParticle.dataset.temp);
                                 
-                            if (Temp !== OtherTemp) {
+                            if (Temp.toFixed(1) !== OtherTemp.toFixed(1)) {
                                 const AverageTemp = (Temp + OtherTemp) / 2;
                                 Particle.dataset.temp = AverageTemp;
                                 OtherParticle.dataset.temp = AverageTemp;
@@ -154,13 +177,8 @@ if (ParticleContainer) {
 
                             if (IsCaustic && OtherIsFlammable) {
                                 if (!OtherIsCaustic) {
-                                    const Element = TPTW.GetElement("SMKE");
-                                    if (Element) {
-                                        TPTW.CreateElement(Element, OtherParticle.offsetLeft, OtherParticle.offsetTop);
-                                    }
+                                    TPTW.CombustElement(Particle, OtherParticle);
                                 }
-                                OtherParticle.remove();
-                                Particle.remove();
                             }
                         }
                     }
@@ -171,43 +189,54 @@ if (ParticleContainer) {
                 } else {
                     if (Particle.dataset.type === "Gas") {
                         let DisplacementAllowed = true;
-            
+
+                        const ParticleRect = Particle.getBoundingClientRect();
+
                         Particles.forEach(OtherParticle => {
                             if (OtherParticle !== Particle && !IgnoreList.has(OtherParticle)) {
                                 const OtherType = OtherParticle.dataset.type;
-                                if (OtherType === "Powder" || OtherType === "Solid") {
+
+                                if (OtherType === "Powder" || OtherType === "Solid" || OtherType === "Liquid") {
                                     const OtherRect = OtherParticle.getBoundingClientRect();
+
                                     if (
-                                        NewTop < OtherRect.bottom &&
-                                        NewTop + ParticleRect.height > OtherRect.top &&
                                         ParticleRect.right > OtherRect.left &&
-                                        ParticleRect.left < OtherRect.right
+                                        ParticleRect.left < OtherRect.right &&
+                                        ParticleRect.top < OtherRect.bottom &&
+                                        ParticleRect.bottom > OtherRect.top
                                     ) {
                                         if (OtherParticle.dataset.flammable === "true") {
                                             TPTW.CombustElement(Particle, OtherParticle);
                                         }
-            
+                                    
+                                        if (OtherType === "Powder" || OtherType === "Liquid") {
+                                            const DisplacementX = ParticleRect.left - OtherRect.left;
+                                            const DisplacementY = ParticleRect.top - OtherRect.top;
+                                        
+                                            OtherParticle.style.left = `${OtherParticle.offsetLeft + DisplacementX}px`;
+                                            OtherParticle.style.top = `${OtherParticle.offsetTop + DisplacementY}px`;
+                                        }
+                                    
                                         DisplacementAllowed = false;
                                     }
                                 }
                             }
                         });
-            
+
                         if (DisplacementAllowed) {
-                            Particle.style.top = `${Particle.offsetTop - 8}px`;
+                            Particle.style.top = `${Particle.offsetTop - 6}px`;
                         }
                     } else if (Particle.dataset.type === "Powder") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
                     } else if (Particle.dataset.type === "Liquid") {
                         Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
 
-                        const NewLeft = Math.min(Math.round((Particle.offsetLeft + Random(GridSize, -GridSize)) / GridSize) * GridSize, MaxWidth);
+                        const NewLeft = Math.min(Math.round((Particle.offsetLeft + Random(GridSize * 2, -GridSize * 2)) / GridSize) * GridSize, MaxWidth);
                         
                         if (!Particles.some(OtherParticle => {
                             const OtherRect = OtherParticle.getBoundingClientRect();
                             return (
                                 OtherRect.left === NewLeft &&
-                                OtherRect.top === Particle.offsetTop &&
                                 OtherParticle.dataset.type === "Liquid"
                             );
                         })) {

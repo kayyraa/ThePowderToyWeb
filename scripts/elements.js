@@ -261,6 +261,19 @@ export const Elements = [
         Flair: "Powder"
     },
     {
+        Name: "RADO",
+        Color: "rgb(155, 255, 155)",
+        Flammable: true,
+        Caustic: false,
+        Radioactive: true,
+        Radioactivity: 24,
+        Light: false,
+        Temp: 46,
+        Type: "Gas",
+        Category: "Gas",
+        Flair: "Radioactive Gas"
+    },
+    {
         Name: "OXYG",
         Color: "rgb(200, 200, 255)",
         Flammable: true,

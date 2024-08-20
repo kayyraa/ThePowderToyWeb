@@ -25,8 +25,8 @@ export function Print(x) {
             Span.style.opacity = "0";
             setTimeout(() => {
                 Span.remove();
-            }, 250);
-        }, 2500);
+            }, getComputedStyle(Span).transitionDelay);
+        }, 500);
     }
 }
 
@@ -64,6 +64,7 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
         Particle.style.pointerEvents = `${Type === "None" ? "none" : ""}`;
 
         Particle.className = Name.toUpperCase();
+        Particle.dataset.name = Name;
         Particle.dataset.particle = "true";
         Particle.dataset.type = Type;
         Particle.dataset.color = TargetColor;
