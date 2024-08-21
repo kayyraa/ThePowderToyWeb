@@ -11,6 +11,8 @@ git add .
 git commit -m "Auto-update from local project folder"
 git push origin main
 
+start "./snapshot.py"
+
 cd ..
 timeout /t 5 /nobreak >nul
 rd /s /q "%TempDir%"
