@@ -106,32 +106,43 @@ if (ParticleContainer) {
                     let MoltenParticle;
                 
                     if (Temp >= parseFloat(MeltingPoint)) {
-                        const NewParticle = {
-                            Name: `MOLTEN ${Particle.dataset.name}`,
-                            Color: `rgb(${TPTW.RgbString(Particle.dataset.color).R}, ${TPTW.RgbString(Particle.dataset.color).G}, ${TPTW.RgbString(Particle.dataset.color).B})`,
-                            Flammable: false,
-                            Caustic: true,
-                            Radioactive: Particle.dataset.radioactive === "true",
-                            Radioactivity: parseFloat(Particle.dataset.radioactivity),
-                            Light: Particle.dataset.light,
-                            Temp: parseFloat(MeltingPoint),
-                            MeltingPoint: parseFloat(MeltingPoint),
-                            BoilingPoint: parseFloat(Particle.dataset.boilingPoint),
-                            Type: "Liquid"
-                        };
+                        const MoltenForm = Particle.dataset.moltenForm;
                 
-                        MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
-                        MoltenParticle.dataset.molten = "true";
-                        MoltenParticle.dataset.wasRadioactive = Particle.dataset.radioactive === "true" ? "true" : "false";
-                        MoltenParticle.dataset.pastType = Particle.dataset.type;
-                        Particle.remove();
+                        if (MoltenForm !== "undefined" && MoltenForm !== undefined) {
+                            const NewParticle = TPTW.GetElement(MoltenForm);
+                            MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
+                            MoltenParticle.dataset.molten = "true";
+                            MoltenParticle.dataset.wasRadioactive = Particle.dataset.radioactive === "true" ? "true" : "false";
+                            MoltenParticle.dataset.pastType = Particle.dataset.type;
+                            Particle.remove();
+                        } else {
+                            const NewParticle = {
+                                Name: Particle.dataset.name,
+                                Color: Particle.dataset.color,
+                                Flammable: false,
+                                Caustic: true,
+                                Radioactive: Particle.dataset.radioactive,
+                                Radioactivity: parseFloat(Particle.dataset.radioactivity),
+                                Light: Particle.dataset.light,
+                                Temp: parseFloat(MeltingPoint),
+                                MeltingPoint: parseFloat(MeltingPoint),
+                                BoilingPoint: parseFloat(Particle.dataset.boilingPoint),
+                                Type: "Liquid"
+                            };
+                
+                            MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
+                            MoltenParticle.dataset.molten = "true";
+                            MoltenParticle.dataset.wasRadioactive = Particle.dataset.radioactive === "true" ? "true" : "false";
+                            MoltenParticle.dataset.pastType = Particle.dataset.type;
+                            Particle.remove();
+                        }
                     } else if (MoltenParticle) {
                         const NewParticle = {
-                            Name: MoltenParticle.dataset.name.replace("MOLTEN ", ""),
-                            Color: `rgb(${TPTW.RgbString(Particle.dataset.color).R}, ${TPTW.RgbString(Particle.dataset.color).G}, ${TPTW.RgbString(Particle.dataset.color).B})`,
+                            Name: Particle.dataset.name,
+                            Color: Particle.dataset.color,
                             Flammable: false,
                             Caustic: true,
-                            Radioactive: MoltenParticle.dataset.wasRadioactive === "true",
+                            Radioactive: MoltenParticle.dataset.wasRadioactive,
                             Radioactivity: parseFloat(Particle.dataset.radioactivity),
                             Light: Particle.dataset.light,
                             Temp: parseFloat(MeltingPoint),
@@ -144,7 +155,7 @@ if (ParticleContainer) {
                         ColdParticle.dataset.molten = "false";
                         MoltenParticle.remove();
                     }
-                }
+                }                
                 
             
                 Particles.forEach(OtherParticle => {

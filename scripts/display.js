@@ -9,14 +9,7 @@ function Loop() {
     const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
     const Display = document.body.getAttribute("display");
 
-    if (Display === "fire") {
-        Particles.forEach(Particle => {
-            if (Particle.dataset.molten === "true") {
-                Particle.style.filter = `brightness(2) drop-shadow(0 0 8px ${Particle.dataset.color})`;
-                Particle.style.boxShadow = `0 0 8px 1px ${Particle.dataset.color}`;
-            }
-        });
-    } else if (Display === "heat") {
+    if (Display === "heat") {
         Particles.forEach(Particle => {
             const Temp = parseFloat(Particle.dataset.temp) || 0;
             const CurrentColor = StringToRgb(getComputedStyle(Particle).backgroundColor);
@@ -43,9 +36,14 @@ function Loop() {
 
     else {
         Particles.forEach(Particle => {
-            Particle.style.filter = "";
-            Particle.style.boxShadow = "";
-            Particle.style.backgroundColor = Particle.dataset.color;
+            if (Particle.dataset.molten === "true") {
+                Particle.style.filter = `brightness(2) drop-shadow(0 0 8px ${Particle.dataset.color})`;
+                Particle.style.boxShadow = `0 0 8px 1px ${Particle.dataset.color}`;
+            } else {
+                Particle.style.filter = "";
+                Particle.style.boxShadow = "";
+                Particle.style.backgroundColor = Particle.dataset.color;
+            }
         });
     }
 

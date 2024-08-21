@@ -3,4 +3,5 @@ export const Settings = {
     MaxSpeed: 16,
     MaxParticleCount: 500,
     PowderEffectStrength: 64,
+    AmbientTemp: 32,
 }

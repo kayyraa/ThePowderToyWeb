@@ -10,7 +10,7 @@ let MouseX = 0;
 let MouseY = 0;
 
 const ActionLabel = document.createElement("span");
-ActionLabel.innerHTML = "Fire Display";
+ActionLabel.innerHTML = "Default Display";
 ActionLabel.style.fontSize = "24px";
 ActionLabel.style.color = "rgb(172, 172, 172)";
 ActionLabel.style.transition = "opacity 0.25s ease";
@@ -56,17 +56,15 @@ ParticlesLabel.style.fontSize = "100%";
 ParticlesLabel.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
 ParticlesLabel.style.padding = "10px";
 ParticlesLabel.style.textAlign = "center";
-ParticlesLabel.style.userSelect = "none";
 StatsContainer.appendChild(ParticlesLabel);
 
 const ElementContainer = document.createElement("div");
 ElementContainer.style.position = "fixed";
 ElementContainer.style.right = "20px";
 ElementContainer.style.top = "50px";
-ElementContainer.style.width = "100px";
+ElementContainer.style.width = "75px";
 ElementContainer.style.height = "600px";
 ElementContainer.style.textAlign = "center";
-ElementContainer.style.userSelect = "none";
 ElementContainer.style.justifyContent = "center";
 ElementContainer.style.alignContent = "center";
 ElementContainer.style.alignItems = "center";
@@ -88,6 +86,77 @@ ElementLabel.style.textAlign = "center";
 ElementLabel.style.userSelect = "none";
 ElementLabel.style.pointerEvents = "none";
 ElementContainer.appendChild(ElementLabel);
+
+for (let Index = 0; Index < Elements.length; Index++) {
+    const Element = Elements[Index];
+
+    const ElementDiv = document.createElement("div");
+    ElementDiv.innerHTML = Element.Name.toUpperCase().substring(0, 4);
+    ElementDiv.style.display = "flex";
+    ElementDiv.style.flexDirection = "column";
+    ElementDiv.style.width = "100%";
+    ElementDiv.style.height = "20px";
+    ElementDiv.style.fontSize = "100%";
+    ElementDiv.style.textAlign = "left";
+    ElementDiv.style.justifyContent = "center";
+    ElementDiv.style.alignContent = "center";
+    ElementDiv.style.alignItems = "center";
+    ElementDiv.style.transition = "height 0.25s ease";
+    ElementDiv.style.backgroundColor = Element.Color;
+    ElementDiv.style.color = InvertColor(Element.Color, false);
+    
+    ElementDiv.dataset.type = Element.Type;
+    ElementDiv.dataset.flammable = Element.Flammable.toString();
+    ElementDiv.dataset.caustic = Element.Caustic.toString();
+    ElementDiv.dataset.radioactive = Element.Radioactive.toString();
+    ElementDiv.dataset.radioactivity = Element.Radioactivity !== undefined ? Element.Radioactivity.toString() : "";
+    ElementDiv.dataset.light = Element.Light.toString();
+    ElementDiv.dataset.temp = Element.Temp.toString();
+    ElementDiv.dataset.meltingPoint = Element.MeltingPoint !== undefined ? Element.MeltingPoint.toString() : 9780;
+    ElementDiv.dataset.boilingPoint = Element.BoilingPoint !== undefined ? Element.BoilingPoint.toString() : 9780;
+    ElementDiv.dataset.name = Element.Name;
+    ElementDiv.style.zIndex = "9999";
+    ElementDiv.id = Element.Name;
+
+    const DescriptionLabel = document.createElement("span");
+    DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair} ${Element.Radioactive ? `- ${Element.Radioactivity}` : ""}`;
+    DescriptionLabel.style.position = "absolute";
+    DescriptionLabel.style.color = "white";
+    DescriptionLabel.style.right = "-125px";
+    DescriptionLabel.style.pointerEvents = "none";
+    DescriptionLabel.style.width = "512px";
+    DescriptionLabel.style.opacity = "0";
+    DescriptionLabel.style.transition = "opacity 0.25s ease";
+    DescriptionLabel.id = "DescriptionLabel";
+    ElementDiv.appendChild(DescriptionLabel);
+
+    ElementDiv.addEventListener("mouseenter", function() {
+        this.style.height = "40px";
+        DescriptionLabel.style.opacity = "1";
+
+        Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
+            if (OtherElement !== this) {
+                OtherElement.style.height = "20px";
+
+                const OtherDescriptionLabel = OtherElement.querySelector("#DescriptionLabel");
+                if (OtherDescriptionLabel) {
+                    OtherDescriptionLabel.style.opacity = "0";
+                }
+            }
+        });
+    });
+
+    ElementDiv.addEventListener("mouseleave", () => {
+        DescriptionLabel.style.opacity = "0";
+        ElementDiv.style.height = "20px";
+    });
+
+    ElementDiv.addEventListener("click", (Event) => {
+        document.body.setAttribute("selected", Event.target.id);
+    });
+
+    ElementContainer.appendChild(ElementDiv);
+}
 
 const TempLabel = document.createElement("span");
 TempLabel.innerHTML = "43°C";
@@ -142,77 +211,6 @@ function InvertColor(RgbString, TrueColor) {
             return 'rgb(255, 255, 255)';
         }
     }f
-}
-
-for (let Index = 0; Index < Elements.length; Index++) {
-    const Element = Elements[Index];
-
-    const ElementDiv = document.createElement("div");
-    ElementDiv.innerHTML = Element.Name.toUpperCase().substring(0, 4);
-    ElementDiv.style.display = "flex";
-    ElementDiv.style.flexDirection = "column";
-    ElementDiv.style.width = "75%";
-    ElementDiv.style.height = `20px`;
-    ElementDiv.style.fontSize = "100%";
-    ElementDiv.style.textAlign = "left";
-    ElementDiv.style.justifyContent = "center";
-    ElementDiv.style.alignContent = "center";
-    ElementDiv.style.alignItems = "center";
-    ElementDiv.style.transition = "width 0.25s ease";
-    ElementDiv.style.backgroundColor = Element.Color;
-    ElementDiv.style.color = InvertColor(Element.Color, false);
-    
-    ElementDiv.dataset.type = Element.Type;
-    ElementDiv.dataset.flammable = Element.Flammable.toString();
-    ElementDiv.dataset.caustic = Element.Caustic.toString();
-    ElementDiv.dataset.radioactive = Element.Radioactive.toString();
-    ElementDiv.dataset.radioactivity = Element.Radioactivity !== undefined ? Element.Radioactivity.toString() : "";
-    ElementDiv.dataset.light = Element.Light.toString();
-    ElementDiv.dataset.temp = Element.Temp.toString();
-    ElementDiv.dataset.meltingPoint = Element.MeltingPoint !== undefined ? Element.MeltingPoint.toString() : 9780;
-    ElementDiv.dataset.boilingPoint = Element.BoilingPoint !== undefined ? Element.BoilingPoint.toString() : 9780;
-    ElementDiv.dataset.name = Element.Name;
-    ElementDiv.style.zIndex = "9999";
-    ElementDiv.id = Element.Name;
-
-    const DescriptionLabel = document.createElement("span");
-    DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair} ${Element.Radioactive ? `- ${Element.Radioactivity}` : ""}`;
-    DescriptionLabel.style.position = "absolute";
-    DescriptionLabel.style.color = "white";
-    DescriptionLabel.style.right = "-125px";
-    DescriptionLabel.style.pointerEvents = "none";
-    DescriptionLabel.style.width = "512px";
-    DescriptionLabel.style.opacity = "0";
-    DescriptionLabel.style.transition = "opacity 0.25s ease";
-    DescriptionLabel.id = "DescriptionLabel";
-    ElementDiv.appendChild(DescriptionLabel);
-
-    ElementDiv.addEventListener("mouseenter", function() {
-        this.style.width = "100%";
-        DescriptionLabel.style.opacity = "1";
-
-        Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
-            if (OtherElement !== this) {
-                OtherElement.style.width = "75%";
-
-                const OtherDescriptionLabel = OtherElement.querySelector("#DescriptionLabel");
-                if (OtherDescriptionLabel) {
-                    OtherDescriptionLabel.style.opacity = "0";
-                }
-            }
-        });
-    });
-
-    ElementDiv.addEventListener("mouseleave", () => {
-        DescriptionLabel.style.opacity = "0";
-        ElementDiv.style.width = "75%";
-    });
-
-    ElementDiv.addEventListener("click", (Event) => {
-        document.body.setAttribute("selected", Event.target.id);
-    });
-
-    ElementContainer.appendChild(ElementDiv);
 }
 
 ClearButton.addEventListener("click", () => {

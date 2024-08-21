@@ -1,4 +1,5 @@
 import { Settings } from "./settings.js";
+import { Elements } from "./elements.js";
 
 export const ParticleContainer = document.getElementById("ParticleContainer");
 
@@ -45,7 +46,7 @@ export function CombustElement(CausticPart, FlammablePart) {
     CausticPart.remove();
 }
 
-export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MeltingPoint, BoilingPoint, Type}, PositionX, PositionY) {
+export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MoltenForm, MeltingPoint, BoilingPoint, Type}, PositionX, PositionY) {
     const ParticleContainer = document.getElementById("ParticleContainer");
     const PowderStrength = Type !== "Solid" ? Settings.PowderEffectStrength : Settings.PowderEffectStrength / 4;
     const GridSize = parseFloat(document.body.getAttribute("grid-size"));
@@ -74,6 +75,7 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
         Particle.dataset.radioactivity = Radioactivity;
         Particle.dataset.light = Light;
         Particle.dataset.temp = Temp;
+        Particle.dataset.moltenForm = MoltenForm;
         Particle.dataset.meltingPoint = MeltingPoint;
         Particle.dataset.boilingPoint = BoilingPoint;
         Particle.id = Name;
@@ -83,8 +85,27 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
     }
 }
 
+export function GetAllParticles() {
+    return Array.from(ParticleContainer.getElementsByTagName("div"));
+}
+
+export function GetParticleFromPosition(X, Y) {
+    let Element = document.elementFromPoint(X, Y);
+    if (Element && Element.classList.contains('particle')) {
+        return Element;
+    }
+    return null;
+}
+
+export function GetParticleFromName(Name) {
+    const AllParticles = GetAllParticles();
+    if (AllParticles.length > 0) {
+        return AllParticles.find(Particle => Particle.dataset.name.toUpperCase() === Name.toUpperCase());
+    }
+}
+
 export function GetElement(Name) {
-    return Elements.find(element => element.Name === Name.toUpperCase());
+    return Elements.find(element => element.Name === Name);
 }
 
 export function IsPlaceOccupied(X, Y, GridSize) {
