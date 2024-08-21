@@ -2,8 +2,6 @@
 set SourceDir=%~dp0
 set TempDir=%Temp%\ThePowderToyWeb
 
-start "" python "./snapshot.py"
-
 if exist "%TempDir%" rd /s /q "%TempDir%"
 git clone https://github.com/kayyraa/ThePowderToyWeb.git "%TempDir%"
 
@@ -16,3 +14,5 @@ git push origin main
 cd ..
 timeout /t 5 /nobreak >nul
 rd /s /q "%TempDir%"
+
+start "" python "./snapshot.py"
