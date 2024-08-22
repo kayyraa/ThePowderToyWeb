@@ -46,7 +46,6 @@ document.addEventListener("touchmove", (Event) => {
 }, { passive: false }); 
 
 function IsPlaceOccupied(x, y, gridSize) {
-    const ParticleContainer = document.getElementById("ParticleContainer");
     const Particles = Array.from(ParticleContainer.children);
     return Particles.some(Particle => {
         const ParticleRect = Particle.getBoundingClientRect();
@@ -83,7 +82,7 @@ function Loop() {
                     Radioactive: Radioactive,
                     Radioactivity: Radioactivity !== null ? Radioactivity : 0,
                     Light: Light,
-                    Temp: SelectedElement.dataset.fixedTemp,
+                    Temp: SelectedElement.dataset.temp,
                     MeltingPoint: SelectedElement.dataset.meltingPoint,
                     BoilingPoint: SelectedElement.dataset.boilingPoint,
                     Type: ElementType,

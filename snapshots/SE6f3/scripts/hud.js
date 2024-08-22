@@ -79,9 +79,9 @@ ElementLabel.style.position = "fixed";
 ElementLabel.style.color = "rgb(172, 172, 172)";
 ElementLabel.style.width = "200px";
 ElementLabel.style.height = "50px";
-ElementLabel.style.bottom = "15px";
-ElementLabel.style.left = "-15px";
-ElementLabel.style.fontSize = "32px";
+ElementLabel.style.bottom = "10px";
+ElementLabel.style.left = "-10px";
+ElementLabel.style.fontSize = "24px";
 ElementLabel.style.paddingLeft = "10px";
 ElementLabel.style.paddingRight = "10px";
 ElementLabel.style.textAlign = "center";
@@ -108,15 +108,12 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.style.color = InvertColor(Element.Color, false);
     
     ElementDiv.dataset.type = Element.Type;
-    ElementDiv.dataset.fixedType = Element.Type;
     ElementDiv.dataset.flammable = Element.Flammable.toString();
     ElementDiv.dataset.caustic = Element.Caustic.toString();
     ElementDiv.dataset.radioactive = Element.Radioactive.toString();
-    ElementDiv.dataset.fixedRadioactive = Element.Radioactive.toString();
     ElementDiv.dataset.radioactivity = Element.Radioactivity !== undefined ? Element.Radioactivity.toString() : "";
     ElementDiv.dataset.light = Element.Light.toString();
     ElementDiv.dataset.temp = Element.Temp.toString();
-    ElementDiv.dataset.fixedTemp = Element.Temp.toString();
     ElementDiv.dataset.meltingPoint = Element.MeltingPoint !== undefined ? Element.MeltingPoint.toString() : 9780;
     ElementDiv.dataset.boilingPoint = Element.BoilingPoint !== undefined ? Element.BoilingPoint.toString() : 9780;
     ElementDiv.dataset.name = Element.Name;
@@ -125,8 +122,6 @@ for (let Index = 0; Index < Elements.length; Index++) {
 
     const DescriptionLabel = document.createElement("span");
     DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair} ${Element.Radioactive ? `- ${Element.Radioactivity}` : ""}`;
-    DescriptionLabel.style.justifyContent = "center";
-    DescriptionLabel.style.alignItems = "center";
     DescriptionLabel.style.position = "fixed";
     DescriptionLabel.style.fontSize = "24px";
     DescriptionLabel.style.color = "white";

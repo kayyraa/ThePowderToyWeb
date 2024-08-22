@@ -47,7 +47,7 @@ function React() {
         if (Particle.dataset.radioactive === "true") {
             RadioactiveParticles.push(Particle);
             setTimeout(() => {
-                Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(256, 8);
+                Particle.dataset.temp = parseFloat(Particle.dataset.temp) + Random(128, 8);
                 TPTW.CreateElement(Elements.find(element => element.Name === "NEUT"), Particle.offsetLeft, Particle.offsetTop); 
             }, (RadioactiveParticles.length * 1000) - (parseFloat(Particle.dataset.radioactivity) * 1000));
         }

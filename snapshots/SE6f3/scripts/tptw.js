@@ -77,7 +77,6 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
         Particle.dataset.radioactivity = Radioactivity;
         Particle.dataset.light = Light;
         Particle.dataset.temp = Temp;
-        Particle.dataset.fixedTemp = Temp;
         Particle.dataset.meltingPoint = MeltingPoint;
         Particle.dataset.boilingPoint = BoilingPoint;
         Particle.id = Name;
