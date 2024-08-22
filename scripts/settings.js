@@ -4,4 +4,5 @@ export const Settings = {
     MaxParticleCount: 500,
     PowderEffectStrength: 64,
     AmbientTemp: 32,
+    Version: "v41.12.6"
 }

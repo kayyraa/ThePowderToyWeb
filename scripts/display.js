@@ -36,14 +36,9 @@ function Loop() {
 
     else {
         Particles.forEach(Particle => {
-            if (Particle.dataset.molten === "true") {
-                Particle.style.filter = `brightness(2) drop-shadow(0 0 8px ${Particle.dataset.color})`;
-                Particle.style.boxShadow = `0 0 8px 1px ${Particle.dataset.color}`;
-            } else {
-                Particle.style.filter = "";
-                Particle.style.boxShadow = "";
-                Particle.style.backgroundColor = Particle.dataset.color;
-            }
+            Particle.style.filter = "";
+            Particle.style.boxShadow = "";
+            Particle.style.backgroundColor = Particle.dataset.color;
         });
     }
 

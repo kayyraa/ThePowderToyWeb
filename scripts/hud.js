@@ -3,6 +3,8 @@ import { Settings } from "./settings.js";
 import { Displays } from "./displays.js";
 import * as tptw from "./tptw.js";
 
+document.title = Settings.Version;
+
 const LogContainer = document.getElementById("LogContainer");
 const ParticleContainer = document.getElementById("ParticleContainer");
 

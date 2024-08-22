@@ -103,59 +103,15 @@ if (ParticleContainer) {
 
                 if (MeltingPoint !== undefined) {
                     const Temp = parseFloat(Particle.dataset.temp);
-                    let MoltenParticle;
                 
-                    if (Temp >= parseFloat(MeltingPoint)) {
-                        const MoltenForm = Particle.dataset.moltenForm;
-                
-                        if (MoltenForm !== "undefined" && MoltenForm !== undefined) {
-                            const NewParticle = TPTW.GetElement(MoltenForm);
-                            MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
-                            MoltenParticle.dataset.molten = "true";
-                            MoltenParticle.dataset.wasRadioactive = Particle.dataset.radioactive === "true" ? "true" : "false";
-                            MoltenParticle.dataset.pastType = Particle.dataset.type;
-                            Particle.remove();
-                        } else {
-                            const NewParticle = {
-                                Name: Particle.dataset.name,
-                                Color: Particle.dataset.color,
-                                Flammable: false,
-                                Caustic: true,
-                                Radioactive: Particle.dataset.radioactive,
-                                Radioactivity: parseFloat(Particle.dataset.radioactivity),
-                                Light: Particle.dataset.light,
-                                Temp: parseFloat(MeltingPoint),
-                                MeltingPoint: parseFloat(MeltingPoint),
-                                BoilingPoint: parseFloat(Particle.dataset.boilingPoint),
-                                Type: "Liquid"
-                            };
-                
-                            MoltenParticle = TPTW.CreateElement(NewParticle, Particle.offsetLeft, Particle.offsetTop);
-                            MoltenParticle.dataset.molten = "true";
-                            MoltenParticle.dataset.wasRadioactive = Particle.dataset.radioactive === "true" ? "true" : "false";
-                            MoltenParticle.dataset.pastType = Particle.dataset.type;
-                            Particle.remove();
-                        }
-                    } else if (MoltenParticle) {
-                        const NewParticle = {
-                            Name: Particle.dataset.name,
-                            Color: Particle.dataset.color,
-                            Flammable: false,
-                            Caustic: true,
-                            Radioactive: MoltenParticle.dataset.wasRadioactive,
-                            Radioactivity: parseFloat(Particle.dataset.radioactivity),
-                            Light: Particle.dataset.light,
-                            Temp: parseFloat(MeltingPoint),
-                            MeltingPoint: parseFloat(MeltingPoint),
-                            BoilingPoint: parseFloat(Particle.dataset.boilingPoint),
-                            Type: MoltenParticle.dataset.pastType
-                        };
-                
-                        const ColdParticle = TPTW.CreateElement(NewParticle, MoltenParticle.offsetLeft, MoltenParticle.offsetTop);
-                        ColdParticle.dataset.molten = "false";
-                        MoltenParticle.remove();
+                    if (Temp > MeltingPoint) {
+                        Particle.dataset.type = "Liquid";
+                        Particle.dataset.radioactive = false;
+                    } else {
+                        Particle.dataset.type = Particle.dataset.fixedType;
+                        Particle.dataset.radioactive = Particle.dataset.fixedRadioactive;
                     }
-                }                
+                }
                 
             
                 Particles.forEach(OtherParticle => {
@@ -165,31 +121,31 @@ if (ParticleContainer) {
                         }
 
                         const OtherRect = OtherParticle.getBoundingClientRect();
-                        if (
+                        const Collision = (
                             NewTop < OtherRect.bottom &&
                             NewTop + ParticleRect.height > OtherRect.top &&
                             ParticleRect.right > OtherRect.left &&
                             ParticleRect.left < OtherRect.right
-                        ) {
+                        );
+
+                        if (Collision) {
                             CollisionDetected = true;
                             CollisionTop = Math.min(CollisionTop, OtherRect.top - ParticleRect.height);
-            
+                        
                             const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
                             const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
-            
+                        
                             const Temp = parseFloat(Particle.dataset.temp);
                             const OtherTemp = parseFloat(OtherParticle.dataset.temp);
-                                
+                        
                             if (Temp.toFixed(1) !== OtherTemp.toFixed(1)) {
                                 const AverageTemp = (Temp + OtherTemp) / 2;
-                                Particle.dataset.temp = AverageTemp;
-                                OtherParticle.dataset.temp = AverageTemp;
+                                Particle.dataset.temp = AverageTemp.toFixed(1);
+                                OtherParticle.dataset.temp = AverageTemp.toFixed(1);
                             }
-
-                            if (IsCaustic && OtherIsFlammable) {
-                                if (!OtherIsCaustic) {
-                                    TPTW.CombustElement(Particle, OtherParticle);
-                                }
+                        
+                            if (IsCaustic && OtherIsFlammable && !OtherIsCaustic) {
+                                TPTW.CombustElement(Particle, OtherParticle);
                             }
                         }
                     }

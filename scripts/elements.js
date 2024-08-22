@@ -128,7 +128,6 @@ export const Elements = [
         Radioactive: false,
         Light: false,
         Temp: 0,
-        MoltenForm: "WATR",
         MeltingPoint: 3,
         BoilingPoint: 100,
         Type: "Powder",

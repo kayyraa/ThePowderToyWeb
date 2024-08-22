@@ -46,7 +46,7 @@ export function CombustElement(CausticPart, FlammablePart) {
     CausticPart.remove();
 }
 
-export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MoltenForm, MeltingPoint, BoilingPoint, Type}, PositionX, PositionY) {
+export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MeltingPoint, BoilingPoint, Type}, PositionX, PositionY) {
     const ParticleContainer = document.getElementById("ParticleContainer");
     const PowderStrength = Type !== "Solid" ? Settings.PowderEffectStrength : Settings.PowderEffectStrength / 4;
     const GridSize = parseFloat(document.body.getAttribute("grid-size"));
@@ -68,14 +68,15 @@ export function CreateElement({Name, Color, Flammable, Caustic, Radioactive, Rad
         Particle.dataset.name = Name;
         Particle.dataset.particle = "true";
         Particle.dataset.type = Type;
+        Particle.dataset.fixedType = Type;
         Particle.dataset.color = TargetColor;
         Particle.dataset.Flammable = Flammable;
         Particle.dataset.caustic = Caustic;
         Particle.dataset.radioactive = Radioactive;
+        Particle.dataset.fixedRadioactive = Radioactive;
         Particle.dataset.radioactivity = Radioactivity;
         Particle.dataset.light = Light;
         Particle.dataset.temp = Temp;
-        Particle.dataset.moltenForm = MoltenForm;
         Particle.dataset.meltingPoint = MeltingPoint;
         Particle.dataset.boilingPoint = BoilingPoint;
         Particle.id = Name;
@@ -116,4 +117,26 @@ export function IsPlaceOccupied(X, Y, GridSize) {
         const ParticleY = Math.floor(ParticleRect.top / GridSize) * GridSize;
         return ParticleX === X && ParticleY === Y;
     });
+}
+
+export class math {
+    static Clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    static Lerp(a, b, t) {
+        return a + (b - a) * t;
+    }
+
+    static Map(value, inMin, inMax, outMin, outMax) {
+        return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    }
+
+    static Sign(value) {
+        return value < 0? -1 : value > 0? 1 : 0;
+    }
+
+    static Rad(degrees) {
+        return degrees * Math.PI / 180;
+    }
 }
