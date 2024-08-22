@@ -250,17 +250,16 @@ function UpdateFps() {
         ElementLabel.innerHTML = SelectedElement.id;
     }
 
-    if (ElapsedTime > 125) {
+    if (ElapsedTime > 250) {
         const Fps = Math.floor(FrameCount / (ElapsedTime / 1000));
         FpsLabel.innerHTML = `FPS: ${Fps}`;
-
         LastTime = CurrentTime;
         FrameCount = 0;
     } else {
         FrameCount++;
     }
 
-    requestAnimationFrame(UpdateFps);
+    setTimeout(UpdateFps, 0);
 }
 
 UpdateFps();
