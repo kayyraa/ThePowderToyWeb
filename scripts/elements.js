@@ -14,6 +14,20 @@ export const Elements = [
         Flair: "Powder"
     },
     {
+        Name: "SLCN",
+        Color: "rgb(188, 205, 223)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        MeltingPoint: 1414,
+        BoilingPoint: 3265,
+        Type: "Powder",
+        Category: "Powder",
+        Flair: "Powder"
+    },
+    {
         Name: "WATR",
         Color: "rgb(15, 94, 156)",
         Flammable: false,
@@ -22,6 +36,20 @@ export const Elements = [
         Light: false,
         Temp: 32,
         BoilingPoint: 100,
+        Type: "Liquid",
+        Category: "Liquid",
+        Flair: "Liquid"
+    },
+    {
+        Name: "LAVA",
+        Color: "rgb(224, 80, 16)",
+        Flammable: false,
+        Caustic: true,
+        Radioactive: false,
+        Light: false,
+        Temp: 1100,
+        MeltingPoint: 1250,
+        BoilingPoint: 2500,
         Type: "Liquid",
         Category: "Liquid",
         Flair: "Liquid"
@@ -102,6 +130,34 @@ export const Elements = [
         Temp: 22,
         MeltingPoint: 1064,
         BoilingPoint: 2836,
+        Type: "Solid",
+        Category: "Solid",
+        Flair: "Solid"
+    },
+    {
+        Name: "DMND",
+        Color: "rgb(0, 255, 255)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        MeltingPoint: 4500,
+        BoilingPoint: 4830,
+        Type: "Solid",
+        Category: "Solid",
+        Flair: "Solid"
+    },
+    {
+        Name: "EMER",
+        Color: "rgb(55, 255, 55)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        MeltingPoint: 1275,
+        BoilingPoint: 2550,
         Type: "Solid",
         Category: "Solid",
         Flair: "Solid"
