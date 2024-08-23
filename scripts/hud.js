@@ -25,7 +25,7 @@ document.body.appendChild(ActionLabel);
 const StatsContainer = document.createElement("div");
 StatsContainer.style.display = "flex";
 StatsContainer.style.flexDirection = "column";
-StatsContainer.style.width = IsMobile() ? "100px" : "210px";
+StatsContainer.style.width = "210px";
 StatsContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
 StatsContainer.style.zIndex = 9999;
 document.body.appendChild(StatsContainer);
