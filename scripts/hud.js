@@ -17,7 +17,6 @@ var MouseX = 0;
 var MouseY = 0;
 
 var DraggingSidebar = false;
-var ElementToggle = true;
 
 const SidebarContainer = document.createElement("div");
 SidebarContainer.style.position = "absolute";
@@ -154,17 +153,6 @@ ElementLabel.style.height = "25px";
 ElementLabel.style.textAlign = "center";
 SidebarContainer.appendChild(ElementLabel);
 
-const ElementToggleButton = document.createElement("div");
-ElementToggleButton.style.display = IsMobile() ? "none" : "block";
-ElementToggleButton.style.cursor = "pointer";
-ElementToggleButton.innerHTML = "TOGGLE";
-ElementToggleButton.style.width = "100%";
-ElementToggleButton.style.height = "17.5px";
-ElementToggleButton.style.transition = "opacity 0.25s ease";
-ElementToggleButton.style.backgroundColor = Theme.SecondaryColor;
-ElementToggleButton.style.color = Theme.QuaternaryColor;
-ElementContainer.appendChild(ElementToggleButton);
-
 for (let Index = 0; Index < Elements.length; Index++) {
     const Element = Elements[Index];
 
@@ -297,25 +285,6 @@ function InvertColor(RgbString, TrueColor) {
         }
     }
 }
-
-ElementToggleButton.addEventListener("click", () => {
-    ElementToggle = !ElementToggle;
-
-    const AllElementDivs = Array.from(ElementContainer.getElementsByTagName("div"));
-    AllElementDivs.forEach(ElementDiv => {
-        if (ElementDiv !== ElementToggleButton) {
-            ElementDiv.style.height = !ElementToggle ? "0px" : "17.5px";
-            ElementDiv.style.opacity = !ElementToggle ? "0" : "1";
-            ElementDiv.style.visibility = "visible";
-
-            ElementToggleButton.style.opacity = !ElementToggle ? "0.5" : "1";
-
-            !ElementToggle ? setTimeout(() => {
-                ElementDiv.style.visibility = "hidden";
-            }, 250) : "";
-        }
-    });
-});
 
 document.addEventListener("mousedown", (Event) => {
     if (Event.target === DragBar) {
