@@ -1,0 +1,7 @@
+.NEUT .PHOT {
+    pointer-events: none !important;
+}
+
+.PART {
+    transition: background-color 0.25s ease;
+}
