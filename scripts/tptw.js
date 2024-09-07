@@ -31,6 +31,14 @@ export function Print(x) {
     }
 }
 
+export function PowderEffect(R, G, B, EffectStrength) {
+    return {
+        R: Random(R + EffectStrength, R),
+        G: Random(G + EffectStrength, G),
+        B: Random(B + EffectStrength, B)
+    };
+}
+
 export function RgbString(RgbString) {
     const RgbArray = RgbString.match(/\d+/g).map(Number);
     return {
@@ -44,6 +52,11 @@ export function CombustElement(CausticPart, FlammablePart) {
     CreateParticle(Elements.find(element => element.Name === "SMKE"), FlammablePart.offsetLeft, FlammablePart.offsetTop);
     FlammablePart.remove();
     CausticPart.remove();
+}
+
+export function ExplodeParticle(Particle, Lifetime) {
+    CreateExplosion(RgbString(Particle.dataset.color).R, RgbString(Particle.dataset.color).G, RgbString(Particle.dataset.color).B, Particle.offsetLeft, Particle.offsetTop, Lifetime);
+    Particle.remove();
 }
 
 export function CreateParticle({ Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MeltingPoint, BoilingPoint, Type, ColdType, HotType }, PositionX, PositionY) {
@@ -97,6 +110,58 @@ export function CreateParticle({ Name, Color, Flammable, Caustic, Radioactive, R
         ParticleContainer.appendChild(Particle);
 
         return Particle;
+    }
+}
+
+export function CreateRawParticle(X, Y) {
+    const GridSize = parseFloat(document.body.getAttribute("grid-size"));
+
+    const Particle = document.createElement("div");
+    Particle.style.position = "absolute";
+    Particle.style.left = `${X}px`;
+    Particle.style.top = `${Y}px`;
+    Particle.style.width = `${GridSize}px`;
+    Particle.style.height = `${GridSize}px`;
+    return Particle;
+}
+
+export function CreateExplosion(R, G, B, X, Y, Lifetime) {
+    for (let Index = 0; Index < 9; Index++) {
+        const XDirection = Random(5, -5);
+        const YDirection = Random(5, -5);
+
+        const Particle = CreateRawParticle(X, Y);
+        Particle.style.backgroundColor = `rgb(${PowderEffect(R, G, B, Settings.PowderEffectStrength).R}, ${PowderEffect(R, G, B, Settings.PowderEffectStrength).G}, ${PowderEffect(R, G, B, Settings.PowderEffectStrength).B})`;
+        document.body.appendChild(Particle);
+
+        var Time = 0;
+
+        function Update() {
+            Time += 0.1;
+
+            Particle.style.left = `${Particle.offsetLeft + XDirection}px`;
+            Particle.style.top = `${Particle.offsetTop + YDirection}px`;
+
+            Particle.style.opacity = 1 - Time / Lifetime;
+
+            const ParticleRect = Particle.getBoundingClientRect();
+
+            if (ParticleRect.left < 0 || ParticleRect.left > window.innerWidth || ParticleRect.top < 0 || ParticleRect.top > window.innerHeight) {
+                const TouchingPart = document.elementFromPoint(ParticleRect.left, ParticleRect.top);
+                if (TouchingPart.classList.contains("PART") && TouchingPart.dataset.hotType === "Explosive") {
+                    CreateExplosion(RgbString(TouchingPart.dataset.color).R, RgbString(TouchingPart.dataset.color).G, RgbString(TouchingPart.dataset.color).B, TouchingPart.offsetLeft, TouchingPart.offsetTop, 15);
+                    TouchingPart.remove();
+                }
+            }
+
+            if (Time <= Lifetime) {
+                requestAnimationFrame(Update);
+            } else {
+                Particle.remove();
+            }
+        }
+
+        Update();
     }
 }
 
@@ -158,7 +223,7 @@ export function GetAllParticles() {
 
 export function GetParticleFromPosition(X, Y) {
     let Element = document.elementFromPoint(X, Y);
-    if (Element && Element.classList.contains('particle')) {
+    if (Element && Element.classList.contains("PART")) {
         return Element;
     }
     return null;
@@ -222,49 +287,8 @@ export class math {
     static Lcm(A, B) {
         return (A * B) / math.Gcd(A, B);
     }
-}
 
-export class vector2 {
-    static LookAt(X, Y) {
-        return Math.atan2(X, Y);
-    }
-
-    static Distance(X1, Y1, X2, Y2) {
-        const dx = X2 - X1;
-        const dy = Y2 - Y1;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    static Normalize(X, Y) {
-        const distance = Math.sqrt(X * X + Y * Y);
-        if (distance > 0) {
-            return { X: X / distance, Y: Y / distance };
-        } else {
-            return { X: 0, Y: 0 };
-        }
-    }
-
-    static Add(X1, Y1, X2, Y2) {
-        return { X: X1 + X2, Y: Y1 + Y2 };
-    }
-
-    static Subtract(X1, Y1, X2, Y2) {
-        return { X: X1 - X2, Y: Y1 - Y2 };
-    }
-
-    static Multiply(X, Y, Scalar) {
-        return { X: X * Scalar, Y: Y * Scalar };
-    }
-
-    static Dot(X1, Y1, X2, Y2) {
-        return X1 * X2 + Y1 * Y2;
-    }
-
-    static Cross(X1, Y1, X2, Y2) {
-        return X1 * Y2 - Y1 * X2;
-    }
-
-    static AngleBetween(X1, Y1, X2, Y2) {
-        return Math.atan2(Y2 - Y1, X2 - X1);
+    static RoundTo(X, Y) {
+        return Math.round(X / Y) * Y;
     }
 }

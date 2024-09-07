@@ -48,7 +48,8 @@ function React() {
             RadioactiveParticles.push(Particle);
             setTimeout(() => {
                 Particle.dataset.temp = parseFloat(Particle.dataset.temp) + parseFloat(Particle.dataset.radioactivity);
-                TPTW.CreateParticle(Elements.find(element => element.Name === "NEUT"), Particle.offsetLeft, Particle.offsetTop); 
+                TPTW.CreateParticle(Elements.find(element => element.Name === "NEUT"), Particle.offsetLeft, Particle.offsetTop);
+
             }, (RadioactiveParticles.length * 1000) - (parseFloat(Particle.dataset.radioactivity) * 1000));
         }
     }
@@ -86,6 +87,7 @@ if (ParticleContainer) {
                 const MeltingPoint = Particle.dataset.meltingPoint;
                 const IsCaustic = Particle.dataset.caustic === "true";
                 const IsLight = Particle.dataset.light === "true";
+                const IsExplosive = Particle.dataset.hotType === "Explosive";
             
                 let CollisionDetected = false;
                 let CollisionTop = MaxHeight;
@@ -107,7 +109,16 @@ if (ParticleContainer) {
                     if (Temp > MeltingPoint) {
                         Particle.dataset.type = Particle.dataset.hotType;
                         Particle.dataset.radioactive = false;
+
+                        if (IsExplosive) {
+                            TPTW.ExplodeParticle(Particle, 25);
+                        }
                     } else {
+                        if (Particle.dataset.coldType === "Powder" || Particle.dataset.coldType === "Solid") {
+                            Particle.style.left = `${TPTW.math.RoundTo(Particle.offsetLeft, GridSize)}px`;
+                            Particle.style.top = `${TPTW.math.RoundTo(Particle.offsetTop, GridSize)}px`;
+                        }
+
                         Particle.dataset.type = Particle.dataset.fixedType;
                         Particle.dataset.radioactive = Particle.dataset.fixedRadioactive;
                     }

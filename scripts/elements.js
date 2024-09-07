@@ -12,7 +12,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Powder"
     },
     {
@@ -28,7 +27,6 @@ export const Elements = [
         ColdType: "Liquid",
         HotType: "Gas",
         Type: "Liquid",
-        Category: "Liquid",
         Flair: "Liquid"
     },
     {
@@ -44,7 +42,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Liquid",
-        Category: "Liquid",
         Flair: "Liquid"
     },
     {
@@ -57,7 +54,6 @@ export const Elements = [
         Temp: 22,
         MeltingPoint: window.Infinity,
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -70,7 +66,6 @@ export const Elements = [
         Temp: 22,
         MeltingPoint: window.Infinity,
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -86,7 +81,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -102,7 +96,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -118,7 +111,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -134,7 +126,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -150,7 +141,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -166,7 +156,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -182,7 +171,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -198,7 +186,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Powder",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
     },
     {
@@ -214,8 +201,22 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Solid"
+    },
+    {
+        Name: "TNT",
+        Color: "rgb(255, 32, 0)",
+        Flammable: false,
+        Caustic: false,
+        Radioactive: false,
+        Light: false,
+        Temp: 22,
+        MeltingPoint: 50,
+        BoilingPoint: 100,
+        ColdType: "Solid",
+        HotType: "Explosive",
+        Type: "Solid",
+        Flair: "Explosive"
     },
     {
         Name: "SNOW",
@@ -230,7 +231,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Powder"
     },
     {
@@ -247,7 +247,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Radioactive Powder"
     },
     {
@@ -264,7 +263,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Radioactive Powder"
     },
     {
@@ -281,7 +279,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Radioactive Powder"
     },
     {
@@ -298,7 +295,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Radioactive Powder"
     },
     {
@@ -315,7 +311,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Radioactive Powder"
     },
     {
@@ -332,7 +327,6 @@ export const Elements = [
         ColdType: "Solid",
         HotType: "Liquid",
         Type: "Solid",
-        Category: "Solid",
         Flair: "Radioactive Solid"
     },
     {
@@ -344,7 +338,6 @@ export const Elements = [
         Light: true,
         Temp: 22,
         Type: "None",
-        Category: "None",
         Flair: "Light"
     },
     {
@@ -356,7 +349,6 @@ export const Elements = [
         Light: true,
         Temp: 1250,
         Type: "None",
-        Category: "None",
         Flair: "Light"
     },
     {
@@ -372,7 +364,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Powder"
     },
     {
@@ -388,7 +379,6 @@ export const Elements = [
         ColdType: "Powder",
         HotType: "Liquid",
         Type: "Powder",
-        Category: "Powder",
         Flair: "Powder"
     },
     {
@@ -403,7 +393,6 @@ export const Elements = [
         MeltingPoint: window.Infinity,
         BoilingPoint: window.Infinity,
         Type: "Gas",
-        Category: "Gas",
         Flair: "Radioactive Gas"
     },
     {
@@ -417,7 +406,6 @@ export const Elements = [
         MeltingPoint: window.Infinity,
         BoilingPoint: window.Infinity,
         Type: "Gas",
-        Category: "Gas",
         Flair: "Gas"
     },
     {
@@ -431,7 +419,6 @@ export const Elements = [
         MeltingPoint: window.Infinity,
         BoilingPoint: window.Infinity,
         Type: "Gas",
-        Category: "Gas",
         Flair: "Gas"
     },
     {
@@ -445,7 +432,6 @@ export const Elements = [
         MeltingPoint: window.Infinity,
         BoilingPoint: window.Infinity,
         Type: "Gas",
-        Category: "Gas",
         Flair: "Gas"
     },
     {
@@ -459,7 +445,6 @@ export const Elements = [
         MeltingPoint: window.Infinity,
         BoilingPoint: window.Infinity,
         Type: "Gas",
-        Category: "Gas",
         Flair: "Caustic Gas"
     },
     {
@@ -473,7 +458,6 @@ export const Elements = [
         MeltingPoint: window.Infinity,
         BoilingPoint: window.Infinity,
         Type: "Gas",
-        Category: "Gas",
         Flair: "Gas"
     },
     {
@@ -485,7 +469,6 @@ export const Elements = [
         Light: false,
         Temp: 0,
         Type: "None",
-        Category: "None",
         Flair: "None"
     }
 ];
