@@ -1,17 +1,13 @@
 import { Theme } from "./theme.js";
+import { Settings } from "./settings.js";
 import * as tptw from "./tptw.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 const ParticleContainer = document.getElementById("ParticleContainer");
 
 const BrowserContainer = document.createElement("div");
-BrowserContainer.style.display = "flex";
-BrowserContainer.style.flexDirection = "row";
-BrowserContainer.style.justifyContent = "center";
-BrowserContainer.style.alignContent = "center";
-BrowserContainer.style.alignItems = "center";
 BrowserContainer.style.fontSize = "100%";
 BrowserContainer.style.width = "60%";
 BrowserContainer.style.height = "75%";
@@ -19,12 +15,49 @@ BrowserContainer.style.position = "absolute";
 BrowserContainer.style.top = "50%";
 BrowserContainer.style.left = "50%";
 BrowserContainer.style.backgroundColor = Theme.BackgroundColor;
-BrowserContainer.style.borderRadius = "8px";
-BrowserContainer.style.border = "2px solid white";
 BrowserContainer.style.visibility = "hidden";
 BrowserContainer.style.transform = "translate(-50%, -50%)";
+BrowserContainer.style.alignContent = "center";
+BrowserContainer.style.alignItems = "center";
 BrowserContainer.id = "BrowserContainer";
 document.body.appendChild(BrowserContainer);
+
+const BrowserTitlebar = document.createElement("div");
+BrowserTitlebar.innerHTML = `ThePowderToyWeb Browser ${Settings.Version}`;
+BrowserTitlebar.style.position = "absolute";
+BrowserTitlebar.style.top = "0";
+BrowserTitlebar.style.width = "100%";
+BrowserTitlebar.style.height = "24px";
+BrowserTitlebar.style.alignContent = "center";
+BrowserTitlebar.style.alignItems = "center";
+BrowserTitlebar.style.textAlign = "center";
+BrowserTitlebar.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+BrowserContainer.appendChild(BrowserTitlebar);
+
+const BrowserAddressbar = document.createElement("input");
+BrowserAddressbar.style.width = "100%";
+BrowserAddressbar.style.height = "24px";
+BrowserAddressbar.style.position = "absolute";
+BrowserAddressbar.style.top = "24px";
+BrowserAddressbar.style.width = "100%";
+BrowserAddressbar.style.height = "24px";
+BrowserAddressbar.style.alignContent = "center";
+BrowserAddressbar.style.alignItems = "center";
+BrowserAddressbar.style.textAlign = "center";
+BrowserAddressbar.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+BrowserAddressbar.placeholder = "eg. 1992731";
+BrowserContainer.appendChild(BrowserAddressbar);
+
+const SavesContainer = document.createElement("div");
+SavesContainer.style.display = "flex";
+SavesContainer.style.flexDirection = "row";
+SavesContainer.style.justifyContent = "center";
+SavesContainer.style.alignContent = "center";
+SavesContainer.style.alignItems = "center";
+SavesContainer.style.width = "100%";
+SavesContainer.style.height = "75%";
+SavesContainer.style.overflow = "hidden";
+BrowserContainer.appendChild(SavesContainer);
 
 const Buttons = document.createElement("div");
 Buttons.style.position = "absolute";
@@ -38,9 +71,8 @@ Buttons.style.fontSize = "100%";
 Buttons.style.bottom = "0";
 Buttons.style.left = "0";
 Buttons.style.backgroundColor = Theme.BackgroundColor;
-Buttons.style.width = "50%";
+Buttons.style.width = "100%";
 Buttons.style.height = "32px";
-Buttons.style.borderTopRightRadius = "8px";
 Buttons.id = "Buttons";
 document.body.appendChild(Buttons);
 
@@ -85,6 +117,17 @@ LoadButton.style.alignContent = "center";
 LoadButton.style.alignItems = "center";
 Buttons.appendChild(LoadButton);
 
+const PublicityButton = document.createElement("div");
+PublicityButton.innerHTML = "PUBLIC";
+PublicityButton.classList.add("BTN");
+PublicityButton.style.color = Theme.TertiaryColor;
+PublicityButton.style.width = "100%";
+PublicityButton.style.height = "100%";
+PublicityButton.style.textAlign = "center";
+PublicityButton.style.alignContent = "center";
+PublicityButton.id = "PublicityButton";
+Buttons.appendChild(PublicityButton);
+
 export const NameButton = document.createElement("input");
 NameButton.autocomplete = "false";
 NameButton.type = "text";
@@ -103,7 +146,6 @@ UsernameButton.placeholder = "Username";
 UsernameButton.style.width = "200%";
 UsernameButton.style.height = "100%";
 UsernameButton.style.textAlign = "center";
-UsernameButton.style.borderTopRightRadius = "8px";
 UsernameButton.classList.add("ENC");
 UsernameButton.id = "UsernameButton";
 Buttons.appendChild(UsernameButton);
@@ -123,15 +165,6 @@ const FirebaseConfig = {
 
 const App = initializeApp(FirebaseConfig);
 const Db = getFirestore(App);
-
-function GenerateUsername() {
-    const Letters = "abcdefghijklmnopqrstuvwxyz";
-    let Username = "";
-    for (let i = 0; i < 8; i++) {
-        Username += Letters[Math.floor(Math.random() * Letters.length)];
-    }
-    return Username;
-}
 
 function SaveToFile() {
     ParticleData.push(NameButton.value);
@@ -157,9 +190,24 @@ function SaveToFile() {
     URL.revokeObjectURL(Url);
 }
 
-function SaveToFirebase() {
-    const Username = UsernameButton.value === "" ? GenerateUsername() : UsernameButton.value;
-    const SimulationName = NameButton.value || "UntitledSimulation";
+async function SaveToFirebase() {
+    if (!UsernameButton.value || !NameButton.value) {
+        UsernameButton.style.backgroundColor = !UsernameButton.value ? "rgba(255, 0, 0, 0.15)" : "transparent";
+        NameButton.style.backgroundColor = !NameButton.value ? "rgba(255, 0, 0, 0.15)" : "transparent";
+
+        setTimeout(() => {
+            UsernameButton.style.backgroundColor = "transparent";
+            NameButton.style.backgroundColor = "transparent";
+        }, 250);
+
+        return;
+    } else {
+        UsernameButton.style.backgroundColor = "transparent";
+        NameButton.style.backgroundColor = "transparent";
+    }
+
+    const Username = UsernameButton.value;
+    const SimulationName = NameButton.value;
 
     var Particles = [];
 
@@ -188,11 +236,13 @@ function SaveToFirebase() {
     
     const CurrentDate = new Date();
 
-    const ParticleDataToSave = {
+    const DocumentData = {
         username: Username,
         simulationName: SimulationName,
         particles: Particles,
         timestamp: FormatDate(CurrentDate),
+        public: CurrentPublicity,
+        saveId: Array.from({length: 8}, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('').toUpperCase()
     };
 
     Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
@@ -203,13 +253,14 @@ function SaveToFirebase() {
             PosY: Particle.offsetTop,
         };
     
-        ParticleDataToSave.particles.push(ParticleMetadata);
+        DocumentData.particles.push(ParticleMetadata);
     });
 
     const savesCollection = collection(Db, 'saves');
-    addDoc(savesCollection, ParticleDataToSave).catch((error) => {
-        console.error('Error saving to Firebase: ', error);
-    });
+    const docRef = await addDoc(savesCollection, DocumentData);
+    if (!CurrentPublicity) {
+      await navigator.clipboard.writeText(docRef.id);
+    }
 }
 
 function LoadFromFile() {
@@ -228,10 +279,6 @@ function LoadFromFile() {
 
                     const DataString = e.target.result;
                     const ParticleData = JSON.parse(DataString);
-                    
-                    while (ParticleContainer.firstChild) {
-                        ParticleContainer.removeChild(ParticleContainer.firstChild);
-                    }
 
                     ParticleData.forEach(Particle => {
                         const CreatedParticle = tptw.CreateParticle(tptw.GetElement(Particle.Name), Particle.PosX, Particle.PosY);
@@ -248,21 +295,35 @@ function LoadFromFile() {
     Input.click(); 
 }
 
-async function LoadSaves() {
-    BrowserContainer.innerHTML = "LOADING";
+let CurrentPage = 1;
+let CurrentPublicity = true;
+const SavesPerPage = 9;
+
+async function LoadSaves(Page = 1) {
+    SavesContainer.innerHTML = "LOADING";
 
     const SavesCollection = collection(Db, 'saves');
     const SavesSnapshot = await getDocs(SavesCollection);
     
     const SavesList = SavesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
+        id: doc.id,
+        ...doc.data()
     }));
 
-    if (SavesList.length > 0) {
-        BrowserContainer.innerHTML = "";
+    const TotalPages = Math.ceil(SavesList.length / SavesPerPage);
+    CurrentPage = Math.max(1, Math.min(Page, TotalPages));
 
-        SavesList.forEach(Save => {
+    const PaginatedSaves = SavesList.slice((CurrentPage - 1) * SavesPerPage, CurrentPage * SavesPerPage);
+
+    if (PaginatedSaves.length > 0) {
+        SavesContainer.innerHTML = "";
+        SavesContainer.style.display = "flex";
+        SavesContainer.style.flexWrap = "wrap";
+        SavesContainer.style.gap = "10px";
+
+        PaginatedSaves.forEach(Save => {
+            if (!Save.public) { return; }
+
             const Username = Save.username;
             const SimulationName = Save.simulationName;
             const Particles = Save.particles;
@@ -275,27 +336,35 @@ async function LoadSaves() {
             SaveButton.style.width = "30%";
             SaveButton.style.height = "25%";
             SaveButton.style.backgroundColor = Theme.BackgroundColor;
-            SaveButton.style.marginLeft = "20px";
-            SaveButton.style.borderRadius = "8px";
             SaveButton.style.cursor = "pointer";
-            BrowserContainer.appendChild(SaveButton);
+            SaveButton.style.boxSizing = "border-box";
+            SaveButton.style.padding = "10px";
+            SaveButton.style.overflow = "hidden";
+            SavesContainer.appendChild(SaveButton);
     
             const Author = document.createElement("i");
             Author.innerHTML = Username;
             Author.style.fontSize = "75%";
-            Author.style.marginTop = "8px";
-            Author.style.marginLeft = "8px";
+            Author.style.marginBottom = "8px";
             SaveButton.appendChild(Author);
     
             const SaveName = document.createElement("span");
             SaveName.innerHTML = SimulationName;
-            SaveName.style.marginLeft = "8px";
+            SaveName.style.display = "block";
             SaveButton.appendChild(SaveName);
 
             const TimestampLabel = document.createElement("span");
             TimestampLabel.innerHTML = Timestamp;
-            TimestampLabel.style.marginLeft = "8px";
+            TimestampLabel.style.display = "block";
             SaveButton.appendChild(TimestampLabel);
+
+            const IdLabel = document.createElement("span");
+            IdLabel.innerHTML = Save.id;
+            IdLabel.style.position = "absolute";
+            IdLabel.style.color = "rgb(255, 255, 0)";
+            IdLabel.style.bottom = "4px";
+            IdLabel.style.left = "8px";
+            SaveButton.appendChild(IdLabel);
 
             const RemoveButton = document.createElement("span");
             RemoveButton.innerHTML = "X";
@@ -303,15 +372,15 @@ async function LoadSaves() {
             RemoveButton.style.cursor = "pointer";
             RemoveButton.style.fontSize = "100%";
             RemoveButton.style.position = "absolute";
-            RemoveButton.style.left = `${SaveButton.offsetWidth - 18}px`;
+            RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
             SaveButton.appendChild(RemoveButton);
 
-            RemoveButton.addEventListener("click", () => {
+            RemoveButton.addEventListener("click", async () => {
                 try {
-                    const DocRef = doc(Db, "saves", Save.id);
-                    deleteDoc(DocRef);
+                    await deleteDoc(doc(Db, "saves", Save.id));
                     SaveButton.remove();
+                    await LoadSaves(CurrentPage);
                 } catch (e) {
                     console.error(`Error removing save: ${Save.id}, ${e}`);
                 }
@@ -322,21 +391,87 @@ async function LoadSaves() {
                     ParticleContainer.innerHTML = "";
                     Particles.forEach(Particle => {
                         const Element = tptw.GetElement(Particle.Name);
-                        tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);
+                        tptw.CreateParticle(Element, Particle.PosX, Particle.PosY).dataset.temp = Particle.Temp;
                     });
                 }
             });
         });
+
+        AddPaginationControls(TotalPages);
     } else {
-        BrowserContainer.innerHTML = "NO SAVES";
+        SavesContainer.innerHTML = "NO DATA FOUND";
     }
 }
 
+async function LoadSave(SaveId) {
+    const DocRef = doc(Db, "saves", SaveId);
+    const DocSnap = await getDoc(DocRef);
+    if (DocSnap.exists()) {
+        const DocumentData = DocSnap.data();
+        const Particles = DocumentData.particles;
+        ParticleContainer.innerHTML = "";
+        Particles.forEach(Particle => {
+            const Element = tptw.GetElement(Particle.Name);
+            const CreatedParticle = tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);
+            CreatedParticle.dataset.temp = Particle.Temp;
+        });
+    }
+}
+
+function AddPaginationControls(TotalPages) {
+    const ExistingControls = document.querySelector(".pagination-controls");
+    if (ExistingControls) {
+        ExistingControls.remove();
+    }
+
+    if (TotalPages > 1) {
+        const ControlsContainer = document.createElement("div");
+        ControlsContainer.className = "pagination-controls";
+        ControlsContainer.style.textAlign = "center";
+        ControlsContainer.style.marginTop = "10px";
+
+        const PreviousButton = document.createElement("div");
+        PreviousButton.innerHTML = "Previous";
+        PreviousButton.style.cursor = "pointer";
+        PreviousButton.setAttribute("disabled", CurrentPage === 1)
+        PreviousButton.addEventListener("click", () => LoadSaves(CurrentPage - 1));
+        PreviousButton.classList.add("ABTN");
+        ControlsContainer.appendChild(PreviousButton);
+
+        const PageInfo = document.createElement("span");
+        PageInfo.innerHTML = `Page ${CurrentPage} of ${TotalPages}`;
+        ControlsContainer.appendChild(PageInfo);
+
+        const NextButton = document.createElement("div");
+        NextButton.innerHTML = "Next";
+        NextButton.style.cursor = "pointer";
+        NextButton.setAttribute("disabled", CurrentPage === TotalPages)
+        NextButton.addEventListener("click", () => LoadSaves(CurrentPage + 1));
+        NextButton.classList.add("ABTN");
+        ControlsContainer.appendChild(NextButton);
+
+        BrowserContainer.appendChild(ControlsContainer);
+    }
+}
+
+function HandleLoadSave(Event) {
+    if (Event.key === "Enter") {
+        LoadSave(BrowserAddressbar.value);
+    }
+}
+ 
 function Browse() {
     LoadSaves();
     BrowserContainer.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? "hidden" : "visible";
 }
 
+function TogglePublicity() {
+    CurrentPublicity = !CurrentPublicity;
+    PublicityButton.innerHTML = !CurrentPublicity ? "PRIVATE" : "PUBLIC";
+}
+
+BrowserAddressbar.addEventListener("keypress", HandleLoadSave);
+PublicityButton.addEventListener("click", TogglePublicity);
 BrowseButton.addEventListener("click", Browse);
 SaveCloudButton.addEventListener("click", SaveToFirebase);
 SaveButton.addEventListener("click", SaveToFile);

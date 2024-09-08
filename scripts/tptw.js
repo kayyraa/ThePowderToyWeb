@@ -9,6 +9,11 @@ export function Random(Max, Min) {
     return Math.floor(Math.random() * (Max - Min + 1)) + Min;
 }
 
+export function IsMobile() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return /android|webos|iphone|ipad|ipod|blackberry|windows phone|opera mini/i.test(userAgent);
+}
+
 export function Clear() {
     ParticleContainer.innerHTML = "";
     NameButton.value = "";

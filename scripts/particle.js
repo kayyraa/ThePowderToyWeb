@@ -114,11 +114,6 @@ if (ParticleContainer) {
                             TPTW.ExplodeParticle(Particle, 25);
                         }
                     } else {
-                        if (Particle.dataset.coldType === "Powder" || Particle.dataset.coldType === "Solid") {
-                            Particle.style.left = `${TPTW.math.RoundTo(Particle.offsetLeft, GridSize)}px`;
-                            Particle.style.top = `${TPTW.math.RoundTo(Particle.offsetTop, GridSize)}px`;
-                        }
-
                         Particle.dataset.type = Particle.dataset.fixedType;
                         Particle.dataset.radioactive = Particle.dataset.fixedRadioactive;
                     }
@@ -260,7 +255,7 @@ if (ParticleContainer) {
             });            
         }
 
-        requestAnimationFrame(Loop);
+        setTimeout(Loop, 1);
     }
 
     Loop();

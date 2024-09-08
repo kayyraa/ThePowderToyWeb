@@ -41,6 +41,8 @@ document.addEventListener("mousedown", (Event) => {
             Event.target !== Buttons
             &&
             Event.target !== BrowserContainer
+            &&
+            Event.target.offsetParent !== BrowserContainer
         ) {
             IsDragging = true;
         }
@@ -164,7 +166,7 @@ function Loop() {
         tptw.DrawLinePlaceholder(LineStartX, LineStartY, MouseX, MouseY);
     }
 
-    requestAnimationFrame(Loop);
+    setTimeout(Loop, 1)
 }
 
 Loop();

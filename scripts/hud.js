@@ -12,8 +12,6 @@ const ParticleContainer = document.getElementById("ParticleContainer");
 var MouseX = 0;
 var MouseY = 0;
 
-var DraggingSidebar = false;
-
 const SidebarContainer = document.createElement("div");
 SidebarContainer.style.position = "absolute";
 SidebarContainer.style.display = "flex";
@@ -22,22 +20,6 @@ SidebarContainer.style.alignItems = "center";
 SidebarContainer.style.width = !IsMobile() ? "210px" : "120px";
 SidebarContainer.style.backgroundColor = Theme.BackgroundColor;
 document.body.appendChild(SidebarContainer);
-
-const DragBar = document.createElement("div");
-DragBar.style.position = "absolute";
-DragBar.style.width = "100%";
-DragBar.style.height = "16px";
-DragBar.style.cursor = "pointer";
-SidebarContainer.appendChild(DragBar);
-
-const DragBarIcon = document.createElement("img");
-DragBarIcon.src = !IsMobile() ? "../images/DragIndicator.png" : "";
-DragBarIcon.draggable = false;
-DragBarIcon.style.transition = "all 0.25s ease";
-DragBarIcon.style.height = "16px";
-DragBarIcon.style.float = "left";
-DragBarIcon.style.cursor = "pointer";
-DragBar.appendChild(DragBarIcon);
 
 const ActionLabel = document.createElement("span");
 ActionLabel.innerHTML = "Default Display";
@@ -128,6 +110,7 @@ ElementLabel.style.color = Theme.TertiaryColor;
 ElementLabel.style.width = "100%";
 ElementLabel.style.height = "25px";
 ElementLabel.style.textAlign = "center";
+ElementLabel.style.paddingTop = "5px";
 SidebarContainer.appendChild(ElementLabel);
 
 for (let Index = 0; Index < Elements.length; Index++) {
@@ -266,79 +249,6 @@ function InvertColor(RgbString, TrueColor) {
     }
 }
 
-document.addEventListener("mousedown", (Event) => {
-    if (Event.target === DragBar) {
-        DraggingSidebar = true;
-    }
-});
-
-document.addEventListener("mousemove", (Event) => {
-    if (DraggingSidebar) {
-        MouseX = Event.clientX;
-        MouseY = Event.clientY;
-
-        let Padding = 8;
-        let NewLeft = MouseX - (DragBar.offsetWidth / 2);
-        let NewTop = MouseY;
-
-        const SnapThreshold = 40;
-        const ViewportWidth = window.innerWidth;
-        const ViewportHeight = window.innerHeight;
-
-        if (NewLeft < SnapThreshold + Padding) {
-            NewLeft = Padding;
-        } else if (NewLeft > ViewportWidth - SidebarContainer.offsetWidth - SnapThreshold - Padding) {
-            NewLeft = ViewportWidth - SidebarContainer.offsetWidth - Padding;
-        }
-
-        if (NewTop < SnapThreshold + Padding) {
-            NewTop = Padding;
-        } else if (NewTop > ViewportHeight - SidebarContainer.offsetHeight - SnapThreshold - Padding) {
-            NewTop = ViewportHeight - SidebarContainer.offsetHeight - Padding;
-        }
-
-        const SidebarRect = {
-            left: NewLeft,
-            top: NewTop,
-            right: NewLeft + SidebarContainer.offsetWidth,
-            bottom: NewTop + SidebarContainer.offsetHeight
-        };
-
-        const OtherElements = document.querySelectorAll('.other-element');
-
-        OtherElements.forEach((Element) => {
-            const ElementRect = Element.getBoundingClientRect();
-            
-            if (SidebarRect.left < ElementRect.right &&
-                SidebarRect.right > ElementRect.left &&
-                SidebarRect.top < ElementRect.bottom &&
-                SidebarRect.bottom > ElementRect.top) {
-                
-                if (SidebarRect.left < ElementRect.left) {
-                    NewLeft = ElementRect.left - SidebarContainer.offsetWidth - Padding;
-                } else if (SidebarRect.right > ElementRect.right) {
-                    NewLeft = ElementRect.right + Padding;
-                }
-
-                if (SidebarRect.top < ElementRect.top) {
-                    NewTop = ElementRect.top - SidebarContainer.offsetHeight - Padding;
-                } else if (SidebarRect.bottom > ElementRect.bottom) {
-                    NewTop = ElementRect.bottom + Padding;
-                }
-            }
-        });
-
-        SidebarContainer.style.left = `${NewLeft}px`;
-        SidebarContainer.style.top = `${NewTop}px`;
-    }
-});
-
-document.addEventListener("mouseup", (Event) => {
-    if (Event.target === DragBar) {
-        DraggingSidebar = false;
-    }
-});
-
 ClearButton.addEventListener("click", () => {
     tptw.Clear();
 });
@@ -360,8 +270,6 @@ function Update() {
     AverageTempLabel.innerHTML = `PT: ${isFinite((MaxTemp + MinTemp) / 2) ? AverageTemp.toFixed(2) : Settings.AmbientTemp.toFixed(2)}°C`;
 
     const Target = document.elementFromPoint(MouseX, MouseY);
-
-    DragBarIcon.style.opacity = DraggingSidebar ? "0.25" : "1";
 
     if (Target && Target.dataset.particle === "true" && Target.dataset.temp) {
         const Temp = parseFloat(Target.dataset.temp);
@@ -414,7 +322,7 @@ function Update() {
         FrameCount++;
     }
 
-    requestAnimationFrame(Update);
+    setTimeout(Update, 1);
 }
 
 Update();
