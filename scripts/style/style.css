@@ -63,3 +63,12 @@ input {
 .ABTN[disabled="true"] {
   opacity: 0.5;
 }
+
+.SAVE {
+  transition: all 0.25s ease;
+}
+
+.SAVE:hover {
+  z-index: 1;
+  scale: 1.125;
+}

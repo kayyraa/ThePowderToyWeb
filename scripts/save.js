@@ -319,7 +319,7 @@ async function LoadSaves(Page = 1) {
         SavesContainer.innerHTML = "";
         SavesContainer.style.display = "flex";
         SavesContainer.style.flexWrap = "wrap";
-        SavesContainer.style.gap = "10px";
+        SavesContainer.style.gap = "5px";
 
         PaginatedSaves.forEach(Save => {
             if (!Save.public) { return; }
@@ -335,11 +335,12 @@ async function LoadSaves(Page = 1) {
             SaveButton.style.position = "relative";
             SaveButton.style.width = "30%";
             SaveButton.style.height = "25%";
-            SaveButton.style.backgroundColor = Theme.BackgroundColor;
+            SaveButton.style.backgroundColor = "rgb(60, 60, 60)";
             SaveButton.style.cursor = "pointer";
             SaveButton.style.boxSizing = "border-box";
             SaveButton.style.padding = "10px";
             SaveButton.style.overflow = "hidden";
+            SaveButton.classList.add("SAVE");
             SavesContainer.appendChild(SaveButton);
     
             const Author = document.createElement("i");
@@ -376,6 +377,10 @@ async function LoadSaves(Page = 1) {
             RemoveButton.style.top = "4px";
             SaveButton.appendChild(RemoveButton);
 
+            IdLabel.addEventListener("click", () => {
+                navigator.clipboard.writeText(Save.id);
+            });
+
             RemoveButton.addEventListener("click", async () => {
                 try {
                     await deleteDoc(doc(Db, "saves", Save.id));
@@ -387,13 +392,18 @@ async function LoadSaves(Page = 1) {
             });
     
             SaveButton.addEventListener("click", (Event) => {
-                if (Event.target !== RemoveButton) {
+                if (Event.target !== RemoveButton && Event.target !== IdLabel) {
                     BrowserContainer.style.visibility = "hidden";
                     ParticleContainer.innerHTML = "";
                     Particles.forEach(Particle => {
                         const Element = tptw.GetElement(Particle.Name);
                         tptw.CreateParticle(Element, Particle.PosX, Particle.PosY).dataset.temp = Particle.Temp;
                     });
+                } else if (Event.target === IdLabel) {
+                    IdLabel.innerHTML = "Copied";
+                    setTimeout(() => {
+                        IdLabel.innerHTML = Save.id;
+                    }, 1000);
                 }
             });
         });
@@ -405,7 +415,9 @@ async function LoadSaves(Page = 1) {
 }
 
 async function LoadSave(SaveId) {
-    const DocRef = doc(Db, "saves", SaveId);
+    if (!SaveId.startsWith("-")) {return;}
+
+    const DocRef = doc(Db, "saves", SaveId.replace("-", ""));
     const DocSnap = await getDoc(DocRef);
     if (DocSnap.exists()) {
         BrowserContainer.style.visibility = "hidden";
