@@ -388,6 +388,7 @@ async function LoadSaves(Page = 1) {
     
             SaveButton.addEventListener("click", (Event) => {
                 if (Event.target !== RemoveButton) {
+                    BrowserContainer.style.visibility = "hidden";
                     ParticleContainer.innerHTML = "";
                     Particles.forEach(Particle => {
                         const Element = tptw.GetElement(Particle.Name);
@@ -407,6 +408,7 @@ async function LoadSave(SaveId) {
     const DocRef = doc(Db, "saves", SaveId);
     const DocSnap = await getDoc(DocRef);
     if (DocSnap.exists()) {
+        BrowserContainer.style.visibility = "hidden";
         const DocumentData = DocSnap.data();
         const Particles = DocumentData.particles;
         ParticleContainer.innerHTML = "";
