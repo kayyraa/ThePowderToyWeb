@@ -21,7 +21,7 @@ BrowserContainer.style.left = "50%";
 BrowserContainer.style.backgroundColor = Theme.BackgroundColor;
 BrowserContainer.style.borderRadius = "8px";
 BrowserContainer.style.border = "2px solid white";
-BrowserContainer.style.visibility = "visible";
+BrowserContainer.style.visibility = "hidden";
 BrowserContainer.style.transform = "translate(-50%, -50%)";
 BrowserContainer.id = "BrowserContainer";
 document.body.appendChild(BrowserContainer);
