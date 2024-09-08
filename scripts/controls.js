@@ -36,3 +36,7 @@ document.addEventListener("keydown", (Event) => {
         ActionLabel.textContent = `${Display} Display`;
     }
 });
+
+document.addEventListener("contextmenu", (Event) => {
+    Event.preventDefault();
+});

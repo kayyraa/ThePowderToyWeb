@@ -14,6 +14,7 @@ var LineEndX = 0;
 var LineEndY = 0;
 var IsLining = false;
 
+var IsRemoving = false;
 var IsDragging = false;
 
 const LineInfo = document.createElement("div");
@@ -33,6 +34,10 @@ document.addEventListener("pointermove", (Event) => {
 
 document.addEventListener("mousedown", (Event) => {
     if (Event.button === 0) {
+        if (!document.body.getAttribute("selection") === "none") {
+            IsRemoving = false;
+        }
+
         if (
             Event.target.offsetParent !== ElementContainer
             &&
@@ -55,6 +60,8 @@ document.addEventListener("mousedown", (Event) => {
 
         MouseX = Event.clientX;
         MouseY = Event.clientY;
+    } else if (Event.button === 2) {
+        IsRemoving = true;
     }
 });
 
@@ -119,6 +126,11 @@ function Loop() {
         LineInfo.innerHTML = `X1: ${LineStartX} Y1: ${LineStartY} X2: ${parseInt(MouseX)} Y2: ${parseInt(MouseY)}`;
     } else {
         LineInfo.style.opacity = "0";
+    }
+
+    if (IsRemoving) {
+        const Particle = tptw.GetParticleFromPosition(MouseX, MouseY);
+        Particle ? Particle.remove() : "";
     }
 
     if (IsDragging && !IsLining && ParticleContainer) {
