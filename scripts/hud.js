@@ -9,10 +9,6 @@ document.title = Settings.Version;
 const LogContainer = document.getElementById("LogContainer");
 const ParticleContainer = document.getElementById("ParticleContainer");
 
-const Clamp = (Value, Min, Max) => Math.max(Min, Math.min(Value, Max));
-
-var MaxFps = 0;
-
 var MouseX = 0;
 var MouseY = 0;
 
@@ -100,25 +96,6 @@ FpsLabel.style.padding = "10px";
 FpsLabel.style.textAlign = "center";
 FpsLabel.style.userSelect = "none";
 SidebarContainer.appendChild(FpsLabel);
-
-const FpsGraph = document.createElement("div");
-FpsGraph.style.width = "25%";
-FpsGraph.style.aspectRatio = "1 / 1";
-FpsGraph.style.boxSizing = "border-box";
-FpsGraph.style.border = "5px solid rgb(23, 161, 191)";
-FpsGraph.style.borderRadius = "512px";
-FpsGraph.style.display = "flex";
-FpsGraph.style.justifyContent = "center";
-FpsGraph.style.alignItems = "center";
-SidebarContainer.appendChild(FpsGraph);
-
-const FpsGraphVisualizer = document.createElement("div");
-FpsGraphVisualizer.style.transition = "width 0.25s ease, border 0.25s ease";
-FpsGraphVisualizer.style.border = "4px solid white";
-FpsGraphVisualizer.style.width = "0%";
-FpsGraphVisualizer.style.aspectRatio = "1 / 1";
-FpsGraphVisualizer.style.borderRadius = "512px";
-FpsGraph.appendChild(FpsGraphVisualizer);
 
 const ParticlesLabel = document.createElement("span");
 ParticlesLabel.innerHTML = "Parts: ~";
@@ -429,12 +406,7 @@ function Update() {
 
     if (ElapsedTime > 125) {
         const Fps = Math.floor(FrameCount / (ElapsedTime / 1000));
-        FpsGraphVisualizer.style.width = `${Clamp((Fps / MaxFps) * 100, 0, 100)}%`;
         FpsLabel.innerHTML = `FPS: ${Fps}`;
-
-        if (Fps >= MaxFps) {
-            MaxFps = Fps;
-        }    
 
         LastTime = CurrentTime;
         FrameCount = 0;

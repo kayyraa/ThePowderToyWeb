@@ -12,7 +12,7 @@ BrowserContainer.style.flexDirection = "row";
 BrowserContainer.style.justifyContent = "center";
 BrowserContainer.style.alignContent = "center";
 BrowserContainer.style.alignItems = "center";
-BrowserContainer.style.fontSize = "24px";
+BrowserContainer.style.fontSize = "100%";
 BrowserContainer.style.width = "60%";
 BrowserContainer.style.height = "75%";
 BrowserContainer.style.position = "absolute";
@@ -48,11 +48,22 @@ const BrowseButton = document.createElement("div");
 BrowseButton.innerHTML = "BROWSE";
 BrowseButton.classList.add("BTN");
 BrowseButton.style.color = Theme.TertiaryColor;
+BrowseButton.style.fontSize = "100%";
 BrowseButton.style.height = "100%";
 BrowseButton.style.width = "100%";
 BrowseButton.style.alignContent = "center";
 BrowseButton.style.alignItems = "center";
 Buttons.appendChild(BrowseButton);
+
+const SaveCloudButton = document.createElement("div");
+SaveCloudButton.innerHTML = "UPLOAD";
+SaveCloudButton.classList.add("BTN");
+SaveCloudButton.style.color = Theme.TertiaryColor;
+SaveCloudButton.style.height = "100%";
+SaveCloudButton.style.width = "100%";
+SaveCloudButton.style.alignContent = "center";
+SaveCloudButton.style.alignItems = "center";
+Buttons.appendChild(SaveCloudButton);
 
 const SaveButton = document.createElement("div");
 SaveButton.innerHTML = "SAVE";
@@ -75,7 +86,7 @@ LoadButton.style.alignItems = "center";
 Buttons.appendChild(LoadButton);
 
 export const NameButton = document.createElement("input");
-NameButton.autocomplete = false;
+NameButton.autocomplete = "false";
 NameButton.type = "text";
 NameButton.placeholder = "Simulation Name";
 NameButton.style.width = "200%";
@@ -86,7 +97,7 @@ NameButton.id = "NameButton";
 Buttons.appendChild(NameButton);
 
 export const UsernameButton = document.createElement("input");
-UsernameButton.autocomplete = false;
+UsernameButton.autocomplete = "false";
 UsernameButton.type = "text";
 UsernameButton.placeholder = "Username";
 UsernameButton.style.width = "200%";
@@ -144,8 +155,6 @@ function SaveToFile() {
     A.download = `${NameButton.value != "" ? NameButton.value : "UntitledSimulation"}.json`;
     A.click();
     URL.revokeObjectURL(Url);
-
-    SaveToFirebase();
 }
 
 function SaveToFirebase() {
@@ -165,10 +174,25 @@ function SaveToFirebase() {
         Particles.push(ParticleMetadata);
     });
 
+    function FormatDate(date) {
+        const Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+        const Day = String(date.getDate());
+        const Month = Months[date.getMonth()].slice(0, 3);
+        const Year = date.getFullYear();
+        const Minutes = String(date.getMinutes()).padStart(2, '0');
+        const Hours = String(date.getHours()).padStart(2, '0');
+    
+        return `${Day} ${Month} ${Year}, ${Hours}:${Minutes}`;
+    }
+    
+    const CurrentDate = new Date();
+
     const ParticleDataToSave = {
         username: Username,
         simulationName: SimulationName,
-        particles: Particles
+        particles: Particles,
+        timestamp: FormatDate(CurrentDate),
     };
 
     Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
@@ -225,7 +249,7 @@ function LoadFromFile() {
 }
 
 async function LoadSaves() {
-    BrowserContainer.innerHTML = "";
+    BrowserContainer.innerHTML = "LOADING";
 
     const SavesCollection = collection(Db, 'saves');
     const SavesSnapshot = await getDocs(SavesCollection);
@@ -242,6 +266,7 @@ async function LoadSaves() {
             const Username = Save.username;
             const SimulationName = Save.simulationName;
             const Particles = Save.particles;
+            const Timestamp = Save.timestamp;
     
             const SaveButton = document.createElement("div");
             SaveButton.style.display = "flex";
@@ -252,11 +277,12 @@ async function LoadSaves() {
             SaveButton.style.backgroundColor = Theme.BackgroundColor;
             SaveButton.style.marginLeft = "20px";
             SaveButton.style.borderRadius = "8px";
+            SaveButton.style.cursor = "pointer";
             BrowserContainer.appendChild(SaveButton);
     
             const Author = document.createElement("i");
             Author.innerHTML = Username;
-            Author.style.fontSize = "16px";
+            Author.style.fontSize = "75%";
             Author.style.marginTop = "8px";
             Author.style.marginLeft = "8px";
             SaveButton.appendChild(Author);
@@ -266,13 +292,19 @@ async function LoadSaves() {
             SaveName.style.marginLeft = "8px";
             SaveButton.appendChild(SaveName);
 
+            const TimestampLabel = document.createElement("span");
+            TimestampLabel.innerHTML = Timestamp;
+            TimestampLabel.style.marginLeft = "8px";
+            SaveButton.appendChild(TimestampLabel);
+
             const RemoveButton = document.createElement("span");
             RemoveButton.innerHTML = "X";
             RemoveButton.style.color = "red";
             RemoveButton.style.cursor = "pointer";
-            RemoveButton.style.fontSize = "32px";
+            RemoveButton.style.fontSize = "100%";
             RemoveButton.style.position = "absolute";
-            RemoveButton.style.left = `${SaveButton.offsetWidth - 22}px`;
+            RemoveButton.style.left = `${SaveButton.offsetWidth - 18}px`;
+            RemoveButton.style.top = "4px";
             SaveButton.appendChild(RemoveButton);
 
             RemoveButton.addEventListener("click", () => {
@@ -285,11 +317,14 @@ async function LoadSaves() {
                 }
             });
     
-            SaveButton.addEventListener("click", () => {
-                Particles.forEach(Particle => {
-                    const Element = tptw.GetElement(Particle.Name);
-                    tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);
-                });
+            SaveButton.addEventListener("click", (Event) => {
+                if (Event.target !== RemoveButton) {
+                    ParticleContainer.innerHTML = "";
+                    Particles.forEach(Particle => {
+                        const Element = tptw.GetElement(Particle.Name);
+                        tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);
+                    });
+                }
             });
         });
     } else {
@@ -303,5 +338,6 @@ function Browse() {
 }
 
 BrowseButton.addEventListener("click", Browse);
+SaveCloudButton.addEventListener("click", SaveToFirebase);
 SaveButton.addEventListener("click", SaveToFile);
 LoadButton.addEventListener("click", LoadFromFile);
