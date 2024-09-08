@@ -242,6 +242,9 @@ function IsMobile() {
 }
 
 if (IsMobile()) {
+    ElementContainer.style.width = "50px";
+    ElementContainer.style.right = "-15px";
+
     const DisplayButton = document.createElement("span");
     DisplayButton.innerHTML = "Display";
     DisplayButton.style.color = "rgb(23, 161, 191)";

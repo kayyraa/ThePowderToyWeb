@@ -15,6 +15,9 @@
         <script type="module" src="scripts/cursor.js"></script>
         <script type="module" src="scripts/save.js"></script>
 
+        <script type="module" src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
+        <script type="module" src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
+
         <link rel="shortcut icon" href="images/Favicon.png" type="image/x-icon">
         <link rel="stylesheet" href="scripts/style/style.css">
         <link rel="stylesheet" href="scripts/style/particles.css">
@@ -23,5 +26,24 @@
         <div id="ParticleContainer"></div>
         <div id="PlaceholderContainer"></div>
         <div id="LogContainer"></div>
+
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+
+            const firebaseConfig = {
+              apiKey: "AIzaSyCWcUsQWn4xNSrZ5wQIdvJSeS1qr3KMCLo",
+              authDomain: "thepowdertoy-750c7.firebaseapp.com",
+              databaseURL: "https://thepowdertoy-750c7-default-rtdb.firebaseio.com",
+              projectId: "thepowdertoy-750c7",
+              storageBucket: "thepowdertoy-750c7.appspot.com",
+              messagingSenderId: "860529669764",
+              appId: "1:860529669764:web:50d0c59b170e8ae1e6b4d1",
+              measurementId: "G-TBC2KPQMS4"
+            };
+          
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+        </script>
     </body>
 </html>

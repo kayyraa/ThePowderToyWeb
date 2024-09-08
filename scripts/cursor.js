@@ -2,6 +2,8 @@ import * as tptw from "./tptw.js";
 
 const ElementContainer = document.getElementById("ElementContainer");
 const ParticleContainer = document.getElementById("ParticleContainer");
+const Buttons = document.getElementById("Buttons");
+const BrowserContainer = document.getElementById("BrowserContainer");
 
 var MouseX = 0;
 var MouseY = 0;
@@ -31,7 +33,15 @@ document.addEventListener("pointermove", (Event) => {
 
 document.addEventListener("mousedown", (Event) => {
     if (Event.button === 0) {
-        if (Event.target.offsetParent !== ElementContainer) {
+        if (
+            Event.target.offsetParent !== ElementContainer
+            &&
+            Event.target.offsetParent !== Buttons
+            &&
+            Event.target !== Buttons
+            &&
+            Event.target !== BrowserContainer
+        ) {
             IsDragging = true;
         }
 
