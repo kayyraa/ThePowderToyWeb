@@ -5,10 +5,15 @@ import * as tptw from "./tptw.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
+const LocalId = localStorage.getItem("localId") === null ? localStorage.setItem("localId",
+    Array.from({length: 6}, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    .charAt(Math.floor(Math.random() * 36)))
+    .join('')
+) : localStorage.getItem("localId");
+
 const ParticleContainer = document.getElementById("ParticleContainer");
 
 const BrowserContainer = document.createElement("div");
-BrowserContainer.style.fontSize = "100%";
 BrowserContainer.style.width = "60%";
 BrowserContainer.style.height = "75%";
 BrowserContainer.style.position = "absolute";
@@ -46,6 +51,7 @@ BrowserAddressbar.style.alignItems = "center";
 BrowserAddressbar.style.textAlign = "center";
 BrowserAddressbar.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
 BrowserAddressbar.placeholder = "eg. 1992731";
+BrowserAddressbar.style.display = "none";
 BrowserContainer.appendChild(BrowserAddressbar);
 
 const SavesContainer = document.createElement("div");
@@ -67,7 +73,7 @@ Buttons.style.alignContent = "center";
 Buttons.style.alignItems = "center";
 Buttons.style.justifyContent = "space-evenly";
 Buttons.style.flexDirection = "row";
-Buttons.style.fontSize = "100%";
+Buttons.style.fontSize = "90%";
 Buttons.style.bottom = "0";
 Buttons.style.left = "0";
 Buttons.style.backgroundColor = Theme.BackgroundColor;
@@ -129,7 +135,7 @@ PublicityButton.id = "PublicityButton";
 Buttons.appendChild(PublicityButton);
 
 export const NameButton = document.createElement("input");
-NameButton.autocomplete = "false";
+NameButton.autocomplete = "off";
 NameButton.type = "text";
 NameButton.placeholder = "Simulation Name";
 NameButton.style.width = "200%";
@@ -140,7 +146,7 @@ NameButton.id = "NameButton";
 Buttons.appendChild(NameButton);
 
 export const UsernameButton = document.createElement("input");
-UsernameButton.autocomplete = "false";
+UsernameButton.autocomplete = "off";
 UsernameButton.type = "text";
 UsernameButton.placeholder = "Username";
 UsernameButton.style.width = "200%";
@@ -191,6 +197,7 @@ function SaveToFile() {
 }
 
 async function SaveToFirebase() {
+    const SavesCollection = collection(Db, 'saves');
     if (!UsernameButton.value || !NameButton.value) {
         UsernameButton.style.backgroundColor = !UsernameButton.value ? "rgba(255, 0, 0, 0.15)" : "transparent";
         NameButton.style.backgroundColor = !NameButton.value ? "rgba(255, 0, 0, 0.15)" : "transparent";
@@ -201,40 +208,36 @@ async function SaveToFirebase() {
         }, 250);
 
         return;
-    } else {
-        UsernameButton.style.backgroundColor = "transparent";
-        NameButton.style.backgroundColor = "transparent";
     }
+
+    UsernameButton.style.backgroundColor = "transparent";
+    NameButton.style.backgroundColor = "transparent";
 
     const Username = UsernameButton.value;
     const SimulationName = NameButton.value;
 
-    var Particles = [];
-
-    Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
-        const ParticleMetadata = {
-            Name: Particle.id,
-            Temp: parseFloat(Particle.dataset.temp),
-            PosX: Particle.offsetLeft,
-            PosY: Particle.offsetTop,
-        };
-    
-        Particles.push(ParticleMetadata);
-    });
+    const Particles = Array.from(ParticleContainer.getElementsByTagName("div")).map(Particle => ({
+        Name: Particle.id,
+        Temp: parseFloat(Particle.dataset.temp),
+        PosX: Particle.offsetLeft,
+        PosY: Particle.offsetTop,
+    }));
 
     function FormatDate(date) {
         const Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    
+
         const Day = String(date.getDate());
         const Month = Months[date.getMonth()].slice(0, 3);
         const Year = date.getFullYear();
         const Minutes = String(date.getMinutes()).padStart(2, '0');
         const Hours = String(date.getHours()).padStart(2, '0');
-    
+
         return `${Day} ${Month} ${Year}, ${Hours}:${Minutes}`;
     }
-    
+
     const CurrentDate = new Date();
+
+    const SaveId = Array.from({ length: 8 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('');
 
     const DocumentData = {
         username: Username,
@@ -242,24 +245,13 @@ async function SaveToFirebase() {
         particles: Particles,
         timestamp: FormatDate(CurrentDate),
         public: CurrentPublicity,
-        saveId: Array.from({length: 8}, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('').toUpperCase()
+        saveId: SaveId.toUpperCase(),
+        localId: LocalId
     };
 
-    Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
-        const ParticleMetadata = {
-            Name: Particle.id,
-            Temp: parseFloat(Particle.dataset.temp),
-            PosX: Particle.offsetLeft,
-            PosY: Particle.offsetTop,
-        };
-    
-        DocumentData.particles.push(ParticleMetadata);
-    });
-
-    const savesCollection = collection(Db, 'saves');
-    const docRef = await addDoc(savesCollection, DocumentData);
+    const DocRef = await addDoc(SavesCollection, DocumentData);
     if (!CurrentPublicity) {
-      await navigator.clipboard.writeText(docRef.id);
+        await navigator.clipboard.writeText(DocRef.id);
     }
 }
 
@@ -333,9 +325,6 @@ async function LoadSaves(Page = 1) {
             SaveButton.style.display = "flex";
             SaveButton.style.flexDirection = "column";
             SaveButton.style.position = "relative";
-            SaveButton.style.width = "30%";
-            SaveButton.style.height = "25%";
-            SaveButton.style.backgroundColor = "rgb(60, 60, 60)";
             SaveButton.style.cursor = "pointer";
             SaveButton.style.boxSizing = "border-box";
             SaveButton.style.padding = "10px";
@@ -375,6 +364,7 @@ async function LoadSaves(Page = 1) {
             RemoveButton.style.position = "absolute";
             RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
+            RemoveButton.style.visibility = Save.localId === LocalId ? "visible" : "hidden";
             SaveButton.appendChild(RemoveButton);
 
             IdLabel.addEventListener("click", () => {
@@ -383,9 +373,11 @@ async function LoadSaves(Page = 1) {
 
             RemoveButton.addEventListener("click", async () => {
                 try {
-                    await deleteDoc(doc(Db, "saves", Save.id));
-                    SaveButton.remove();
-                    await LoadSaves(CurrentPage);
+                    if (Save.localId === LocalId) {
+                        await deleteDoc(doc(Db, "saves", Save.id));
+                        SaveButton.remove();
+                        await LoadSaves(CurrentPage);
+                    }
                 } catch (e) {
                     console.error(`Error removing save: ${Save.id}, ${e}`);
                 }

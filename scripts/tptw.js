@@ -1,6 +1,6 @@
 import { Settings } from "./settings.js";
 import { Elements } from "./elements.js";
-import { NameButton } from "./save.js";
+import { NameButton, UsernameButton } from "./save.js";
 
 export const ParticleContainer = document.getElementById("ParticleContainer");
 export const PlaceholderContainer = document.getElementById("PlaceholderContainer");
@@ -17,6 +17,7 @@ export function IsMobile() {
 export function Clear() {
     ParticleContainer.innerHTML = "";
     NameButton.value = "";
+    UsernameButton.value = "";
 }
 
 export function Print(x) {
@@ -142,7 +143,7 @@ export function CreateExplosion(R, G, B, X, Y, Lifetime) {
         var Time = 0;
 
         function Update() {
-            Time += 0.1;
+            Time += 0.15;
 
             Particle.style.left = `${Particle.offsetLeft + XDirection}px`;
             Particle.style.top = `${Particle.offsetTop + YDirection}px`;
@@ -150,13 +151,10 @@ export function CreateExplosion(R, G, B, X, Y, Lifetime) {
             Particle.style.opacity = 1 - Time / Lifetime;
 
             const ParticleRect = Particle.getBoundingClientRect();
-
-            if (ParticleRect.left < 0 || ParticleRect.left > window.innerWidth || ParticleRect.top < 0 || ParticleRect.top > window.innerHeight) {
-                const TouchingPart = document.elementFromPoint(ParticleRect.left, ParticleRect.top);
-                if (TouchingPart.classList.contains("PART") && TouchingPart.dataset.hotType === "Explosive") {
-                    CreateExplosion(RgbString(TouchingPart.dataset.color).R, RgbString(TouchingPart.dataset.color).G, RgbString(TouchingPart.dataset.color).B, TouchingPart.offsetLeft, TouchingPart.offsetTop, 15);
-                    TouchingPart.remove();
-                }
+            const TouchingPart = document.elementFromPoint(ParticleRect.left, ParticleRect.top);
+            if (TouchingPart.dataset.hotType === "Explosive") {
+                CreateExplosion(RgbString(TouchingPart.dataset.color).R, RgbString(TouchingPart.dataset.color).G, RgbString(TouchingPart.dataset.color).B, TouchingPart.offsetLeft, TouchingPart.offsetTop, 15);
+                TouchingPart.remove();
             }
 
             if (Time <= Lifetime) {

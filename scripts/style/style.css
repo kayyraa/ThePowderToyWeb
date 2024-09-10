@@ -65,10 +65,13 @@ input {
 }
 
 .SAVE {
+  height: 25%;
+  width: 30%;
+  background-color: rgb(60, 60, 60);
   transition: all 0.25s ease;
 }
 
 .SAVE:hover {
-  z-index: 1;
-  scale: 1.125;
+  background-color: rgb(70, 70, 70);
+  height: 30%;
 }

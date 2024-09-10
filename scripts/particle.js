@@ -255,7 +255,7 @@ if (ParticleContainer) {
             });            
         }
 
-        setTimeout(Loop, 1);
+        requestAnimationFrame(Loop);
     }
 
     Loop();

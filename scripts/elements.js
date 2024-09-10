@@ -319,7 +319,7 @@ export const Elements = [
         Flammable: false,
         Caustic: false,
         Radioactive: true,
-        Radioactivity: 48,
+        Radioactivity: 64,
         Light: false,
         Temp: 46,
         MeltingPoint: 450,

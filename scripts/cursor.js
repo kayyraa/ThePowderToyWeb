@@ -122,8 +122,10 @@ function IsPlaceOccupied(X, Y, GridSize) {
 
 function Loop() {
     if (IsLining) {
+        const GridSize = parseInt(document.body.getAttribute("grid-size"));
+
         LineInfo.style.opacity = "1";
-        LineInfo.innerHTML = `X1: ${LineStartX} Y1: ${LineStartY} X2: ${parseInt(MouseX)} Y2: ${parseInt(MouseY)}`;
+        LineInfo.innerHTML = `X1: ${Math.floor(LineStartX / GridSize) * GridSize} Y1: ${Math.floor(LineStartY / GridSize) * GridSize} X2: ${parseInt(Math.floor(MouseX / GridSize) * GridSize)} Y2: ${parseInt(Math.floor(MouseY / GridSize) * GridSize)}`;
     } else {
         LineInfo.style.opacity = "0";
     }
@@ -134,10 +136,10 @@ function Loop() {
     }
 
     if (IsDragging && !IsLining && ParticleContainer) {
+        const GridSize = parseInt(document.body.getAttribute("grid-size"));
+
         const SelectedElementId = document.body.getAttribute("selected");
         const SelectedElement = document.getElementById(SelectedElementId);
-
-        const GridSize = parseInt(document.body.getAttribute("grid-size"));
 
         if (SelectedElement !== null) {
             const SnappedX = Math.floor((MouseX + (SelectedElement.dataset.type !== "Solid" ? tptw.math.Random(20, -20) : 0)) / GridSize) * GridSize;

@@ -280,7 +280,7 @@ function Update() {
         
         TempLabel.style.color = `rgb(255, ${255 - ((Temp / MeltingPoint) * 100)}, ${255 - ((Temp / MeltingPoint) * 100)})`;
 
-        TempLabel.innerHTML = `${TempText}°C ${isFinite(MeltingPoint) ? MeltingPointText : ""}`;
+        TempLabel.innerHTML = `${Target.id} - ${TempText}°C ${isFinite(MeltingPoint) ? MeltingPointText : ""}`;
         TempLabel.style.opacity = "1";
     } else {
         TempLabel.style.opacity = "0";
@@ -322,7 +322,7 @@ function Update() {
         FrameCount++;
     }
 
-    setTimeout(Update, 1);
+    requestAnimationFrame(Update);
 }
 
 Update();
