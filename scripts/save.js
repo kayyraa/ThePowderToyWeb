@@ -51,7 +51,6 @@ BrowserAddressbar.style.alignItems = "center";
 BrowserAddressbar.style.textAlign = "center";
 BrowserAddressbar.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
 BrowserAddressbar.placeholder = "eg. 1992731";
-BrowserAddressbar.style.display = "none";
 BrowserContainer.appendChild(BrowserAddressbar);
 
 const SavesContainer = document.createElement("div");
@@ -65,7 +64,7 @@ SavesContainer.style.height = "75%";
 SavesContainer.style.overflow = "hidden";
 BrowserContainer.appendChild(SavesContainer);
 
-const Buttons = document.createElement("div");
+export const Buttons = document.createElement("div");
 Buttons.style.position = "absolute";
 Buttons.style.display = "flex";
 Buttons.style.textAlign = "center";
@@ -344,7 +343,7 @@ async function LoadSaves(Page = 1) {
             SaveButton.appendChild(SaveName);
 
             const TimestampLabel = document.createElement("span");
-            TimestampLabel.innerHTML = Timestamp;
+            TimestampLabel.innerHTML = `Updated: ${Timestamp}`;
             TimestampLabel.style.display = "block";
             SaveButton.appendChild(TimestampLabel);
 
@@ -364,22 +363,19 @@ async function LoadSaves(Page = 1) {
             RemoveButton.style.position = "absolute";
             RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
-            RemoveButton.style.visibility = Save.localId === LocalId ? "visible" : "hidden";
             SaveButton.appendChild(RemoveButton);
+
+            RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? Save.localId === LocalId ? "visible" : "hidden" : "hidden";
 
             IdLabel.addEventListener("click", () => {
                 navigator.clipboard.writeText(Save.id);
             });
 
             RemoveButton.addEventListener("click", async () => {
-                try {
-                    if (Save.localId === LocalId) {
-                        await deleteDoc(doc(Db, "saves", Save.id));
-                        SaveButton.remove();
-                        await LoadSaves(CurrentPage);
-                    }
-                } catch (e) {
-                    console.error(`Error removing save: ${Save.id}, ${e}`);
+                if (Save.localId === LocalId) {
+                    await deleteDoc(doc(Db, "saves", Save.id));
+                    SaveButton.remove();
+                    await LoadSaves(CurrentPage);
                 }
             });
     
@@ -390,6 +386,20 @@ async function LoadSaves(Page = 1) {
                     Particles.forEach(Particle => {
                         const Element = tptw.GetElement(Particle.Name);
                         tptw.CreateParticle(Element, Particle.PosX, Particle.PosY).dataset.temp = Particle.Temp;
+                    });
+
+                    UsernameButton.value = Username;
+                    NameButton.value = SimulationName;
+
+                    RemoveButton.style.visibility = "hidden";
+
+                    Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
+                        if (Button !== BrowseButton) {
+                            Button.setAttribute("disabled", true);
+                        }
+                    });
+                    Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
+                        Button.disabled = true;
                     });
                 } else if (Event.target === IdLabel) {
                     IdLabel.innerHTML = "Copied";
@@ -407,15 +417,24 @@ async function LoadSaves(Page = 1) {
 }
 
 async function LoadSave(SaveId) {
-    if (!SaveId.startsWith("-")) {return;}
-
-    const DocRef = doc(Db, "saves", SaveId.replace("-", ""));
+    const DocRef = doc(Db, "saves", SaveId);
     const DocSnap = await getDoc(DocRef);
     if (DocSnap.exists()) {
         BrowserContainer.style.visibility = "hidden";
         const DocumentData = DocSnap.data();
         const Particles = DocumentData.particles;
         ParticleContainer.innerHTML = "";
+        BrowserAddressbar.value = "";
+        UsernameButton.value = DocumentData.username;
+        NameButton.value = DocumentData.simulationName;
+        
+        Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
+            Button.setAttribute("disabled", true);
+        });
+        Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
+            Button.disabled = true;
+        });
+
         Particles.forEach(Particle => {
             const Element = tptw.GetElement(Particle.Name);
             const CreatedParticle = tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);

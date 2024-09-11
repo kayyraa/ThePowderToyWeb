@@ -1,4 +1,5 @@
 const ParticleContainer = document.getElementById("ParticleContainer");
+const MaxTemp = 9720;
 
 function StringToRgb(RgbString) {
     const [R, G, B] = RgbString.match(/\d+/g).map(Number);
@@ -14,7 +15,13 @@ function Loop() {
             const Temp = parseFloat(Particle.dataset.temp) || 0;
             const CurrentColor = StringToRgb(getComputedStyle(Particle).backgroundColor);
 
-            Particle.style.backgroundColor = `rgb(${CurrentColor.R + (Temp * 2)}, ${CurrentColor.G}, ${CurrentColor.B})`;
+            const ColorRatio = Math.min(1, Temp / MaxTemp);
+
+            const NewR = Math.min(255, CurrentColor.R + (ColorRatio * 100));
+            const NewG = CurrentColor.G;
+            const NewB = Math.max(0, CurrentColor.B - (ColorRatio * 100));
+
+            Particle.style.backgroundColor = `rgb(${NewR}, ${NewG}, ${NewB})`;
             Particle.style.filter = "";
             Particle.style.boxShadow = "";
         });
@@ -25,10 +32,13 @@ function Loop() {
         });
     } else if (Display === "fancy") {
         Particles.forEach(Particle => {
+            const MeltingPoint = parseFloat(Particle.dataset.metlingPoint) || 0;
+            const Temp = parseFloat(Particle.dataset.temp) || 0;
+
             Particle.style.filter = "";
             Particle.style.backgroundColor = Particle.dataset.fixedColor;
-            if (Particle.dataset.radioactive === "true") {
-                Particle.style.filter = `brightness(2) drop-shadow(0 0 8px ${Particle.dataset.fixedColor})`;
+            if (Particle.dataset.radioactive === "true" || Temp >= MeltingPoint) {
+                Particle.style.filter = `drop-shadow(0 0 8px ${Particle.dataset.fixedColor})`;
                 Particle.style.boxShadow = `0 0 8px 1px ${Particle.dataset.fixedColor}`;
             } else if (Particle.dataset.light === "true") {
                 Particle.style.boxShadow = `0 0 16px 4px ${Particle.dataset.fixedColor}`;

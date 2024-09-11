@@ -73,5 +73,20 @@ input {
 
 .SAVE:hover {
   background-color: rgb(70, 70, 70);
-  height: 30%;
+}
+
+#Buttons div input {
+  transition: all 0.25s ease;
+  pointer-events: all;
+  opacity: 1;
+}
+
+#Buttons div[disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#Buttons input:disabled {
+  opacity: 0.75;
+  pointer-events: none;
 }

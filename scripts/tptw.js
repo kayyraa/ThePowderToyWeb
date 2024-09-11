@@ -1,6 +1,6 @@
 import { Settings } from "./settings.js";
 import { Elements } from "./elements.js";
-import { NameButton, UsernameButton } from "./save.js";
+import { NameButton, UsernameButton, Buttons } from "./save.js";
 
 export const ParticleContainer = document.getElementById("ParticleContainer");
 export const PlaceholderContainer = document.getElementById("PlaceholderContainer");
@@ -18,6 +18,13 @@ export function Clear() {
     ParticleContainer.innerHTML = "";
     NameButton.value = "";
     UsernameButton.value = "";
+
+    Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
+        Button.setAttribute("disabled", false);
+    });
+    Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
+        Button.disabled = false;
+    });
 }
 
 export function Print(x) {
