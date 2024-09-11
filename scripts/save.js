@@ -171,7 +171,7 @@ const FirebaseConfig = {
 const App = initializeApp(FirebaseConfig);
 const Db = getFirestore(App);
 
-function SaveToFile() {
+export function SaveToFile() {
     ParticleData.push(NameButton.value);
 
     Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
@@ -334,7 +334,6 @@ async function LoadSaves(Page = 1) {
             const Author = document.createElement("i");
             Author.innerHTML = Username;
             Author.style.fontSize = "75%";
-            Author.style.marginBottom = "8px";
             SaveButton.appendChild(Author);
     
             const SaveName = document.createElement("span");
@@ -345,6 +344,7 @@ async function LoadSaves(Page = 1) {
             const TimestampLabel = document.createElement("span");
             TimestampLabel.innerHTML = `Updated: ${Timestamp}`;
             TimestampLabel.style.display = "block";
+            TimestampLabel.style.fontSize = "13px";
             SaveButton.appendChild(TimestampLabel);
 
             const IdLabel = document.createElement("span");

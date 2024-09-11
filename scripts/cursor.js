@@ -34,8 +34,8 @@ document.addEventListener("pointermove", (Event) => {
 
 document.addEventListener("mousedown", (Event) => {
     if (Event.button === 0) {
-        if (!document.body.getAttribute("selection") === "none") {
-            IsRemoving = false;
+        if (document.body.getAttribute("selected") === "NONE") {
+            IsRemoving = true;
         }
 
         if (
@@ -78,6 +78,10 @@ document.addEventListener("mouseup", (Event) => {
             tptw.ClearLinePlaceholder();
             
             IsLining = false;
+        }
+    } else if (Event.button === 2) {
+        if (document.body.getAttribute("selected") !== "NONE") {
+            IsRemoving = false;
         }
     }
 });
