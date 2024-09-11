@@ -3,13 +3,55 @@ import { Settings } from "./settings.js";
 import * as tptw from "./tptw.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-const LocalId = localStorage.getItem("localId") === null ? localStorage.setItem("localId",
-    Array.from({length: 6}, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    .charAt(Math.floor(Math.random() * 36)))
-    .join('')
-) : localStorage.getItem("localId");
+var LocalId
+
+const FirebaseConfig = {
+    apiKey: "AIzaSyCWcUsQWn4xNSrZ5wQIdvJSeS1qr3KMCLo",
+    authDomain: "thepowdertoy-750c7.firebaseapp.com",
+    databaseURL: "https://thepowdertoy-750c7-default-rtdb.firebaseio.com",
+    projectId: "thepowdertoy-750c7",
+    storageBucket: "thepowdertoy-750c7.appspot.com",
+    messagingSenderId: "860529669764",
+    appId: "1:860529669764:web:50d0c59b170e8ae1e6b4d1",
+    measurementId: "G-TBC2KPQMS4"
+};
+  
+const App = initializeApp(FirebaseConfig);
+const Db = getFirestore(App);
+
+async function GetUserIp() {
+    try {
+        const Response = await fetch("https://ipinfo.io/json");
+        const Data = await Response.json();
+        return Data.ip;
+    } catch (Error) {
+        return null;
+    }
+}
+
+async function CheckUserDoc() {
+    const IP = await GetUserIp();
+    if (!IP) return;
+
+    const UsersCollection = collection(Db, "users");
+    const UserDocRef = doc(UsersCollection, IP);
+    const DocSnapshot = await getDoc(UserDocRef);
+
+    if (DocSnapshot.exists()) {
+        return DocSnapshot.data().ip;
+    } else {
+        await setDoc(UserDocRef, { ip: IP });
+        return IP;
+    }
+}
+
+CheckUserDoc().then(GotLocalId => {
+    if (GotLocalId) {
+        LocalId = GotLocalId;
+    }
+});
 
 const ParticleContainer = document.getElementById("ParticleContainer");
 
@@ -156,20 +198,6 @@ UsernameButton.id = "UsernameButton";
 Buttons.appendChild(UsernameButton);
 
 const ParticleData = [];
-
-const FirebaseConfig = {
-  apiKey: "AIzaSyCWcUsQWn4xNSrZ5wQIdvJSeS1qr3KMCLo",
-  authDomain: "thepowdertoy-750c7.firebaseapp.com",
-  databaseURL: "https://thepowdertoy-750c7-default-rtdb.firebaseio.com",
-  projectId: "thepowdertoy-750c7",
-  storageBucket: "thepowdertoy-750c7.appspot.com",
-  messagingSenderId: "860529669764",
-  appId: "1:860529669764:web:50d0c59b170e8ae1e6b4d1",
-  measurementId: "G-TBC2KPQMS4"
-};
-
-const App = initializeApp(FirebaseConfig);
-const Db = getFirestore(App);
 
 export function SaveToFile() {
     ParticleData.push(NameButton.value);
@@ -363,9 +391,8 @@ async function LoadSaves(Page = 1) {
             RemoveButton.style.position = "absolute";
             RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
+            RemoveButton.style.visibility = Save.localId.trim() === LocalId.trim() ? "visible" : "hidden";
             SaveButton.appendChild(RemoveButton);
-
-            RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? Save.localId === LocalId ? "visible" : "hidden" : "hidden";
 
             IdLabel.addEventListener("click", () => {
                 navigator.clipboard.writeText(Save.id);
@@ -390,8 +417,6 @@ async function LoadSaves(Page = 1) {
 
                     UsernameButton.value = Username;
                     NameButton.value = SimulationName;
-
-                    RemoveButton.style.visibility = "hidden";
 
                     Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
                         if (Button !== BrowseButton) {
