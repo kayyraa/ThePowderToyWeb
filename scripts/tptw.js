@@ -27,6 +27,75 @@ export function Clear() {
     });
 }
 
+export function Notify(Title, Message, MarkIcon) {
+    const Container = document.createElement("div");
+    Container.style.position = "absolute";
+    Container.style.left = "50%";
+    Container.style.top = "50%";
+    Container.style.transform = "translate(-50%, -50%)";
+    Container.style.width = "75%";
+    Container.style.height = "35%";
+    Container.style.backgroundColor = "white";
+    Container.style.color = "black";
+    Container.style.transition = "all 0.125s ease";
+    Container.style.overflow = "hidden";
+    document.body.appendChild(Container);
+
+    const TitleElement = document.createElement("span");
+    TitleElement.style.position = "absolute";
+    TitleElement.style.display = "flex";
+    TitleElement.style.paddingLeft = "2.5%";
+    TitleElement.style.width = "100%";
+    TitleElement.style.height = "10%";
+    TitleElement.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    TitleElement.style.color = "white";
+    TitleElement.style.alignItems = "center";
+    TitleElement.style.alignContent = "center";
+    TitleElement.innerHTML = Title;
+    Container.appendChild(TitleElement);
+
+    const CloseButton = document.createElement("div");
+    CloseButton.style.position = "absolute";
+    CloseButton.innerHTML = "X";
+    CloseButton.style.right = "4.5%";
+    CloseButton.style.cursor = "pointer";
+    TitleElement.appendChild(CloseButton);
+
+    const Image = document.createElement("img");
+    Image.src = MarkIcon;
+    Image.draggable = false;
+    Image.style.position = "absolute";
+    Image.style.transform = "translate(-50%, -50%)";
+    Image.style.width = "10%";
+    Image.style.top = "52.5%";
+    Image.style.left = "10%";
+    Container.appendChild(Image);
+
+    const MessageContent = document.createElement("div");
+    MessageContent.innerHTML = Message;
+    MessageContent.style.position = "absolute";
+    MessageContent.style.transform = "translate(0%, -50%)";
+    MessageContent.style.top = "52.5%";
+    MessageContent.style.left = "20%";
+    MessageContent.style.fontSize = "1.5rem";
+    Container.appendChild(MessageContent);
+
+    CloseButton.addEventListener("click", () => {
+        Container.style.opacity = 0;
+        setTimeout(() => {
+            Container.remove();
+        }, 125);
+    });
+
+    CloseButton.addEventListener("mouseenter", () => {
+        CloseButton.style.color = "red";
+    });
+
+    CloseButton.addEventListener("mouseleave", () => {
+        CloseButton.style.color = "white";
+    });
+}
+
 export function Print(x) {
     const LogContainer = document.getElementById("LogContainer");
 

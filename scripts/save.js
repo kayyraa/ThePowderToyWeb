@@ -5,7 +5,7 @@ import * as tptw from "./tptw.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-var LocalId
+var LocalId = undefined;
 
 const FirebaseConfig = {
     apiKey: "AIzaSyCWcUsQWn4xNSrZ5wQIdvJSeS1qr3KMCLo",
@@ -17,7 +17,7 @@ const FirebaseConfig = {
     appId: "1:860529669764:web:50d0c59b170e8ae1e6b4d1",
     measurementId: "G-TBC2KPQMS4"
 };
-  
+
 const App = initializeApp(FirebaseConfig);
 const Db = getFirestore(App);
 
@@ -26,13 +26,14 @@ const UsersCollection = collection(Db, "users");
 async function json(url) {
     return fetch(url).then(res => res.json());
 }
-
+  
 async function CheckUserDoc() {
     const IP = await json(`https://api.ipdata.co?api-key=b1bf8f09e6f8fd273c85562c3adf823f22cb40a5d06762baba6cd04b`).then(data => {
         return data.ip;
     });
     if (!IP) return;
-    console.log(IP);
+
+    LocalId = IP;
     
     const UserDocRef = doc(UsersCollection, IP);
     const DocSnapshot = await getDoc(UserDocRef);
@@ -41,8 +42,6 @@ async function CheckUserDoc() {
         setDoc(UserDocRef, {
             ip: IP
         });
-        
-        LocalId = IP;
     }
 }
 
@@ -257,8 +256,6 @@ async function SaveToFirebase() {
 
     const CurrentDate = new Date();
 
-    const SaveId = Array.from({ length: 8 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('');
-
     const DocumentData = {
         username: Username,
         simulationName: SimulationName,
@@ -279,9 +276,14 @@ function LoadFromFile() {
     Input.type = "file";
     Input.accept = ".json";
     
-    Input.addEventListener("change", (event) => {
+    Input.addEventListener("change", (event) => {        
         const File = event.target.files[0];
         if (File) {
+            if (!File.name.endsWith(".json")) {
+                tptw.Notify("Load From File Error", "Cannot load file: Incorrect file type.", "../images/MessageBox/Error.svg");
+                return;
+            }
+
             const Reader = new FileReader();
             Reader.onload = (e) => {
                 try {
@@ -458,6 +460,8 @@ async function LoadSave(SaveId) {
             const CreatedParticle = tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);
             CreatedParticle.dataset.temp = Particle.Temp;
         });
+    } else {
+        tptw.Notify("Failed To Load Save", "Failed To Load Save: Save not found", "../images/MessageBox/Error.svg");
     }
 }
 
@@ -519,4 +523,7 @@ BrowseButton.addEventListener("click", Browse);
 SaveCloudButton.addEventListener("click", SaveToFirebase);
 SaveButton.addEventListener("click", SaveToFile);
 LoadButton.addEventListener("click", LoadFromFile);
-document.addEventListener("DOMContentLoaded", CheckUserDoc);
+
+document.addEventListener("DOMContentLoaded", () => {
+    CheckUserDoc();
+});
