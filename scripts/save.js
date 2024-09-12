@@ -315,6 +315,8 @@ const SavesPerPage = 9;
 async function LoadSaves(Page = 1) {
     SavesContainer.innerHTML = "LOADING";
 
+    const RemoveButtons = [];
+
     const SavesCollection = collection(Db, 'saves');
     const SavesSnapshot = await getDocs(SavesCollection);
     
@@ -380,14 +382,15 @@ async function LoadSaves(Page = 1) {
 
             const RemoveButton = document.createElement("span");
             RemoveButton.innerHTML = "X";
+            RemoveButton.classList.add("RemoveButton");
             RemoveButton.style.color = "red";
             RemoveButton.style.cursor = "pointer";
             RemoveButton.style.fontSize = "100%";
             RemoveButton.style.position = "absolute";
             RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
-            RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
             SaveButton.appendChild(RemoveButton);
+            RemoveButtons.push(RemoveButton);
 
             IdLabel.addEventListener("click", () => {
                 navigator.clipboard.writeText(Save.id);
@@ -411,6 +414,9 @@ async function LoadSaves(Page = 1) {
                     UsernameButton.value = Username;
                     NameButton.value = SimulationName;
 
+                    RemoveButtons.forEach(RemoveButton => {
+                        RemoveButton.style.visibility = "hidden";
+                    });
                     Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
                         if (Button !== BrowseButton) {
                             Button.setAttribute("disabled", true);
