@@ -386,7 +386,7 @@ async function LoadSaves(Page = 1) {
             RemoveButton.style.position = "absolute";
             RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
-            RemoveButton.style.visibility = getComputedStyle(SavesContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
+            RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
             SaveButton.appendChild(RemoveButton);
 
             IdLabel.addEventListener("click", () => {
@@ -394,11 +394,9 @@ async function LoadSaves(Page = 1) {
             });
 
             RemoveButton.addEventListener("click", async () => {
-                if (Save.localId === LocalId) {
-                    await deleteDoc(doc(Db, "saves", Save.id));
-                    SaveButton.remove();
-                    await LoadSaves(CurrentPage);
-                }
+                await deleteDoc(doc(Db, "saves", Save.id));
+                SaveButton.remove();
+                await LoadSaves(CurrentPage);
             });
     
             SaveButton.addEventListener("click", (Event) => {
