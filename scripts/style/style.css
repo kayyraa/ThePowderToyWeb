@@ -17,6 +17,19 @@ input {
   border: none;
 }
 
+textarea {
+  font-family: "TptFont";
+  background-color: rgba(255, 255, 255, 0.5);
+  color: white;
+  border: none;
+  resize: none;
+}
+
+textarea::placeholder {
+  color: rgb(80, 80, 80);
+  opacity: 0.5;
+}
+
 #LogContainer {
   display: flex;
   flex-direction: column;
@@ -89,4 +102,12 @@ input {
 #Buttons input:disabled {
   opacity: 0.75;
   pointer-events: none;
+}
+
+.BUTTON {
+  align-self: center;
+}
+
+.BUTTON:hover {
+  color: rgba(255, 255, 255, 0.25);
 }

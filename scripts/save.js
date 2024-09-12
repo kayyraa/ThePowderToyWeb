@@ -22,6 +22,7 @@ const App = initializeApp(FirebaseConfig);
 const Db = getFirestore(App);
 
 const UsersCollection = collection(Db, "users");
+const SavesCollection = collection(Db, 'saves');
 
 async function json(url) {
     return fetch(url).then(res => res.json());
@@ -40,6 +41,7 @@ async function CheckUserDoc() {
 
     if (!DocSnapshot.exists()) {
         setDoc(UserDocRef, {
+            register: Math.floor(Date.now() / 1000),
             ip: IP
         });
     }
@@ -216,7 +218,6 @@ export function SaveToFile() {
 }
 
 async function SaveToFirebase() {
-    const SavesCollection = collection(Db, 'saves');
     if (!UsernameButton.value || !NameButton.value) {
         UsernameButton.style.backgroundColor = !UsernameButton.value ? "rgba(255, 0, 0, 0.15)" : "transparent";
         NameButton.style.backgroundColor = !NameButton.value ? "rgba(255, 0, 0, 0.15)" : "transparent";
@@ -262,7 +263,8 @@ async function SaveToFirebase() {
         particles: Particles,
         timestamp: FormatDate(CurrentDate),
         public: CurrentPublicity,
-        localId: LocalId
+        localId: LocalId,
+        description: ""
     };
 
     const DocRef = await addDoc(SavesCollection, DocumentData);
@@ -308,17 +310,19 @@ function LoadFromFile() {
     Input.click(); 
 }
 
+
+
 let CurrentPage = 1;
-let CurrentPublicity = true;
 const SavesPerPage = 9;
 
 async function LoadSaves(Page = 1) {
     SavesContainer.innerHTML = "LOADING";
 
     const RemoveButtons = [];
+    const SaveButtons = [];
 
-    const SavesCollection = collection(Db, 'saves');
-    const SavesSnapshot = await getDocs(SavesCollection);
+    const SavesCollectionRef = collection(Db, 'saves');
+    const SavesSnapshot = await getDocs(SavesCollectionRef);
     
     const SavesList = SavesSnapshot.docs.map(doc => ({
         id: doc.id,
@@ -337,7 +341,9 @@ async function LoadSaves(Page = 1) {
         SavesContainer.style.gap = "5px";
 
         PaginatedSaves.forEach(Save => {
-            if (!Save.public) { return; }
+            if (!Save.public) return;
+
+            let ClickCount = 0;
 
             const Username = Save.username;
             const SimulationName = Save.simulationName;
@@ -355,6 +361,7 @@ async function LoadSaves(Page = 1) {
             SaveButton.style.overflow = "hidden";
             SaveButton.classList.add("SAVE");
             SavesContainer.appendChild(SaveButton);
+            SaveButtons.push(SaveButton);
     
             const Author = document.createElement("i");
             Author.innerHTML = Username;
@@ -367,10 +374,32 @@ async function LoadSaves(Page = 1) {
             SaveButton.appendChild(SaveName);
 
             const TimestampLabel = document.createElement("span");
-            TimestampLabel.innerHTML = `Updated: ${Timestamp}`;
+            TimestampLabel.innerHTML = Timestamp;
             TimestampLabel.style.display = "block";
             TimestampLabel.style.fontSize = "13px";
             SaveButton.appendChild(TimestampLabel);
+
+            const DescriptionLabel = document.createElement("span");
+            DescriptionLabel.innerHTML = Save.description !== undefined ? Save.description : "";
+            DescriptionLabel.style.display = "block";
+            DescriptionLabel.style.fontSize = "13px";
+            DescriptionLabel.style.visibility = "hidden";
+            SaveButton.appendChild(DescriptionLabel);
+
+            const DescriptionInput = document.createElement("textarea");
+            DescriptionInput.style.width = "75%";
+            DescriptionInput.style.height = "50%";
+            DescriptionInput.style.marginTop = "2%";
+            DescriptionInput.style.visibility = "hidden";
+            DescriptionInput.style.alignSelf = "center";
+            DescriptionInput.placeholder = "Description here...";
+            SaveButton.appendChild(DescriptionInput);
+
+            const SaveChangesButton = document.createElement("div");
+            SaveChangesButton.innerHTML = "Save Changes";
+            SaveChangesButton.classList.add("BUTTON");
+            SaveChangesButton.style.visibility = "hidden";
+            SaveButton.appendChild(SaveChangesButton);
 
             const IdLabel = document.createElement("span");
             IdLabel.innerHTML = Save.id;
@@ -389,6 +418,7 @@ async function LoadSaves(Page = 1) {
             RemoveButton.style.position = "absolute";
             RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
+            RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
             SaveButton.appendChild(RemoveButton);
             RemoveButtons.push(RemoveButton);
 
@@ -402,29 +432,59 @@ async function LoadSaves(Page = 1) {
                 await LoadSaves(CurrentPage);
             });
     
-            SaveButton.addEventListener("click", (Event) => {
-                if (Event.target !== RemoveButton && Event.target !== IdLabel) {
-                    BrowserContainer.style.visibility = "hidden";
-                    ParticleContainer.innerHTML = "";
-                    Particles.forEach(Particle => {
-                        const Element = tptw.GetElement(Particle.Name);
-                        tptw.CreateParticle(Element, Particle.PosX, Particle.PosY).dataset.temp = Particle.Temp;
-                    });
+            SaveButton.addEventListener("click", function(Event) {
+                if (
+                    Event.target !== RemoveButton && 
+                    Event.target !== IdLabel && 
+                    Event.target !== DescriptionInput &&
+                    Event.target !== SaveChangesButton) {
+                    ClickCount++;
 
-                    UsernameButton.value = Username;
-                    NameButton.value = SimulationName;
+                    DescriptionLabel.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden" : "hidden";
+                    DescriptionInput.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden" : "hidden";
+                    SaveChangesButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden" : "hidden";
 
-                    RemoveButtons.forEach(RemoveButton => {
-                        RemoveButton.style.visibility = "hidden";
-                    });
-                    Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
-                        if (Button !== BrowseButton) {
-                            Button.setAttribute("disabled", true);
-                        }
-                    });
-                    Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
-                        Button.disabled = true;
-                    });
+                    if (ClickCount === 1) {
+                        this.style.position = "absolute";
+                        this.style.height = "50%";
+                        this.style.width = "75%";
+                        this.style.zIndex = "1";
+                        IdLabel.style.visibility = "hidden";
+
+                        SaveButtons.forEach(SaveButton => {
+                            if (this !== SaveButton) {
+                                SaveButton.style.opacity = "0";
+                            }
+                        });
+                    } else if (ClickCount === 2) {
+                        this.style.height = "25%";
+                        this.style.width = "30%";
+                        this.style.zIndex = "0";
+                        this.style.opacity = "0";
+                        BrowserContainer.style.visibility = "hidden";
+                        ParticleContainer.innerHTML = "";
+                        Particles.forEach(Particle => {
+                            const Element = tptw.GetElement(Particle.Name);
+                            tptw.CreateParticle(Element, Particle.PosX, Particle.PosY).dataset.temp = Particle.Temp;
+                        });
+
+                        UsernameButton.value = Username;
+                        NameButton.value = SimulationName;
+
+                        RemoveButtons.forEach(RemoveButton => {
+                            RemoveButton.style.visibility = "hidden";
+                        });
+                        Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
+                            if (Button !== BrowseButton) {
+                                Button.setAttribute("disabled", true);
+                            }
+                        });
+                        Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
+                            Button.disabled = true;
+                        });
+                    } else {
+                        ClickCount = 0;
+                    }
                 } else if (Event.target === IdLabel) {
                     IdLabel.innerHTML = "Copied";
                     setTimeout(() => {
@@ -432,6 +492,26 @@ async function LoadSaves(Page = 1) {
                     }, 1000);
                 }
             });
+
+            SavesContainer.addEventListener("click", (Event) => {
+                if (Event.target === SavesContainer) {
+                    LoadSaves(Page);
+                }
+            });
+
+            SaveChangesButton.addEventListener("click", async () => {
+                const Description = DescriptionInput.value !== "" ? DescriptionInput.value : "";
+            
+                try {
+                    const docRef = doc(Db, "saves", Save.id);
+                    await setDoc(docRef, {
+                        description: Description
+                    }, { merge: true });
+                    LoadSaves(Page);
+                } catch (error) {
+                    console.error("Error updating document: ", error);
+                }
+            });            
         });
 
         AddPaginationControls(TotalPages);
@@ -440,34 +520,6 @@ async function LoadSaves(Page = 1) {
     }
 }
 
-async function LoadSave(SaveId) {
-    const DocRef = doc(Db, "saves", SaveId);
-    const DocSnap = await getDoc(DocRef);
-    if (DocSnap.exists()) {
-        BrowserContainer.style.visibility = "hidden";
-        const DocumentData = DocSnap.data();
-        const Particles = DocumentData.particles;
-        ParticleContainer.innerHTML = "";
-        BrowserAddressbar.value = "";
-        UsernameButton.value = DocumentData.username;
-        NameButton.value = DocumentData.simulationName;
-        
-        Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
-            Button.setAttribute("disabled", true);
-        });
-        Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
-            Button.disabled = true;
-        });
-
-        Particles.forEach(Particle => {
-            const Element = tptw.GetElement(Particle.Name);
-            const CreatedParticle = tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);
-            CreatedParticle.dataset.temp = Particle.Temp;
-        });
-    } else {
-        tptw.Notify("Failed To Load Save", "Failed To Load Save: Save not found", "../images/MessageBox/Error.svg");
-    }
-}
 
 function AddPaginationControls(TotalPages) {
     const ExistingControls = document.querySelector(".pagination-controls");
