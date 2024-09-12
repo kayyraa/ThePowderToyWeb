@@ -21,37 +21,30 @@ const FirebaseConfig = {
 const App = initializeApp(FirebaseConfig);
 const Db = getFirestore(App);
 
-async function GetUserIp() {
-    try {
-        const Response = await fetch("https://ipinfo.io/json");
-        const Data = await Response.json();
-        return Data.ip;
-    } catch (Error) {
-        return null;
-    }
+const UsersCollection = collection(Db, "users");
+
+async function json(url) {
+    return fetch(url).then(res => res.json());
 }
 
 async function CheckUserDoc() {
-    const IP = await GetUserIp();
+    const IP = await json(`https://api.ipdata.co?api-key=b1bf8f09e6f8fd273c85562c3adf823f22cb40a5d06762baba6cd04b`).then(data => {
+        return data.ip;
+    });
     if (!IP) return;
-
-    const UsersCollection = collection(Db, "users");
+    console.log(IP);
+    
     const UserDocRef = doc(UsersCollection, IP);
     const DocSnapshot = await getDoc(UserDocRef);
 
-    if (DocSnapshot.exists()) {
-        return DocSnapshot.data().ip;
-    } else {
-        await setDoc(UserDocRef, { ip: IP });
-        return IP;
+    if (!DocSnapshot.exists()) {
+        setDoc(UserDocRef, {
+            ip: IP
+        });
+        
+        LocalId = IP;
     }
 }
-
-CheckUserDoc().then(GotLocalId => {
-    if (GotLocalId) {
-        LocalId = GotLocalId;
-    }
-});
 
 const ParticleContainer = document.getElementById("ParticleContainer");
 
@@ -272,7 +265,6 @@ async function SaveToFirebase() {
         particles: Particles,
         timestamp: FormatDate(CurrentDate),
         public: CurrentPublicity,
-        saveId: SaveId.toUpperCase(),
         localId: LocalId
     };
 
@@ -347,6 +339,7 @@ async function LoadSaves(Page = 1) {
             const SimulationName = Save.simulationName;
             const Particles = Save.particles;
             const Timestamp = Save.timestamp;
+            const SaveId = String(Save.localId).trim();
     
             const SaveButton = document.createElement("div");
             SaveButton.style.display = "flex";
@@ -391,7 +384,7 @@ async function LoadSaves(Page = 1) {
             RemoveButton.style.position = "absolute";
             RemoveButton.style.right = "8px";
             RemoveButton.style.top = "4px";
-            RemoveButton.style.visibility = Save.localId.trim() === LocalId.trim() ? "visible" : "hidden";
+            RemoveButton.style.visibility = getComputedStyle(SavesContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
             SaveButton.appendChild(RemoveButton);
 
             IdLabel.addEventListener("click", () => {
@@ -526,3 +519,4 @@ BrowseButton.addEventListener("click", Browse);
 SaveCloudButton.addEventListener("click", SaveToFirebase);
 SaveButton.addEventListener("click", SaveToFile);
 LoadButton.addEventListener("click", LoadFromFile);
+document.addEventListener("DOMContentLoaded", CheckUserDoc);
