@@ -12,7 +12,7 @@ const ParticleContainer = document.getElementById("ParticleContainer");
 var MouseX = 0;
 var MouseY = 0;
 
-const SidebarContainer = document.createElement("div");
+export const SidebarContainer = document.createElement("div");
 SidebarContainer.style.position = "absolute";
 SidebarContainer.style.display = "flex";
 SidebarContainer.style.flexDirection = "column";
@@ -77,7 +77,7 @@ const ElementContainer = document.createElement("div");
 ElementContainer.id = "ElementContainer";
 document.body.appendChild(ElementContainer);
 
-const ElementLabel = document.createElement("span");
+export const ElementLabel = document.createElement("span");
 ElementLabel.innerHTML = "NONE";
 ElementLabel.classList.add("ElementLabel");
 ElementLabel.style.color = Theme.TertiaryColor;

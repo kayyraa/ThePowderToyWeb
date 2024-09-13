@@ -1,9 +1,10 @@
 import { Theme } from "./theme.js";
 import { Settings } from "./settings.js";
+import * as sc from "./hud.js";
 import * as tptw from "./tptw.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 var LocalId = undefined;
 var CurrentPublicity = true;
@@ -25,18 +26,51 @@ const Db = getFirestore(App);
 const UsersCollection = collection(Db, "users");
 const SavesCollection = collection(Db, 'saves');
 
+const SidebarContainer = document.createElement("div");
+SidebarContainer.style.width = !tptw.IsMobile() ? "220px" : "120px";
+SidebarContainer.style.height = `${sc.SidebarContainer.offsetHeight - (sc.ElementLabel.offsetHeight / 1.75)}px`;
+SidebarContainer.classList.add("SidebarContainer");
+SidebarContainer.style.left = `${sc.SidebarContainer.offsetLeft + sc.SidebarContainer.offsetWidth + 10}px`;
+SidebarContainer.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
+SidebarContainer.style.color = Theme.TertiaryColor;
+SidebarContainer.innerHTML = "ACCOUNT";
+document.body.appendChild(SidebarContainer);
+
+const IpLabel = document.createElement("div");
+SidebarContainer.appendChild(IpLabel);
+
+const RegisterLabel = document.createElement("div");
+RegisterLabel.innerHTML = "SIGN: 00 JAN 0000, 00:00";
+SidebarContainer.appendChild(RegisterLabel);
+
+const SavesLabel = document.createElement("div");
+SavesLabel.innerHTML = "SAVES: 0";
+SidebarContainer.appendChild(SavesLabel);
+
+const RemoveAccountButton = document.createElement("div");
+RemoveAccountButton.innerHTML = "REMOVE ACCOUNT";
+RemoveAccountButton.style.color = "red";
+RemoveAccountButton.style.cursor = "pointer";
+SidebarContainer.appendChild(RemoveAccountButton);
+
 async function json(url) {
     return fetch(url).then(res => res.json());
 }
-  
+
 async function CheckUserDoc() {
     const IP = await json(`https://api.ipdata.co?api-key=b1bf8f09e6f8fd273c85562c3adf823f22cb40a5d06762baba6cd04b`).then(data => {
         return data.ip;
     });
     if (!IP) return;
 
+    IpLabel.innerHTML = `IP: ${IP}`;
+
     LocalId = IP;
-    
+
+    const SavesQuery = query(SavesCollection, where("localId", "==", IP));
+    const SavesQuerySnapshot = await getDocs(SavesQuery);
+    SavesLabel.innerHTML = `SAVES: ${SavesQuerySnapshot.docs.length}`;
+
     const UserDocRef = doc(UsersCollection, IP);
     const DocSnapshot = await getDoc(UserDocRef);
 
@@ -45,7 +79,35 @@ async function CheckUserDoc() {
             register: Math.floor(Date.now() / 1000),
             ip: IP
         });
+    } else {
+        const Register = DocSnapshot.data().register;
+
+        const Seconds = new Date(Register * 1000);
+
+        const Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const Day = Seconds.getDate().toString().padStart(2, '0');
+        const Month = Months[Seconds.getMonth()];
+        const Year = Seconds.getFullYear();
+        const Time = Seconds.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+        const RegisterDate = `${Day} ${Month} ${Year}, ${Time}`;
+
+        RegisterLabel.innerHTML = `SIGN: ${RegisterDate}`;
     }
+
+    RemoveAccountButton.addEventListener("click", async () => {
+        const SavesQuery = query(SavesCollection, where("localId", "==", IP));
+        const SavesQuerySnapshot = await getDocs(SavesQuery);
+        SavesQuerySnapshot.forEach(docRef => {
+            setDoc(docRef, {
+                public: false
+            }, { merge: true });
+        });
+
+        const UserDocRef = doc(UsersCollection, IP);
+        await deleteDoc(UserDocRef);
+        CheckUserDoc();
+    });
 }
 
 const ParticleContainer = document.getElementById("ParticleContainer");
@@ -78,44 +140,17 @@ BrowserTitlebar.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
 BrowserContainer.appendChild(BrowserTitlebar);
 
 const BrowserAddressbar = document.createElement("input");
-BrowserAddressbar.style.width = "100%";
-BrowserAddressbar.style.height = "24px";
-BrowserAddressbar.style.position = "absolute";
-BrowserAddressbar.style.top = "24px";
-BrowserAddressbar.style.width = "100%";
-BrowserAddressbar.style.height = "24px";
-BrowserAddressbar.style.alignContent = "center";
-BrowserAddressbar.style.alignItems = "center";
-BrowserAddressbar.style.textAlign = "center";
-BrowserAddressbar.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+BrowserAddressbar.classList.add("BrowserAddressbar");
 BrowserAddressbar.placeholder = "eg. 1992731";
 BrowserContainer.appendChild(BrowserAddressbar);
 
 const SavesContainer = document.createElement("div");
-SavesContainer.style.display = "flex";
-SavesContainer.style.flexDirection = "row";
-SavesContainer.style.justifyContent = "center";
-SavesContainer.style.alignContent = "center";
-SavesContainer.style.alignItems = "center";
-SavesContainer.style.width = "100%";
-SavesContainer.style.height = "75%";
-SavesContainer.style.overflow = "hidden";
+SavesContainer.classList.add("SavesContainer");
 BrowserContainer.appendChild(SavesContainer);
 
 export const Buttons = document.createElement("div");
-Buttons.style.position = "absolute";
-Buttons.style.display = "flex";
-Buttons.style.textAlign = "center";
-Buttons.style.alignContent = "center";
-Buttons.style.alignItems = "center";
-Buttons.style.justifyContent = "space-evenly";
-Buttons.style.flexDirection = "row";
-Buttons.style.fontSize = "80%";
-Buttons.style.bottom = "0";
-Buttons.style.left = "0";
+Buttons.classList.add("Buttons");
 Buttons.style.backgroundColor = Theme.BackgroundColor;
-Buttons.style.width = "100%";
-Buttons.style.height = "32px";
 Buttons.id = "Buttons";
 document.body.appendChild(Buttons);
 
@@ -123,53 +158,30 @@ const BrowseButton = document.createElement("div");
 BrowseButton.innerHTML = "BROWSE";
 BrowseButton.classList.add("BTN");
 BrowseButton.style.color = Theme.TertiaryColor;
-BrowseButton.style.fontSize = "100%";
-BrowseButton.style.height = "100%";
-BrowseButton.style.width = "100%";
-BrowseButton.style.alignContent = "center";
-BrowseButton.style.alignItems = "center";
 Buttons.appendChild(BrowseButton);
 
 const SaveCloudButton = document.createElement("div");
 SaveCloudButton.innerHTML = "UPLOAD";
 SaveCloudButton.classList.add("BTN");
 SaveCloudButton.style.color = Theme.TertiaryColor;
-SaveCloudButton.style.height = "100%";
-SaveCloudButton.style.width = "100%";
-SaveCloudButton.style.alignContent = "center";
-SaveCloudButton.style.alignItems = "center";
 Buttons.appendChild(SaveCloudButton);
 
 const SaveButton = document.createElement("div");
 SaveButton.innerHTML = "SAVE";
 SaveButton.classList.add("BTN");
 SaveButton.style.color = Theme.TertiaryColor;
-SaveButton.style.height = "100%";
-SaveButton.style.width = "100%";
-SaveButton.style.alignContent = "center";
-SaveButton.style.alignItems = "center";
-SaveButton.style.display = "none";
 Buttons.appendChild(SaveButton);
 
 const LoadButton = document.createElement("div");
 LoadButton.innerHTML = "LOAD";
 LoadButton.classList.add("BTN");
 LoadButton.style.color = Theme.TertiaryColor;
-LoadButton.style.height = "100%";
-LoadButton.style.width = "100%";
-LoadButton.style.alignContent = "center";
-LoadButton.style.alignItems = "center";
-LoadButton.style.display = "none";
 Buttons.appendChild(LoadButton);
 
 const PublicityButton = document.createElement("div");
 PublicityButton.innerHTML = "PUBLIC";
 PublicityButton.classList.add("BTN");
 PublicityButton.style.color = Theme.TertiaryColor;
-PublicityButton.style.width = "100%";
-PublicityButton.style.height = "100%";
-PublicityButton.style.textAlign = "center";
-PublicityButton.style.alignContent = "center";
 PublicityButton.id = "PublicityButton";
 Buttons.appendChild(PublicityButton);
 
@@ -177,9 +189,6 @@ export const NameButton = document.createElement("input");
 NameButton.autocomplete = "off";
 NameButton.type = "text";
 NameButton.placeholder = "Simulation Name";
-NameButton.style.width = "200%";
-NameButton.style.height = "100%";
-NameButton.style.textAlign = "center";
 NameButton.classList.add("ENC");
 NameButton.id = "NameButton";
 Buttons.appendChild(NameButton);
@@ -188,9 +197,6 @@ export const UsernameButton = document.createElement("input");
 UsernameButton.autocomplete = "off";
 UsernameButton.type = "text";
 UsernameButton.placeholder = "Username";
-UsernameButton.style.width = "200%";
-UsernameButton.style.height = "100%";
-UsernameButton.style.textAlign = "center";
 UsernameButton.classList.add("ENC");
 UsernameButton.id = "UsernameButton";
 Buttons.appendChild(UsernameButton);
@@ -705,7 +711,4 @@ BrowseButton.addEventListener("click", Browse);
 SaveCloudButton.addEventListener("click", SaveToFirebase);
 SaveButton.addEventListener("click", SaveToFile);
 LoadButton.addEventListener("click", LoadFromFile);
-
-document.addEventListener("DOMContentLoaded", () => {
-    CheckUserDoc();
-});
+document.addEventListener("DOMContentLoaded", CheckUserDoc);

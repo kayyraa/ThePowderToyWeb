@@ -55,9 +55,9 @@ textarea::placeholder {
 }
 
 #ParticleContainer div {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .BTN {
@@ -135,6 +135,20 @@ textarea::placeholder {
   padding-top: 5px;
 }
 
+.ENC {
+  width: 200%;
+  height: 100%;
+  text-align: center;
+}
+
+.BTN {
+  font-size: 100%;
+  height: 100%;
+  width: 100%;
+  align-content: center;
+  align-items: center;
+}
+
 .BUTTON {
   align-self: center;
 }
@@ -162,4 +176,51 @@ textarea::placeholder {
 
 .RemoveButton:hover {
   visibility: hidden;
+}
+
+.BrowserAddressbar {
+  width: 100%;
+  height: 24px;
+  position: absolute;
+  top: 24px;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.SavesContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  width: 100%;
+  height: 75%;
+  overflow: hidden;
+}
+
+.Buttons {
+  position: absolute;
+  display: flex;
+  text-align: center;
+  align-content: center;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: row;
+  font-size: 80%;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 32px;
+}
+
+.SidebarContainer {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 90%;
+  padding-top: 5px;
 }

@@ -1,8 +1,8 @@
 import * as TPTW from "./tptw.js";
+import { Buttons } from "./save.js";
 import { Elements } from "./elements.js";
 
 const ParticleContainer = document.getElementById("ParticleContainer");
-const IgnoreList = new Set();
 
 function Random(Max, Min) {
     return Math.floor(Math.random() * (Max - Min + 1)) + Min;
@@ -62,9 +62,7 @@ if (ParticleContainer) {
         const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
 
         if (Particles.length > 0) {
-            Particles.forEach(Particle => {
-                if (IgnoreList.has(Particle)) return;
-            
+            Particles.forEach(Particle => {        
                 if (
                     Math.abs(Particle.offsetTop) > window.innerHeight || 
                     Math.abs(Particle.offsetLeft) > (window.innerWidth - Particle.offsetWidth)
@@ -81,7 +79,7 @@ if (ParticleContainer) {
                 const NewTop = ParticleRect.top + 12;
 
                 const GridSize = parseInt(document.body.getAttribute("grid-size"));
-                const MaxHeight = window.innerHeight - ParticleRect.height;
+                const MaxHeight = (window.innerHeight - Buttons.offsetHeight) - ParticleRect.height;
                 const MaxWidth = window.innerWidth - ParticleRect.width;
 
                 const MeltingPoint = Particle.dataset.meltingPoint;
@@ -166,7 +164,7 @@ if (ParticleContainer) {
                         const ParticleRect = Particle.getBoundingClientRect();
 
                         Particles.forEach(OtherParticle => {
-                            if (OtherParticle !== Particle && !IgnoreList.has(OtherParticle)) {
+                            if (OtherParticle !== Particle) {
                                 const OtherType = OtherParticle.dataset.type;
 
                                 if (OtherType === "Powder" || OtherType === "Solid" || OtherType === "Liquid") {
@@ -218,41 +216,9 @@ if (ParticleContainer) {
                     }
                 }
             
-                const IsMoving = (
-                    Particle.offsetTop !== parseFloat(Particle.dataset.previousTop) ||
-                    Particle.offsetLeft !== parseFloat(Particle.dataset.previousLeft)
-                );
-            
-                if (!IsMoving) {
-                    IgnoreList.add(Particle);
-                }
-            
                 Particle.dataset.previousTop = Particle.offsetTop;
                 Particle.dataset.previousLeft = Particle.offsetLeft;
             });
-            
-            IgnoreList.forEach(Particle => {
-                const ParticleRect = Particle.getBoundingClientRect();
-                let SurroundingClear = true;
-            
-                Particles.forEach(OtherParticle => {
-                    if (OtherParticle !== Particle) {
-                        const OtherRect = OtherParticle.getBoundingClientRect();
-                        if (
-                            ParticleRect.top < OtherRect.bottom &&
-                            ParticleRect.bottom > OtherRect.top &&
-                            ParticleRect.left < OtherRect.right &&
-                            ParticleRect.right > OtherRect.left
-                        ) {
-                            SurroundingClear = false;
-                        }
-                    }
-                });
-            
-                if (SurroundingClear) {
-                    IgnoreList.delete(Particle);
-                }
-            });            
         }
 
         requestAnimationFrame(Loop);
