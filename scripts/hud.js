@@ -32,32 +32,6 @@ ActionLabel.draggable = false;
 ActionLabel.id = "ActionLabel";
 SidebarContainer.appendChild(ActionLabel);
 
-const AmbientTempLabel = document.createElement("span");
-AmbientTempLabel.innerHTML = `AT: ${Settings.AmbientTemp.toFixed(2)}°C`;
-AmbientTempLabel.style.fontSize = "16px";
-AmbientTempLabel.style.color = Theme.TertiaryColor;
-AmbientTempLabel.style.width = "100%";
-AmbientTempLabel.style.height = "24px";
-AmbientTempLabel.style.paddingTop = "12px";
-AmbientTempLabel.style.textAlign = "center";
-AmbientTempLabel.style.userSelect = "none";
-AmbientTempLabel.draggable = false;
-AmbientTempLabel.id = "AmbientTempLabel";
-SidebarContainer.appendChild(AmbientTempLabel);
-
-const AverageTempLabel = document.createElement("span");
-AverageTempLabel.innerHTML = `PT: 42.00°C`;
-AverageTempLabel.style.fontSize = "16px";
-AverageTempLabel.style.color = Theme.TertiaryColor;
-AverageTempLabel.style.width = "100%";
-AverageTempLabel.style.height = "24px";
-AverageTempLabel.style.paddingTop = "12px";
-AverageTempLabel.style.textAlign = "center";
-AverageTempLabel.style.userSelect = "none";
-AverageTempLabel.draggable = false;
-AverageTempLabel.id = "AverageTempLabel";
-SidebarContainer.appendChild(AverageTempLabel);
-
 const ClearButton = document.createElement("span");
 ClearButton.innerHTML = "CLEAR";
 ClearButton.style.color = Theme.PrimaryColor;
@@ -68,6 +42,17 @@ ClearButton.style.cursor = "pointer";
 ClearButton.style.textAlign = "center";
 ClearButton.style.userSelect = "none";
 SidebarContainer.appendChild(ClearButton);
+
+const DisplayButton = document.createElement("span");
+DisplayButton.innerHTML = "DISPLAY";
+DisplayButton.style.color = Theme.PrimaryColor;
+DisplayButton.style.fontSize = "100%";
+DisplayButton.style.width = "100%";
+DisplayButton.style.padding = "10px";
+DisplayButton.style.cursor = "pointer";
+DisplayButton.style.textAlign = "center";
+DisplayButton.style.userSelect = "none";
+SidebarContainer.appendChild(DisplayButton);
 
 const FpsLabel = document.createElement("span");
 FpsLabel.innerHTML = "FPS: ~";
@@ -89,48 +74,21 @@ ParticlesLabel.style.textAlign = "center";
 SidebarContainer.appendChild(ParticlesLabel);
 
 const ElementContainer = document.createElement("div");
-ElementContainer.style.position = "fixed";
-ElementContainer.style.right = "-25px";
-ElementContainer.style.top = "50%";
-ElementContainer.style.width = "75px";
-ElementContainer.style.height = "600px";
-ElementContainer.style.textAlign = "center";
-ElementContainer.style.justifyContent = "center";
-ElementContainer.style.alignContent = "center";
-ElementContainer.style.alignItems = "center";
-ElementContainer.style.transform = "translate(-50%, -50%)";
-ElementContainer.style.transition = "right 0.25s ease"
-ElementContainer.style.pointerEvents = "all";
 ElementContainer.id = "ElementContainer";
 document.body.appendChild(ElementContainer);
 
 const ElementLabel = document.createElement("span");
 ElementLabel.innerHTML = "NONE";
+ElementLabel.classList.add("ElementLabel");
 ElementLabel.style.color = Theme.TertiaryColor;
-ElementLabel.style.width = "100%";
-ElementLabel.style.height = "25px";
-ElementLabel.style.textAlign = "center";
-ElementLabel.style.paddingTop = "5px";
 SidebarContainer.appendChild(ElementLabel);
 
-for (let Index = 0; Index < Elements.length; Index++) {
-    const Element = Elements[Index];
-
+Elements.forEach(Element => {
     const ElementDiv = document.createElement("div");
+    ElementDiv.classList.add("ELEMENT");
     ElementDiv.innerHTML = Element.Name.toUpperCase().substring(0, 4);
-    ElementDiv.style.display = "flex";
-    ElementDiv.style.flexDirection = "column";
-    ElementDiv.style.width = "100%";
-    ElementDiv.style.height = "17.5px";
-    ElementDiv.style.fontSize = "100%";
-    ElementDiv.style.textAlign = "left";
-    ElementDiv.style.justifyContent = "center";
-    ElementDiv.style.alignContent = "center";
-    ElementDiv.style.alignItems = "center";
-    ElementDiv.style.transition = "height 0.25s ease, opacity 0.25s ease";
     ElementDiv.style.backgroundColor = Element.Color;
     ElementDiv.style.color = InvertColor(Element.Color, false);
-    ElementDiv.style.cursor = "pointer";
     
     ElementDiv.dataset.type = Element.Type;
     ElementDiv.dataset.coldType = Element.ColdType;
@@ -144,28 +102,21 @@ for (let Index = 0; Index < Elements.length; Index++) {
     ElementDiv.dataset.meltingPoint = Element.MeltingPoint !== undefined ? Element.MeltingPoint : undefined;
     ElementDiv.dataset.boilingPoint = Element.BoilingPoint !== undefined ? Element.BoilingPoint : undefined;
     ElementDiv.dataset.name = Element.Name;
-    ElementDiv.style.zIndex = "9999";
     ElementDiv.id = Element.Name;
 
     const DescriptionLabel = document.createElement("span");
     DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair} ${Element.Radioactive ? `- ${Element.Radioactivity}` : ""}`;
-    DescriptionLabel.style.position = "absolute";
-    DescriptionLabel.style.color = "white";
     DescriptionLabel.style.right = !IsMobile() ? "-150px" : "-156px";
-    DescriptionLabel.style.pointerEvents = "none";
-    DescriptionLabel.style.width = "512px";
-    DescriptionLabel.style.opacity = "0";
-    DescriptionLabel.style.transition = "opacity 0.25s ease";
     DescriptionLabel.id = "DescriptionLabel";
     ElementDiv.appendChild(DescriptionLabel);
 
     ElementDiv.addEventListener("mouseenter", function() {
-        this.style.height = "25px";
+        this.style.height = "5%";
         DescriptionLabel.style.opacity = "1";
 
         Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
             if (OtherElement !== this) {
-                OtherElement.style.height = "17.5px";
+                OtherElement.style.height = "3%";
 
                 const OtherDescriptionLabel = OtherElement.querySelector("#DescriptionLabel");
                 if (OtherDescriptionLabel) {
@@ -185,7 +136,7 @@ for (let Index = 0; Index < Elements.length; Index++) {
     });
 
     ElementContainer.appendChild(ElementDiv);
-}
+});
 
 const TempLabel = document.createElement("span");
 TempLabel.innerHTML = "43°C";
@@ -204,24 +155,6 @@ function IsMobile() {
 if (IsMobile()) {
     ElementContainer.style.width = "50px";
     ElementContainer.style.right = "-15px";
-
-    const DisplayButton = document.createElement("span");
-    DisplayButton.innerHTML = "Display";
-    DisplayButton.style.color = "rgb(23, 161, 191)";
-    DisplayButton.style.fontSize = "100%";
-    DisplayButton.style.padding = "10px";
-    DisplayButton.style.cursor = "pointer";
-    DisplayButton.style.textAlign = "center";
-    DisplayButton.style.userSelect = "none";
-    SidebarContainer.appendChild(DisplayButton);
-
-    DisplayButton.addEventListener("click", () => {
-        let Display = document.body.getAttribute("display") || Displays[0];
-        const NextIndex = (Displays.indexOf(Display.charAt(0).toUpperCase() + Display.slice(1)) + 1) % Displays.length;
-        Display = Displays[NextIndex];
-        document.body.setAttribute("display", Display.toLowerCase());
-        ActionLabel.textContent = `${Display} Display`;
-    });
 }
 
 let LastTime = performance.now();
@@ -249,6 +182,14 @@ function InvertColor(RgbString, TrueColor) {
     }
 }
 
+DisplayButton.addEventListener("click", () => {
+    let Display = document.body.getAttribute("display") || Displays[0];
+    const NextIndex = (Displays.indexOf(Display.charAt(0).toUpperCase() + Display.slice(1)) + 1) % Displays.length;
+    Display = Displays[NextIndex];
+    document.body.setAttribute("display", Display.toLowerCase());
+    ActionLabel.textContent = `${Display} Display`;
+});
+
 ClearButton.addEventListener("click", () => {
     tptw.Clear();
 });
@@ -266,8 +207,6 @@ function Update() {
  
     TempLabel.style.left = `${MouseX - 50}px`;
     TempLabel.style.top = `${MouseY - 25}px`;
-
-    AverageTempLabel.innerHTML = `PT: ${isFinite((MaxTemp + MinTemp) / 2) ? AverageTemp.toFixed(2) : Settings.AmbientTemp.toFixed(2)}°C`;
 
     const Target = document.elementFromPoint(MouseX, MouseY);
 
@@ -291,26 +230,6 @@ function Update() {
 
     let SelectedElement = document.getElementById(document.body.getAttribute("selected"));
     ElementLabel.innerHTML = SelectedElement ? SelectedElement.id : "NONE";
-
-    var MinTemp = Infinity;
-    var MaxTemp = -Infinity;
-
-    Array.from(ParticleContainer.getElementsByTagName("div")).forEach(Particle => {
-        const Temp = parseFloat(Particle.dataset.temp);
-    
-        if (isFinite(Temp)) {
-            if (Temp < MinTemp) {
-                MinTemp = Temp;
-            }
-            if (Temp > MaxTemp) {
-                MaxTemp = Temp;
-            }
-        }
-    });
-
-    if (isFinite(MinTemp) && isFinite(MaxTemp)) {
-        AverageTempLabel.innerHTML = `PT: ${((MaxTemp + MinTemp) / 2).toFixed(2)}°C`;
-    }
 
     if (ElapsedTime > 125) {
         const Fps = Math.floor(FrameCount / (ElapsedTime / 1000));
