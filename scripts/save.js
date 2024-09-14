@@ -26,33 +26,6 @@ const Db = getFirestore(App);
 const UsersCollection = collection(Db, "users");
 const SavesCollection = collection(Db, 'saves');
 
-const SidebarContainer = document.createElement("div");
-SidebarContainer.style.width = !tptw.IsMobile() ? "220px" : "120px";
-SidebarContainer.style.height = `${sc.SidebarContainer.offsetHeight - (sc.ElementLabel.offsetHeight / 1.75)}px`;
-SidebarContainer.classList.add("SidebarContainer");
-SidebarContainer.style.left = `${sc.SidebarContainer.offsetLeft + sc.SidebarContainer.offsetWidth + 10}px`;
-SidebarContainer.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
-SidebarContainer.style.color = Theme.TertiaryColor;
-SidebarContainer.innerHTML = "ACCOUNT";
-document.body.appendChild(SidebarContainer);
-
-const IpLabel = document.createElement("div");
-SidebarContainer.appendChild(IpLabel);
-
-const RegisterLabel = document.createElement("div");
-RegisterLabel.innerHTML = "SIGN: 00 JAN 0000, 00:00";
-SidebarContainer.appendChild(RegisterLabel);
-
-const SavesLabel = document.createElement("div");
-SavesLabel.innerHTML = "SAVES: 0";
-SidebarContainer.appendChild(SavesLabel);
-
-const RemoveAccountButton = document.createElement("div");
-RemoveAccountButton.innerHTML = "REMOVE ACCOUNT";
-RemoveAccountButton.style.color = "red";
-RemoveAccountButton.style.cursor = "pointer";
-SidebarContainer.appendChild(RemoveAccountButton);
-
 async function json(url) {
     return fetch(url).then(res => res.json());
 }
@@ -63,13 +36,7 @@ async function CheckUserDoc() {
     });
     if (!IP) return;
 
-    IpLabel.innerHTML = `IP: ${IP}`;
-
     LocalId = IP;
-
-    const SavesQuery = query(SavesCollection, where("localId", "==", IP));
-    const SavesQuerySnapshot = await getDocs(SavesQuery);
-    SavesLabel.innerHTML = `SAVES: ${SavesQuerySnapshot.docs.length}`;
 
     const UserDocRef = doc(UsersCollection, IP);
     const DocSnapshot = await getDoc(UserDocRef);
@@ -79,51 +46,23 @@ async function CheckUserDoc() {
             register: Math.floor(Date.now() / 1000),
             ip: IP
         });
-    } else {
-        const Register = DocSnapshot.data().register;
-
-        const Seconds = new Date(Register * 1000);
-
-        const Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const Day = Seconds.getDate().toString().padStart(2, '0');
-        const Month = Months[Seconds.getMonth()];
-        const Year = Seconds.getFullYear();
-        const Time = Seconds.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-
-        const RegisterDate = `${Day} ${Month} ${Year}, ${Time}`;
-
-        RegisterLabel.innerHTML = `SIGN: ${RegisterDate}`;
     }
-
-    RemoveAccountButton.addEventListener("click", async () => {
-        const SavesQuery = query(SavesCollection, where("localId", "==", IP));
-        const SavesQuerySnapshot = await getDocs(SavesQuery);
-        SavesQuerySnapshot.forEach(docRef => {
-            setDoc(docRef, {
-                public: false
-            }, { merge: true });
-        });
-
-        const UserDocRef = doc(UsersCollection, IP);
-        await deleteDoc(UserDocRef);
-        CheckUserDoc();
-    });
 }
 
 const ParticleContainer = document.getElementById("ParticleContainer");
 
 const BrowserContainer = document.createElement("div");
-BrowserContainer.style.width = "60%";
+BrowserContainer.style.width = "75%";
 BrowserContainer.style.height = "75%";
 BrowserContainer.style.position = "absolute";
 BrowserContainer.style.top = "50%";
 BrowserContainer.style.left = "50%";
-BrowserContainer.style.backgroundColor = Theme.BackgroundColor;
+BrowserContainer.style.backgroundColor = "rgb(40, 40, 40)";
 BrowserContainer.style.visibility = "hidden";
 BrowserContainer.style.transform = "translate(-50%, -50%)";
 BrowserContainer.style.alignContent = "center";
 BrowserContainer.style.alignItems = "center";
-
+BrowserContainer.style.overflow = "hidden";
 BrowserContainer.id = "BrowserContainer";
 document.body.appendChild(BrowserContainer);
 
@@ -136,12 +75,13 @@ BrowserTitlebar.style.height = "24px";
 BrowserTitlebar.style.alignContent = "center";
 BrowserTitlebar.style.alignItems = "center";
 BrowserTitlebar.style.textAlign = "center";
-BrowserTitlebar.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+BrowserTitlebar.style.backgroundColor = "rgb(50, 50, 50)";
 BrowserContainer.appendChild(BrowserTitlebar);
 
 const BrowserAddressbar = document.createElement("input");
 BrowserAddressbar.classList.add("BrowserAddressbar");
 BrowserAddressbar.placeholder = "eg. 1992731";
+BrowserAddressbar.style.backgroundColor = "rgb(50, 50, 50)";
 BrowserContainer.appendChild(BrowserAddressbar);
 
 const SavesContainer = document.createElement("div");
@@ -321,12 +261,273 @@ function LoadFromFile() {
 }
 
 let CurrentPage = 1;
-const SavesPerPage = 9;
+const SavesPerPage = 6;
 
 var RemoveButtons = [];
 var SaveButtons = [];
 
-async function LoadSaves(Page = 1) {
+function CreateSaveButton(Save, Page) {
+    if (!Save.public) return;
+
+    let ClickCount = 0;
+
+    const Username = Save.username;
+    const SimulationName = Save.simulationName;
+    const Particles = Save.particles;
+    const Timestamp = Save.timestamp;
+    const SaveId = String(Save.localId).trim();
+
+    const SaveButton = document.createElement("div");
+    SaveButton.style.display = "flex";
+    SaveButton.style.flexDirection = "column";
+    SaveButton.style.position = "relative";
+    SaveButton.style.cursor = "pointer";
+    SaveButton.style.boxSizing = "border-box";
+    SaveButton.style.padding = "10px";
+    SaveButton.style.overflow = "hidden";
+    SaveButton.classList.add("SAVE");
+    SavesContainer.appendChild(SaveButton);
+    SaveButtons.push(SaveButton);
+
+    const Author = document.createElement("i");
+    Author.innerHTML = Username;
+    Author.style.fontSize = "75%";
+    SaveButton.appendChild(Author);
+
+    const SaveName = document.createElement("span");
+    SaveName.innerHTML = SimulationName;
+    SaveName.style.display = "block";
+    SaveButton.appendChild(SaveName);
+
+    const TimestampLabel = document.createElement("span");
+    TimestampLabel.innerHTML = Timestamp;
+    TimestampLabel.style.display = "block";
+    TimestampLabel.style.fontSize = "13px";
+    SaveButton.appendChild(TimestampLabel);
+
+    const DescriptionLabel = document.createElement("span");
+    DescriptionLabel.innerHTML = Save.description !== undefined ? Save.description : "";
+    DescriptionLabel.style.display = "block";
+    DescriptionLabel.style.fontSize = "22px";
+    DescriptionLabel.style.color = "rgb(120, 120, 120)";
+    DescriptionLabel.style.visibility = "hidden";
+    SaveButton.appendChild(DescriptionLabel);
+
+    const ThumbnailPhoto = document.createElement("div");
+    ThumbnailPhoto.style.position = "relative";
+    ThumbnailPhoto.style.overflow = "hidden";
+    ThumbnailPhoto.style.visibility = "hidden";
+    ThumbnailPhoto.style.width = "75%";
+    ThumbnailPhoto.style.height = "100%";
+    ThumbnailPhoto.style.alignSelf = "center";
+    ThumbnailPhoto.style.backgroundColor = "rgba(40, 40, 40)";
+    ThumbnailPhoto.style.boxSizing = "border-box";
+    ThumbnailPhoto.style.border = "3px solid black";
+    SaveButton.appendChild(ThumbnailPhoto);
+
+    const ThumbnailWidth = ThumbnailPhoto.offsetWidth;
+    const ThumbnailHeight = ThumbnailPhoto.offsetHeight;
+
+    const OriginalCanvasWidth = ParticleContainer.offsetWidth / 2;
+    const OriginalCanvasHeight = ParticleContainer.offsetHeight / 2;
+
+    const ScaleFactorX = ThumbnailWidth / OriginalCanvasWidth;
+    const ScaleFactorY = ThumbnailHeight / OriginalCanvasHeight;
+
+    const ScaleFactor = Math.min(ScaleFactorX, ScaleFactorY);
+
+    const OffsetX = (ThumbnailWidth - (OriginalCanvasWidth * ScaleFactor)) / 2;
+    const OffsetY = (ThumbnailHeight - (OriginalCanvasHeight * ScaleFactor)) / 2;
+
+    Particles.forEach(Particle => {
+        const Container = document.createElement("div");
+        Container.style.position = "absolute";
+        Container.style.width = "100%";
+        Container.style.height = "100%";
+        ThumbnailPhoto.appendChild(Container);
+
+        const GeneratedParticle = document.createElement("div");
+        const GridSize = parseFloat(document.body.getAttribute("grid-size"));
+
+        const PosX = Particle.PosX * ScaleFactor + OffsetX;
+        const PosY = Particle.PosY * ScaleFactor + OffsetY;
+    
+        GeneratedParticle.style.backgroundColor = tptw.GetElement(Particle.Name).Color;
+        GeneratedParticle.style.position = "absolute";
+        GeneratedParticle.style.left = `${PosX}px`;
+        GeneratedParticle.style.top = `${PosY}px`;
+        GeneratedParticle.style.width = `${GridSize * ScaleFactor}px`;
+        GeneratedParticle.style.aspectRatio = "1 / 1";
+        Container.appendChild(GeneratedParticle);
+    });
+
+    const DescriptionInput = document.createElement("textarea");
+    DescriptionInput.style.width = "75%";
+    DescriptionInput.style.height = "50%";
+    DescriptionInput.style.marginTop = "2%";
+    DescriptionInput.style.visibility = "hidden";
+    DescriptionInput.style.alignSelf = "center";
+    DescriptionInput.value = Save.description || "";
+    DescriptionInput.placeholder = "Description here...";
+    SaveButton.appendChild(DescriptionInput);
+
+    const SaveChangesButton = document.createElement("div");
+    SaveChangesButton.innerHTML = "Save Changes";
+    SaveChangesButton.classList.add("BUTTON");
+    SaveChangesButton.style.visibility = "hidden";
+    SaveButton.appendChild(SaveChangesButton);
+
+    const OpenSaveButton = document.createElement("div");
+    OpenSaveButton.innerHTML = "Open Save";
+    OpenSaveButton.classList.add("BUTTON");
+    OpenSaveButton.style.visibility = "hidden";
+    SaveButton.appendChild(OpenSaveButton);
+
+    const IdLabel = document.createElement("span");
+    IdLabel.innerHTML = Save.id;
+    IdLabel.style.position = "absolute";
+    IdLabel.style.color = "rgb(255, 255, 0)";
+    IdLabel.style.bottom = "4px";
+    IdLabel.style.left = "8px";
+    SaveButton.appendChild(IdLabel);
+
+    const RemoveButton = document.createElement("span");
+    RemoveButton.innerHTML = "REMOVE";
+    RemoveButton.classList.add("RemoveButton");
+    RemoveButton.style.color = "red";
+    RemoveButton.style.cursor = "pointer";
+    RemoveButton.style.fontSize = "100%";
+    RemoveButton.style.position = "absolute";
+    RemoveButton.style.alignSelf = "center";
+    RemoveButton.style.top = "4px";
+    RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
+    SaveButton.appendChild(RemoveButton);
+    RemoveButtons.push(RemoveButton);
+
+    const CloseButton = document.createElement("span");
+    CloseButton.innerHTML = "X";
+    CloseButton.style.color = "red";
+    CloseButton.style.cursor = "pointer";
+    CloseButton.style.fontSize = "100%";
+    CloseButton.style.position = "absolute";
+    CloseButton.style.right = "8px";
+    CloseButton.style.top = "4px";
+    CloseButton.style.visibility = "hidden";
+    SaveButton.appendChild(CloseButton);
+
+    IdLabel.addEventListener("click", () => {
+        navigator.clipboard.writeText(Save.id);
+    });
+
+    RemoveButton.addEventListener("click", async () => {
+        await deleteDoc(doc(Db, "saves", Save.id));
+        SaveButton.remove();
+        await LoadSaves(CurrentPage, {
+            Forload: false
+        });
+    });
+
+    SaveButton.addEventListener("click", function(Event) {
+        if (
+            Event.target !== RemoveButton && 
+            Event.target !== IdLabel && 
+            Event.target !== DescriptionInput &&
+            Event.target !== SaveChangesButton &&
+            Event.target !== OpenSaveButton
+        ) {
+            if (ClickCount !== 1) {
+                ClickCount++
+            }
+
+            CloseButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
+            ThumbnailPhoto.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
+            DescriptionLabel.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
+            OpenSaveButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
+
+            DescriptionInput.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden" : "hidden";
+            SaveChangesButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden" : "hidden";
+
+            if (ClickCount === 1) {
+                this.style.position = "absolute";
+                this.style.height = "75%";
+                this.style.width = "75%";
+                this.style.zIndex = "1";
+                IdLabel.style.visibility = "hidden";
+
+                SaveButtons.forEach(SaveButton => {
+                    if (this !== SaveButton) {
+                        SaveButton.style.opacity = "0";
+                    }
+                });
+            } else {
+                ClickCount = 0
+            }
+        } else if (Event.target === IdLabel) {
+            IdLabel.innerHTML = "Copied";
+            setTimeout(() => {
+                IdLabel.innerHTML = Save.id;
+            }, 1000);
+        }
+    });
+
+    SaveChangesButton.addEventListener("click", async () => {
+        const Description = DescriptionInput.value !== "" ? DescriptionInput.value : "";
+    
+        try {
+            const docRef = doc(Db, "saves", Save.id);
+            await setDoc(docRef, {
+                description: Description
+            }, { merge: true });
+            LoadSaves(Page, {
+                Forload: false
+            });
+        } catch (error) {
+            console.error("Error updating document: ", error);
+        }
+    });
+
+    CloseButton.addEventListener("click", () => {
+        LoadSaves(Page, {
+            Forload: false
+        });
+    });
+    
+    OpenSaveButton.addEventListener("click", () => {
+        SaveButton.style.height = "25%";
+        SaveButton.style.width = "30%";
+        SaveButton.style.zIndex = "0";
+        SaveButton.style.opacity = "0";
+
+        ThumbnailPhoto.style.visibility = "hidden";
+        SaveButton.style.visibility = "hidden";
+        SaveChangesButton.style.visibility = "hidden";
+        OpenSaveButton.style.visibility = "hidden";
+        BrowserContainer.style.visibility = "hidden";
+        ParticleContainer.innerHTML = "";
+
+        Particles.forEach(Particle => {
+            const Element = tptw.GetElement(Particle.Name);
+            tptw.CreateParticle(Element, Particle.PosX, Particle.PosY).dataset.temp = Particle.Temp;
+        });
+
+        UsernameButton.value = Username;
+        NameButton.value = SimulationName;
+
+        RemoveButtons.forEach(RemoveButton => {
+            RemoveButton.style.visibility = "hidden";
+        });
+        Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
+            if (Button !== BrowseButton) {
+                Button.setAttribute("disabled", true);
+            }
+        });
+        Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
+            Button.disabled = true;
+        });
+    });
+}
+
+async function LoadSaves(Page = 1, {Forload = false}) {
     SavesContainer.innerHTML = "LOADING";
 
     RemoveButtons = [];
@@ -352,264 +553,13 @@ async function LoadSaves(Page = 1) {
         SavesContainer.style.gap = "5px";
 
         PaginatedSaves.forEach(Save => {
-            if (!Save.public) return;
-
-            let ClickCount = 0;
-
-            const Username = Save.username;
-            const SimulationName = Save.simulationName;
-            const Particles = Save.particles;
-            const Timestamp = Save.timestamp;
-            const SaveId = String(Save.localId).trim();
-    
-            const SaveButton = document.createElement("div");
-            SaveButton.style.display = "flex";
-            SaveButton.style.flexDirection = "column";
-            SaveButton.style.position = "relative";
-            SaveButton.style.cursor = "pointer";
-            SaveButton.style.boxSizing = "border-box";
-            SaveButton.style.padding = "10px";
-            SaveButton.style.overflow = "hidden";
-            SaveButton.classList.add("SAVE");
-            SavesContainer.appendChild(SaveButton);
-            SaveButtons.push(SaveButton);
-    
-            const Author = document.createElement("i");
-            Author.innerHTML = Username;
-            Author.style.fontSize = "75%";
-            SaveButton.appendChild(Author);
-    
-            const SaveName = document.createElement("span");
-            SaveName.innerHTML = SimulationName;
-            SaveName.style.display = "block";
-            SaveButton.appendChild(SaveName);
-
-            const TimestampLabel = document.createElement("span");
-            TimestampLabel.innerHTML = Timestamp;
-            TimestampLabel.style.display = "block";
-            TimestampLabel.style.fontSize = "13px";
-            SaveButton.appendChild(TimestampLabel);
-
-            const DescriptionLabel = document.createElement("span");
-            DescriptionLabel.innerHTML = Save.description !== undefined ? Save.description : "";
-            DescriptionLabel.style.display = "block";
-            DescriptionLabel.style.fontSize = "22px";
-            DescriptionLabel.style.color = "rgb(120, 120, 120)";
-            DescriptionLabel.style.visibility = "hidden";
-            SaveButton.appendChild(DescriptionLabel);
-
-            const ThumbnailPhoto = document.createElement("div");
-            ThumbnailPhoto.style.position = "relative";
-            ThumbnailPhoto.style.overflow = "hidden";
-            ThumbnailPhoto.style.visibility = "hidden";
-            ThumbnailPhoto.style.width = "75%";
-            ThumbnailPhoto.style.height = "100%";
-            ThumbnailPhoto.style.alignSelf = "center";
-            ThumbnailPhoto.style.backgroundColor = "rgba(40, 40, 40)";
-            ThumbnailPhoto.style.boxSizing = "border-box";
-            ThumbnailPhoto.style.border = "3px solid black";
-            SaveButton.appendChild(ThumbnailPhoto);
-
-            const ThumbnailWidth = ThumbnailPhoto.offsetWidth;
-            const ThumbnailHeight = ThumbnailPhoto.offsetHeight;
-
-            const OriginalCanvasWidth = ParticleContainer.offsetWidth / 2;
-            const OriginalCanvasHeight = ParticleContainer.offsetHeight / 2;
-
-            const ScaleFactorX = ThumbnailWidth / OriginalCanvasWidth;
-            const ScaleFactorY = ThumbnailHeight / OriginalCanvasHeight;
-
-            const ScaleFactor = Math.min(ScaleFactorX, ScaleFactorY);
-
-            const OffsetX = (ThumbnailWidth - (OriginalCanvasWidth * ScaleFactor)) / 2;
-            const OffsetY = (ThumbnailHeight - (OriginalCanvasHeight * ScaleFactor)) / 2;
-
-            Particles.forEach(Particle => {
-                const Container = document.createElement("div");
-                Container.style.position = "absolute";
-                Container.style.width = "100%";
-                Container.style.height = "100%";
-                ThumbnailPhoto.appendChild(Container);
-
-                const GeneratedParticle = document.createElement("div");
-                const GridSize = parseFloat(document.body.getAttribute("grid-size"));
-
-                const PosX = Particle.PosX * ScaleFactor + OffsetX;
-                const PosY = Particle.PosY * ScaleFactor + OffsetY;
-            
-                GeneratedParticle.style.backgroundColor = tptw.GetElement(Particle.Name).Color;
-                GeneratedParticle.style.position = "absolute";
-                GeneratedParticle.style.left = `${PosX}px`;
-                GeneratedParticle.style.top = `${PosY}px`;
-                GeneratedParticle.style.width = `${GridSize * ScaleFactor}px`;
-                GeneratedParticle.style.aspectRatio = "1 / 1";
-                Container.appendChild(GeneratedParticle);
-            });
-
-            const DescriptionInput = document.createElement("textarea");
-            DescriptionInput.style.width = "75%";
-            DescriptionInput.style.height = "50%";
-            DescriptionInput.style.marginTop = "2%";
-            DescriptionInput.style.visibility = "hidden";
-            DescriptionInput.style.alignSelf = "center";
-            DescriptionInput.value = Save.description || "";
-            DescriptionInput.placeholder = "Description here...";
-            SaveButton.appendChild(DescriptionInput);
-
-            const SaveChangesButton = document.createElement("div");
-            SaveChangesButton.innerHTML = "Save Changes";
-            SaveChangesButton.classList.add("BUTTON");
-            SaveChangesButton.style.visibility = "hidden";
-            SaveButton.appendChild(SaveChangesButton);
-
-            const OpenSaveButton = document.createElement("div");
-            OpenSaveButton.innerHTML = "Open Save";
-            OpenSaveButton.classList.add("BUTTON");
-            OpenSaveButton.style.visibility = "hidden";
-            SaveButton.appendChild(OpenSaveButton);
-
-            const IdLabel = document.createElement("span");
-            IdLabel.innerHTML = Save.id;
-            IdLabel.style.position = "absolute";
-            IdLabel.style.color = "rgb(255, 255, 0)";
-            IdLabel.style.bottom = "4px";
-            IdLabel.style.left = "8px";
-            SaveButton.appendChild(IdLabel);
-
-            const RemoveButton = document.createElement("span");
-            RemoveButton.innerHTML = "REMOVE";
-            RemoveButton.classList.add("RemoveButton");
-            RemoveButton.style.color = "red";
-            RemoveButton.style.cursor = "pointer";
-            RemoveButton.style.fontSize = "100%";
-            RemoveButton.style.position = "absolute";
-            RemoveButton.style.alignSelf = "center";
-            RemoveButton.style.top = "4px";
-            RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
-            SaveButton.appendChild(RemoveButton);
-            RemoveButtons.push(RemoveButton);
-
-            const CloseButton = document.createElement("span");
-            CloseButton.innerHTML = "X";
-            CloseButton.style.color = "red";
-            CloseButton.style.cursor = "pointer";
-            CloseButton.style.fontSize = "100%";
-            CloseButton.style.position = "absolute";
-            CloseButton.style.right = "8px";
-            CloseButton.style.top = "4px";
-            CloseButton.style.visibility = "hidden";
-            SaveButton.appendChild(CloseButton);
-
-            IdLabel.addEventListener("click", () => {
-                navigator.clipboard.writeText(Save.id);
-            });
-
-            RemoveButton.addEventListener("click", async () => {
-                await deleteDoc(doc(Db, "saves", Save.id));
-                SaveButton.remove();
-                await LoadSaves(CurrentPage);
-            });
-    
-            SaveButton.addEventListener("click", function(Event) {
-                if (
-                    Event.target !== RemoveButton && 
-                    Event.target !== IdLabel && 
-                    Event.target !== DescriptionInput &&
-                    Event.target !== SaveChangesButton &&
-                    Event.target !== OpenSaveButton
-                ) {
-                    if (ClickCount !== 1) {
-                        ClickCount++
-                    }
-
-                    CloseButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
-                    ThumbnailPhoto.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
-                    DescriptionLabel.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
-                    OpenSaveButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
-
-                    DescriptionInput.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden" : "hidden";
-                    SaveChangesButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden" : "hidden";
-
-                    if (ClickCount === 1) {
-                        this.style.position = "absolute";
-                        this.style.height = "75%";
-                        this.style.width = "75%";
-                        this.style.zIndex = "1";
-                        IdLabel.style.visibility = "hidden";
-
-                        SaveButtons.forEach(SaveButton => {
-                            if (this !== SaveButton) {
-                                SaveButton.style.opacity = "0";
-                            }
-                        });
-                    } else {
-                        ClickCount = 0
-                    }
-                } else if (Event.target === IdLabel) {
-                    IdLabel.innerHTML = "Copied";
-                    setTimeout(() => {
-                        IdLabel.innerHTML = Save.id;
-                    }, 1000);
+            if (Forload) {
+                if (Save.localId === LocalId) {
+                    CreateSaveButton(Save, Page);
                 }
-            });
-
-            SavesContainer.addEventListener("click", (Event) => {
-                if (Event.target === SavesContainer) {
-                    LoadSaves(Page);
-                }
-            });
-
-            SaveChangesButton.addEventListener("click", async () => {
-                const Description = DescriptionInput.value !== "" ? DescriptionInput.value : "";
-            
-                try {
-                    const docRef = doc(Db, "saves", Save.id);
-                    await setDoc(docRef, {
-                        description: Description
-                    }, { merge: true });
-                    LoadSaves(Page);
-                } catch (error) {
-                    console.error("Error updating document: ", error);
-                }
-            });
-
-            CloseButton.addEventListener("click", () => {
-                LoadSaves(Page);
-            });
-            
-            OpenSaveButton.addEventListener("click", () => {
-                SaveButton.style.height = "25%";
-                SaveButton.style.width = "30%";
-                SaveButton.style.zIndex = "0";
-                SaveButton.style.opacity = "0";
-
-                ThumbnailPhoto.style.visibility = "hidden";
-                SaveButton.style.visibility = "hidden";
-                SaveChangesButton.style.visibility = "hidden";
-                OpenSaveButton.style.visibility = "hidden";
-                BrowserContainer.style.visibility = "hidden";
-                ParticleContainer.innerHTML = "";
-
-                Particles.forEach(Particle => {
-                    const Element = tptw.GetElement(Particle.Name);
-                    tptw.CreateParticle(Element, Particle.PosX, Particle.PosY).dataset.temp = Particle.Temp;
-                });
-
-                UsernameButton.value = Username;
-                NameButton.value = SimulationName;
-
-                RemoveButtons.forEach(RemoveButton => {
-                    RemoveButton.style.visibility = "hidden";
-                });
-                Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
-                    if (Button !== BrowseButton) {
-                        Button.setAttribute("disabled", true);
-                    }
-                });
-                Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
-                    Button.disabled = true;
-                });
-            });
+            } else {
+                CreateSaveButton(Save, Page);
+            }
         });
 
         AddPaginationControls(TotalPages);
@@ -624,17 +574,29 @@ function AddPaginationControls(TotalPages) {
         ExistingControls.remove();
     }
 
-    if (TotalPages > 1) {
-        const ControlsContainer = document.createElement("div");
-        ControlsContainer.className = "pagination-controls";
-        ControlsContainer.style.textAlign = "center";
-        ControlsContainer.style.marginTop = "10px";
+    const ControlsContainer = document.createElement("div");
+    ControlsContainer.className = "pagination-controls";
+    ControlsContainer.style.textAlign = "center";
+    ControlsContainer.style.marginTop = "10px";
+    BrowserContainer.appendChild(ControlsContainer);
 
+    const ReloadButton = document.createElement("div");
+    ReloadButton.innerHTML = "Reload";
+    ReloadButton.style.cursor = "pointer";
+    ReloadButton.addEventListener("click", () => LoadSaves(CurrentPage, {
+        Forload: false
+    }));
+    ReloadButton.classList.add("ABTN");
+    ControlsContainer.appendChild(ReloadButton);
+
+    if (TotalPages > 1) {
         const PreviousButton = document.createElement("div");
         PreviousButton.innerHTML = "Previous";
         PreviousButton.style.cursor = "pointer";
         PreviousButton.setAttribute("disabled", CurrentPage === 1)
-        PreviousButton.addEventListener("click", () => LoadSaves(CurrentPage - 1));
+        PreviousButton.addEventListener("click", () => LoadSaves(CurrentPage - 1, {
+            Forload: false
+        }));
         PreviousButton.classList.add("ABTN");
         ControlsContainer.appendChild(PreviousButton);
 
@@ -646,37 +608,39 @@ function AddPaginationControls(TotalPages) {
         NextButton.innerHTML = "Next";
         NextButton.style.cursor = "pointer";
         NextButton.setAttribute("disabled", CurrentPage === TotalPages)
-        NextButton.addEventListener("click", () => LoadSaves(CurrentPage + 1));
+        NextButton.addEventListener("click", () => LoadSaves(CurrentPage + 1, {
+            Forload: false
+        }));
         NextButton.classList.add("ABTN");
         ControlsContainer.appendChild(NextButton);
-
-        BrowserContainer.appendChild(ControlsContainer);
     }
 }
 
 async function LoadSave(SaveId) {
-    const DocRef = doc(Db, "saves", SaveId);
-    const DocSnap = await getDoc(DocRef);
-    if (DocSnap.exists()) {
+    if (SaveId.startsWith("save:")) {
+        const SaveDocRef = doc(Db, "saves", SaveId.replace("save:", ""));
+        const SaveDocSnap = await getDoc(SaveDocRef);
+
         BrowserContainer.style.visibility = "hidden";
-        const DocumentData = DocSnap.data();
-        const Particles = DocumentData.particles;
+        const SaveData = SaveDocSnap.data();
+        const Particles = SaveData.particles;
         ParticleContainer.innerHTML = "";
         BrowserAddressbar.value = "";
 
-        PublicityButton.innerHTML = DocumentData.public ? "PUBLIC" : "PRIVATE";
-        
-        UsernameButton.value = DocumentData.username;
-        NameButton.value = DocumentData.simulationName;
+        PublicityButton.innerHTML = SaveData.public ? "PUBLIC" : "PRIVATE";
+        UsernameButton.value = SaveData.username;
+        NameButton.value = SaveData.simulationName;
 
         RemoveButtons.forEach(RemoveButton => {
             RemoveButton.style.visibility = "hidden";
         });
+
         Array.from(Buttons.getElementsByTagName("div")).forEach(Button => {
             if (Button !== BrowseButton) {
                 Button.setAttribute("disabled", true);
             }
         });
+
         Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
             Button.disabled = true;
         });
@@ -685,6 +649,15 @@ async function LoadSave(SaveId) {
             const Element = tptw.GetElement(Particle.Name);
             const CreatedParticle = tptw.CreateParticle(Element, Particle.PosX, Particle.PosY);
             CreatedParticle.dataset.temp = Particle.Temp;
+        });
+
+    } else if (SaveId.startsWith("user:")) {
+        LoadSaves(CurrentPage, {
+            Forload: true
+        });
+    } else if (SaveId === "") {
+        LoadSaves(CurrentPage, {
+            Forload: false
         });
     }
 }
@@ -696,7 +669,7 @@ function HandleLoadSave(Event) {
 }
  
 function Browse() {
-    LoadSaves();
+    LoadSaves(CurrentPage, false);
     BrowserContainer.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? "hidden" : "visible";
 }
 

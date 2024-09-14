@@ -157,6 +157,10 @@ textarea::placeholder {
   color: rgba(255, 255, 255, 0.25);
 }
 
+.ABTN:hover {
+  opacity: 0.5;
+}
+
 .ELEMENT {
   display: flex;
   flex-direction: column;
