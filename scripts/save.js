@@ -581,7 +581,7 @@ function AddPaginationControls(TotalPages) {
     BrowserContainer.appendChild(ControlsContainer);
 
     const ReloadButton = document.createElement("div");
-    ReloadButton.innerHTML = "Reload";
+    ReloadButton.innerHTML = "Refresh";
     ReloadButton.style.cursor = "pointer";
     ReloadButton.addEventListener("click", () => LoadSaves(CurrentPage, {
         Forload: false
