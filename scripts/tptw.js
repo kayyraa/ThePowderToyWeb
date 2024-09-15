@@ -1,6 +1,6 @@
 import { Settings } from "./settings.js";
 import { Elements } from "./elements.js";
-import { NameButton, UsernameButton, Buttons } from "./save.js";
+import { NameButton, UsernameButton, Buttons, SetCurrentOpenedSave } from "./save.js";
 
 export const ParticleContainer = document.getElementById("ParticleContainer");
 export const PlaceholderContainer = document.getElementById("PlaceholderContainer");
@@ -15,6 +15,8 @@ export function IsMobile() {
 }
 
 export function Clear() {
+    SetCurrentOpenedSave(undefined);
+
     ParticleContainer.innerHTML = "";
     NameButton.value = "";
     UsernameButton.value = "";

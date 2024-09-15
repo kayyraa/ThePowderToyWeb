@@ -19,14 +19,14 @@ input {
 
 textarea {
   font-family: "TptFont";
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.25);
   color: rgb(80, 80, 80);
   border: none;
   resize: none;
 }
 
 textarea::placeholder {
-  color: rgb(80, 80, 80);
+  color: rgb(40, 40, 40);
   opacity: 0.5;
 }
 
@@ -128,6 +128,22 @@ textarea::placeholder {
   transition: opacity 0.25s ease;
 }
 
+#BrowserContainer {
+  width: 85%;
+  height: 75%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: rgb(40, 40, 40);
+  visibility: hidden;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 1;
+}
+
 .ElementLabel {
   width: 100%;
   height: 25px;
@@ -191,12 +207,10 @@ textarea::placeholder {
   align-content: center;
   align-items: center;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .SavesContainer {
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-content: center;
   align-items: center;

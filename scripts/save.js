@@ -1,6 +1,5 @@
 import { Theme } from "./theme.js";
 import { Settings } from "./settings.js";
-import * as sc from "./hud.js";
 import * as tptw from "./tptw.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
@@ -8,6 +7,7 @@ import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc, setD
 
 var LocalId = undefined;
 var CurrentPublicity = true;
+var CurrentOpenSave = undefined;
 
 const FirebaseConfig = {
     apiKey: "AIzaSyCWcUsQWn4xNSrZ5wQIdvJSeS1qr3KMCLo",
@@ -52,17 +52,6 @@ async function CheckUserDoc() {
 const ParticleContainer = document.getElementById("ParticleContainer");
 
 const BrowserContainer = document.createElement("div");
-BrowserContainer.style.width = "75%";
-BrowserContainer.style.height = "75%";
-BrowserContainer.style.position = "absolute";
-BrowserContainer.style.top = "50%";
-BrowserContainer.style.left = "50%";
-BrowserContainer.style.backgroundColor = "rgb(40, 40, 40)";
-BrowserContainer.style.visibility = "hidden";
-BrowserContainer.style.transform = "translate(-50%, -50%)";
-BrowserContainer.style.alignContent = "center";
-BrowserContainer.style.alignItems = "center";
-BrowserContainer.style.overflow = "hidden";
 BrowserContainer.id = "BrowserContainer";
 document.body.appendChild(BrowserContainer);
 
@@ -110,12 +99,14 @@ const SaveButton = document.createElement("div");
 SaveButton.innerHTML = "SAVE";
 SaveButton.classList.add("BTN");
 SaveButton.style.color = Theme.TertiaryColor;
+SaveButton.style.display = "none";
 Buttons.appendChild(SaveButton);
 
 const LoadButton = document.createElement("div");
 LoadButton.innerHTML = "LOAD";
 LoadButton.classList.add("BTN");
 LoadButton.style.color = Theme.TertiaryColor;
+LoadButton.style.display = "none";
 Buttons.appendChild(LoadButton);
 
 const PublicityButton = document.createElement("div");
@@ -124,6 +115,22 @@ PublicityButton.classList.add("BTN");
 PublicityButton.style.color = Theme.TertiaryColor;
 PublicityButton.id = "PublicityButton";
 Buttons.appendChild(PublicityButton);
+
+const DownvoteButton = document.createElement("div");
+DownvoteButton.innerHTML = "DOWNVOTE";
+DownvoteButton.classList.add("BTN");
+DownvoteButton.style.color = "rgb(200, 0, 0)";
+DownvoteButton.style.left = "-100%";
+DownvoteButton.style.position = "absolute";
+Buttons.appendChild(DownvoteButton);
+
+const UpvoteButton = document.createElement("div");
+UpvoteButton.innerHTML = "UPVOTE";
+UpvoteButton.classList.add("BTN");
+UpvoteButton.style.color = "rgb(0, 200, 0)";
+UpvoteButton.style.left = "-100%";
+UpvoteButton.style.position = "absolute";
+Buttons.appendChild(UpvoteButton);
 
 export const NameButton = document.createElement("input");
 NameButton.autocomplete = "off";
@@ -214,7 +221,10 @@ async function SaveToFirebase() {
         timestamp: FormatDate(CurrentDate),
         public: CurrentPublicity,
         localId: LocalId,
-        description: ""
+        description: "",
+        views: 0,
+        upvotes: 0,
+        downvotes: 0,
     };
 
     const DocRef = await addDoc(SavesCollection, DocumentData);
@@ -266,7 +276,7 @@ const SavesPerPage = 6;
 var RemoveButtons = [];
 var SaveButtons = [];
 
-function CreateSaveButton(Save, Page) {
+async function CreateSaveButton(Save, Page) {
     if (!Save.public) return;
 
     let ClickCount = 0;
@@ -276,6 +286,9 @@ function CreateSaveButton(Save, Page) {
     const Particles = Save.particles;
     const Timestamp = Save.timestamp;
     const SaveId = String(Save.localId).trim();
+    const Views = Save.views;
+    const Upvotes = Save.upvotes;
+    const Downvotes = Save.downvotes;
 
     const SaveButton = document.createElement("div");
     SaveButton.style.display = "flex";
@@ -305,6 +318,36 @@ function CreateSaveButton(Save, Page) {
     TimestampLabel.style.fontSize = "13px";
     SaveButton.appendChild(TimestampLabel);
 
+    const ViewsLabel = document.createElement("span");
+    ViewsLabel.innerHTML = Views;
+    ViewsLabel.style.display = "block";
+    ViewsLabel.style.fontSize = "13px";
+    ViewsLabel.style.visibility = "hidden";
+    SaveButton.appendChild(ViewsLabel);
+
+    const UpvotesLabel = document.createElement("span");
+    UpvotesLabel.innerHTML = Upvotes;
+    UpvotesLabel.style.display = "block";
+    UpvotesLabel.style.fontSize = "13px";
+    UpvotesLabel.style.color = "green";
+    UpvotesLabel.style.visibility = "hidden";
+    SaveButton.appendChild(UpvotesLabel);
+
+    const DownvotesLabel = document.createElement("span");
+    DownvotesLabel.innerHTML = Downvotes;
+    DownvotesLabel.style.display = "block";
+    DownvotesLabel.style.fontSize = "13px";
+    DownvotesLabel.style.color = "red";
+    DownvotesLabel.style.visibility = "hidden";
+    SaveButton.appendChild(DownvotesLabel);
+
+    const StateIcon = document.createElement("img");
+    StateIcon.src = "../images/Downvote.svg";
+    StateIcon.style.marginLeft = "1%";
+    StateIcon.style.width = "12px";
+    StateIcon.style.aspectRatio = "1 / 1";
+    UpvotesLabel.appendChild(StateIcon);
+
     const DescriptionLabel = document.createElement("span");
     DescriptionLabel.innerHTML = Save.description !== undefined ? Save.description : "";
     DescriptionLabel.style.display = "block";
@@ -324,6 +367,14 @@ function CreateSaveButton(Save, Page) {
     ThumbnailPhoto.style.boxSizing = "border-box";
     ThumbnailPhoto.style.border = "3px solid black";
     SaveButton.appendChild(ThumbnailPhoto);
+
+    if (Upvotes < Downvotes) {
+        StateIcon.src = "../images/Downvote.svg";
+    } else if ((Upvotes > Downvotes)) {
+        StateIcon.src = "../images/Upvote.svg";
+    } else {
+        StateIcon.src = "../images/Unset.svg";
+    }
 
     const ThumbnailWidth = ThumbnailPhoto.offsetWidth;
     const ThumbnailHeight = ThumbnailPhoto.offsetHeight;
@@ -377,12 +428,6 @@ function CreateSaveButton(Save, Page) {
     SaveChangesButton.style.visibility = "hidden";
     SaveButton.appendChild(SaveChangesButton);
 
-    const OpenSaveButton = document.createElement("div");
-    OpenSaveButton.innerHTML = "Open Save";
-    OpenSaveButton.classList.add("BUTTON");
-    OpenSaveButton.style.visibility = "hidden";
-    SaveButton.appendChild(OpenSaveButton);
-
     const IdLabel = document.createElement("span");
     IdLabel.innerHTML = Save.id;
     IdLabel.style.position = "absolute";
@@ -399,7 +444,7 @@ function CreateSaveButton(Save, Page) {
     RemoveButton.style.fontSize = "100%";
     RemoveButton.style.position = "absolute";
     RemoveButton.style.alignSelf = "center";
-    RemoveButton.style.top = "4px";
+    RemoveButton.style.top = "2%";
     RemoveButton.style.visibility = getComputedStyle(BrowserContainer).visibility === "visible" ? SaveId === LocalId ? "visible" : "hidden" : "hidden";
     SaveButton.appendChild(RemoveButton);
     RemoveButtons.push(RemoveButton);
@@ -410,10 +455,16 @@ function CreateSaveButton(Save, Page) {
     CloseButton.style.cursor = "pointer";
     CloseButton.style.fontSize = "100%";
     CloseButton.style.position = "absolute";
-    CloseButton.style.right = "8px";
-    CloseButton.style.top = "4px";
+    CloseButton.style.right = "1%";
+    CloseButton.style.top = "2%";
     CloseButton.style.visibility = "hidden";
     SaveButton.appendChild(CloseButton);
+
+    const OpenSaveButton = document.createElement("div");
+    OpenSaveButton.innerHTML = "Open Save";
+    OpenSaveButton.classList.add("BUTTON");
+    OpenSaveButton.style.visibility = "hidden";
+    SaveButton.appendChild(OpenSaveButton);
 
     IdLabel.addEventListener("click", () => {
         navigator.clipboard.writeText(Save.id);
@@ -439,6 +490,14 @@ function CreateSaveButton(Save, Page) {
                 ClickCount++
             }
 
+            const docRef = doc(Db, "saves", Save.id);
+            setDoc(docRef, {
+                views: Views + 1
+            }, { merge: true });
+
+            ViewsLabel.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
+            DownvotesLabel.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
+            UpvotesLabel.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
             CloseButton.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
             ThumbnailPhoto.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
             DescriptionLabel.style.visibility = ClickCount === 1 ? getComputedStyle(BrowserContainer).visibility === "visible" ? "visible" : "hidden" : "hidden";
@@ -449,8 +508,8 @@ function CreateSaveButton(Save, Page) {
 
             if (ClickCount === 1) {
                 this.style.position = "absolute";
-                this.style.height = "75%";
-                this.style.width = "75%";
+                this.style.height = "100%";
+                this.style.width = "100%";
                 this.style.zIndex = "1";
                 IdLabel.style.visibility = "hidden";
 
@@ -524,10 +583,13 @@ function CreateSaveButton(Save, Page) {
         Array.from(Buttons.getElementsByTagName("input")).forEach(Button => {
             Button.disabled = true;
         });
+
+        CurrentOpenSave = doc(Db, "saves", Save.id);
+        CheckSave();
     });
 }
 
-async function LoadSaves(Page = 1, {Forload = false}) {
+async function LoadSaves(Page = 1, {Forload = false, ForId = undefined}) {
     SavesContainer.innerHTML = "LOADING";
 
     RemoveButtons = [];
@@ -553,8 +615,9 @@ async function LoadSaves(Page = 1, {Forload = false}) {
         SavesContainer.style.gap = "5px";
 
         PaginatedSaves.forEach(Save => {
-            if (Forload) {
-                if (Save.localId === LocalId) {
+
+            if (Forload && ForId) {
+                if (String(Save.username).toLowerCase() === ForId.toLowerCase()) {
                     CreateSaveButton(Save, Page);
                 }
             } else {
@@ -580,22 +643,13 @@ function AddPaginationControls(TotalPages) {
     ControlsContainer.style.marginTop = "10px";
     BrowserContainer.appendChild(ControlsContainer);
 
-    const ReloadButton = document.createElement("div");
-    ReloadButton.innerHTML = "Refresh";
-    ReloadButton.style.cursor = "pointer";
-    ReloadButton.addEventListener("click", () => LoadSaves(CurrentPage, {
-        Forload: false
-    }));
-    ReloadButton.classList.add("ABTN");
-    ControlsContainer.appendChild(ReloadButton);
-
     if (TotalPages > 1) {
         const PreviousButton = document.createElement("div");
         PreviousButton.innerHTML = "Previous";
         PreviousButton.style.cursor = "pointer";
         PreviousButton.setAttribute("disabled", CurrentPage === 1)
         PreviousButton.addEventListener("click", () => LoadSaves(CurrentPage - 1, {
-            Forload: false
+            Forload: false,
         }));
         PreviousButton.classList.add("ABTN");
         ControlsContainer.appendChild(PreviousButton);
@@ -651,9 +705,12 @@ async function LoadSave(SaveId) {
             CreatedParticle.dataset.temp = Particle.Temp;
         });
 
+        CurrentOpenSave = SaveDocRef;
+        CheckSave();
     } else if (SaveId.startsWith("user:")) {
         LoadSaves(CurrentPage, {
-            Forload: true
+            Forload: true,
+            ForId: SaveId.replace("user:", "")
         });
     } else if (SaveId === "") {
         LoadSaves(CurrentPage, {
@@ -677,6 +734,76 @@ function TogglePublicity() {
     CurrentPublicity = !CurrentPublicity;
     PublicityButton.innerHTML = !CurrentPublicity ? "PRIVATE" : "PUBLIC";
 }
+
+export function SetCurrentOpenedSave(State) {
+    CurrentOpenSave = State;
+    CheckSave();
+}
+
+async function CheckSave() {
+    if (!CurrentOpenSave) {
+        UpvoteButton.style.position = "absolute";
+        DownvoteButton.style.position = "absolute";
+        return;
+    }
+
+    try {
+        const DocSnap = await getDoc(CurrentOpenSave);
+        const DocData = DocSnap.data();
+        const { upvotes: Upvotes, downvotes: Downvotes, voters: Voters } = DocData;
+
+        if (DocData.localId !== LocalId) {
+            UpvoteButton.style.position = "";
+            DownvoteButton.style.position = "";
+        }
+
+        UpvoteButton.removeAttribute("disabled");
+        DownvoteButton.removeAttribute("disabled");
+
+        const UpdateButtonColors = (CurrentVote) => {
+            if (CurrentVote === undefined) {
+                UpvoteButton.style.backgroundColor = "transparent";
+                DownvoteButton.style.backgroundColor = "transparent";
+            } else if (CurrentVote) {
+                UpvoteButton.style.backgroundColor = "rgb(50, 150, 50)";
+                DownvoteButton.style.backgroundColor = "transparent";
+                UpvoteButton.setAttribute("disabled", "true");
+                DownvoteButton.setAttribute("disabled", "true");
+            } else {
+                DownvoteButton.style.backgroundColor = "rgb(150, 50, 50)";
+                UpvoteButton.style.backgroundColor = "transparent";
+                UpvoteButton.setAttribute("disabled", "true");
+                DownvoteButton.setAttribute("disabled", "true");
+            }
+        };
+
+        const CurrentVote = Voters.find(Voter => Voter.Id === LocalId)?.Vote;
+        UpdateButtonColors(CurrentVote);
+
+        const HandleVote = async (Vote) => {
+            if (CurrentVote !== undefined) return;
+
+            const NewVoters = [...Voters.filter(Voter => Voter.Id !== LocalId), { Id: LocalId, Vote }];
+            await setDoc(CurrentOpenSave, { voters: NewVoters }, { merge: true });
+
+            if (!Voters.some(Voter => Voter.Id === LocalId)) {
+                await setDoc(CurrentOpenSave, Vote ? { upvotes: Upvotes + 1 } : { downvotes: Downvotes + 1 }, { merge: true });
+            }
+
+            const UpdatedVote = NewVoters.find(Voter => Voter.Id === LocalId)?.Vote;
+            UpdateButtonColors(UpdatedVote);
+
+            CheckSave();
+        };
+
+        UpvoteButton.addEventListener("click", () => HandleVote(true));
+        DownvoteButton.addEventListener("click", () => HandleVote(false));
+
+    } catch (Error) {
+        console.error("Error fetching document:", Error);
+    }
+}
+
 
 BrowserAddressbar.addEventListener("keypress", HandleLoadSave);
 PublicityButton.addEventListener("click", TogglePublicity);
