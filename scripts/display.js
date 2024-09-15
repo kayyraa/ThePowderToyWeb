@@ -1,3 +1,5 @@
+import { ModsEnabled } from "./mods.js";
+
 const ParticleContainer = document.getElementById("ParticleContainer");
 const MaxTemp = 9720;
 
@@ -83,7 +85,10 @@ function Loop() {
         Particles.forEach(Particle => {
             Particle.style.filter = "";
             Particle.style.boxShadow = "";
-            Particle.style.backgroundColor = Particle.dataset.fixedColor;
+
+            if (ModsEnabled.length === 0) {
+                Particle.style.backgroundColor = Particle.dataset.fixedColor;
+            }
         });
     }
 

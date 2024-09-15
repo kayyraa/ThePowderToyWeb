@@ -144,6 +144,45 @@ textarea::placeholder {
   z-index: 1;
 }
 
+#ModsBrowser {
+  width: 85%;
+  height: 75%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: rgb(40, 40, 40);
+  visibility: hidden;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.ModButton {
+  margin-left: 1%;
+  padding-left: 0.5%;
+  padding-top: 0.5%;
+  width: 25%;
+  height: 10%;
+  background-color: rgb(70, 70, 70);
+  cursor: pointer;
+}
+
+.ModButton:hover {
+  background-color: rgb(80, 80, 80);
+}
+
+.ToggleButton[disabled="true"] {
+  color: red;
+}
+
+.ToggleButton[disabled="false"] {
+  color: green;
+}
+
 .ElementLabel {
   width: 100%;
   height: 25px;
@@ -207,6 +246,16 @@ textarea::placeholder {
   align-content: center;
   align-items: center;
   text-align: center;
+}
+
+.ModsContainer {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  width: 100%;
+  height: 75%;
+  overflow: hidden;
 }
 
 .SavesContainer {
