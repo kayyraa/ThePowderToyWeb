@@ -6,7 +6,6 @@ import * as tptw from "./tptw.js";
 
 document.title = Settings.Version;
 
-const LogContainer = document.getElementById("LogContainer");
 const ParticleContainer = document.getElementById("ParticleContainer");
 
 var MouseX = 0;
@@ -202,7 +201,6 @@ document.addEventListener("pointermove", (Event) => {
 function Update() {
     const Parts = ParticleContainer.children.length;
 
-    LogContainer.scrollTop = LogContainer.scrollHeight;
     ParticlesLabel.innerHTML = `Parts: ${Parts}`;
  
     TempLabel.style.left = `${MouseX - 50}px`;

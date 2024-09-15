@@ -50,7 +50,7 @@ const Mods = [
     }
 ];
 
-const ModsBrowser = document.createElement("div");
+export const ModsBrowser = document.createElement("div");
 ModsBrowser.id = "ModsBrowser";
 document.body.appendChild(ModsBrowser);
 

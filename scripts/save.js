@@ -51,7 +51,7 @@ async function CheckUserDoc() {
 
 const ParticleContainer = document.getElementById("ParticleContainer");
 
-const BrowserContainer = document.createElement("div");
+export const BrowserContainer = document.createElement("div");
 BrowserContainer.id = "BrowserContainer";
 document.body.appendChild(BrowserContainer);
 
@@ -803,7 +803,6 @@ async function CheckSave() {
         console.error("Error fetching document:", Error);
     }
 }
-
 
 BrowserAddressbar.addEventListener("keypress", HandleLoadSave);
 PublicityButton.addEventListener("click", TogglePublicity);
