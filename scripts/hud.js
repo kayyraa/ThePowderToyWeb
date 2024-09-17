@@ -83,25 +83,30 @@ ElementLabel.style.color = Theme.TertiaryColor;
 SidebarContainer.appendChild(ElementLabel);
 
 Elements.forEach(Element => {
+    const RadioactiveSettings = Element.RadioactiveSettings;
+
     const ElementDiv = document.createElement("div");
     ElementDiv.classList.add("ELEMENT");
     ElementDiv.innerHTML = Element.Name.toUpperCase().substring(0, 4);
     ElementDiv.style.backgroundColor = Element.Color;
     ElementDiv.style.color = InvertColor(Element.Color, false);
-    
-    ElementDiv.dataset.type = Element.Type;
-    ElementDiv.dataset.coldType = Element.ColdType;
-    ElementDiv.dataset.hotType = Element.HotType;
-    ElementDiv.dataset.flammable = Element.Flammable.toString();
-    ElementDiv.dataset.caustic = Element.Caustic.toString();
-    ElementDiv.dataset.radioactive = Element.Radioactive.toString();
-    ElementDiv.dataset.radioactivity = Element.Radioactivity !== undefined ? Element.Radioactivity.toString() : "";
-    ElementDiv.dataset.light = Element.Light.toString();
-    ElementDiv.dataset.temp = Element.Temp.toString();
-    ElementDiv.dataset.meltingPoint = Element.MeltingPoint !== undefined ? Element.MeltingPoint : undefined;
-    ElementDiv.dataset.boilingPoint = Element.BoilingPoint !== undefined ? Element.BoilingPoint : undefined;
-    ElementDiv.dataset.name = Element.Name;
     ElementDiv.id = Element.Name;
+
+    Object.assign(ElementDiv.dataset, {
+        type: Element.Type,
+        coldType: Element.ColdType,
+        hotType: Element.HotType,
+        flammable: Element.Flammable.toString(),
+        caustic: Element.Caustic.toString(),
+        radioactive: !!RadioactiveSettings,
+        radioactivity: RadioactiveSettings?.Radioactivity?.toString() || "",
+        decayParticle: RadioactiveSettings?.DecayParticle || "",
+        light: Element.Light.toString(),
+        temp: Element.Temp.toString(),
+        meltingPoint: Element.MeltingPoint ?? "",
+        boilingPoint: Element.BoilingPoint ?? "",
+        name: Element.Name
+    });
 
     const DescriptionLabel = document.createElement("span");
     DescriptionLabel.innerHTML = `${Element.Name} - ${Element.Flair} ${Element.Radioactive ? `- ${Element.Radioactivity}` : ""}`;
@@ -110,12 +115,12 @@ Elements.forEach(Element => {
     ElementDiv.appendChild(DescriptionLabel);
 
     ElementDiv.addEventListener("mouseenter", function() {
-        this.style.height = "5%";
+        this.style.opacity = "1";
         DescriptionLabel.style.opacity = "1";
 
         Array.from(ElementContainer.getElementsByTagName("div")).forEach(OtherElement => {
             if (OtherElement !== this) {
-                OtherElement.style.height = "3%";
+                OtherElement.style.opacity = "0.5";
 
                 const OtherDescriptionLabel = OtherElement.querySelector("#DescriptionLabel");
                 if (OtherDescriptionLabel) {
@@ -127,7 +132,7 @@ Elements.forEach(Element => {
 
     ElementDiv.addEventListener("mouseleave", () => {
         DescriptionLabel.style.opacity = "0";
-        ElementDiv.style.height = "17.5px";
+        ElementDiv.style.opacity = "0.5";
     });
 
     ElementDiv.addEventListener("click", (Event) => {

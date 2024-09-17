@@ -107,7 +107,7 @@ textarea::placeholder {
 #ElementContainer {
   position: fixed;
   right: -25px;
-  top: 50%;
+  top: 45%;
   width: 5%;
   height: 85%;
   text-align: center;
@@ -229,7 +229,8 @@ textarea::placeholder {
   justify-content: center;
   align-content: center;
   align-items: center;
-  transition: height 0.25s ease, opacity 0.25s ease;
+  opacity: 0.5;
+  transition: opacity 0.25s ease;
 }
 
 .RemoveButton {

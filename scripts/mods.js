@@ -2,53 +2,9 @@ import { Buttons } from "./save.js";
 import { Theme } from "./theme.js";
 import { Settings } from "./settings.js";
 
-import * as tptw from "./tptw.js";
+import { Mods } from "./allmods.js";
 
 export var ModsEnabled = [];
-
-const Mods = [
-    {
-        Name: "ColorfulMod",
-        Version: "1.0.0",
-
-        Setup: () => {
-            console.log("ColorfulMod");
-        },
-
-        Loop: () => {
-            const Particles = tptw.GetAllParticles();
-            Particles.forEach(Particle => {
-                Particle.style.backgroundColor = `rgb(${tptw.Random(255, 0)}, ${tptw.Random(255, 0)}, ${tptw.Random(255, 0)})`;
-            });
-        },
-
-        Stop: () => {
-            const Particles = tptw.GetAllParticles();
-            Particles.forEach(Particle => {
-                Particle.style.backgroundColor = Particle.dataset.fixedColor;
-            });
-        }
-    },
-    {
-        Name: "PerformanceMod",
-        Version: "1.0.0",
-
-        Setup: () => {
-            console.log("PerformanceMod");
-        },
-
-        Loop: () => {
-            const Particles = tptw.GetAllParticles();
-            Particles.forEach(Particle => {
-                if (Particle.dataset.type === "None") {
-                    Particle.remove();
-                }
-            });
-        },
-
-        Stop: () => {}
-    }
-];
 
 export const ModsBrowser = document.createElement("div");
 ModsBrowser.id = "ModsBrowser";

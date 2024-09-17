@@ -37,7 +37,7 @@ function InitializeParticle(Particle) {
 }
 
 function React() {
-    const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
+    const Particles = TPTW.GetAllParticles();
     let RadioactiveParticles = [];
 
     if (Particles.length > 0) {
@@ -47,8 +47,15 @@ function React() {
         if (Particle.dataset.radioactive === "true") {
             RadioactiveParticles.push(Particle);
             setTimeout(() => {
+                const DecayA = TPTW.math.Random(parseFloat(Particle.dataset.radioactivity), 0);
+
                 Particle.dataset.temp = parseFloat(Particle.dataset.temp) + parseFloat(Particle.dataset.radioactivity);
-                TPTW.CreateParticle(Elements.find(element => element.Name === "NEUT"), Particle.offsetLeft, Particle.offsetTop);
+                TPTW.CreateParticle(Elements.find(element => element.Name === Particle.dataset.decayParticle), Particle.offsetLeft, Particle.offsetTop);
+
+                if (DecayA >= parseFloat(Particle.dataset.radioactivity)) {
+                    TPTW.CreateParticle(Elements.find(element => element.Name === "STNE"), Particle.offsetLeft, Particle.offsetTop).dataset.temp = Particle.dataset.temp;
+                    Particle.remove();
+                }
 
             }, (RadioactiveParticles.length * 1000) - (parseFloat(Particle.dataset.radioactivity) * 1000));
         }
@@ -57,174 +64,166 @@ function React() {
     requestAnimationFrame(React);
 }
 
-if (ParticleContainer) {
-    function Loop() {
-        const Particles = Array.from(ParticleContainer.getElementsByTagName("div"));
+function Loop() {
+    const Particles = TPTW.GetAllParticles();
 
-        if (Particles.length > 0) {
-            Particles.forEach(Particle => {        
-                if (
-                    Math.abs(Particle.offsetTop) > window.innerHeight || 
-                    Math.abs(Particle.offsetLeft) > (window.innerWidth - Particle.offsetWidth)
-                ) {
-                    Particle.remove();
-                    return;
-                }
+    if (Particles.length > 0) {
+        Particles.forEach(Particle => {        
+            if (
+                Math.abs(Particle.offsetTop) > window.innerHeight || 
+                Math.abs(Particle.offsetLeft) > (window.innerWidth - Particle.offsetWidth)
+            ) {
+                Particle.remove();
+                return;
+            }
+        
+            if (!Particle.dataset.offsetX || !Particle.dataset.offsetY) {
+                InitializeParticle(Particle);
+            }
+        
+            const ParticleRect = Particle.getBoundingClientRect();
+            const NewTop = ParticleRect.top + 12;
+
+            const GridSize = parseInt(document.body.getAttribute("grid-size"));
+            const MaxHeight = (window.innerHeight - Buttons.offsetHeight) - ParticleRect.height;
+            const MaxWidth = window.innerWidth - ParticleRect.width;
+
+            const MeltingPoint = Particle.dataset.meltingPoint;
+            const IsCaustic = Particle.dataset.caustic === "true";
+            const IsLight = Particle.dataset.light === "true";
+            const IsExplosive = Particle.dataset.hotType === "Explosive";
+        
+            let CollisionDetected = false;
+            let CollisionTop = MaxHeight;
+        
+            if (IsLight) {
+                const OffsetX = parseInt(Particle.dataset.offsetX, 10);
+                const OffsetY = parseInt(Particle.dataset.offsetY, 10);
+                const CurrentLeft = parseFloat(Particle.style.left) || Particle.offsetLeft;
+                const CurrentTop = parseFloat(Particle.style.top) || Particle.offsetTop;
+                Particle.style.left = `${CurrentLeft + OffsetX}px`;
+                Particle.style.top = `${CurrentTop + OffsetY}px`;
+
+                return;
+            }
+
+            if (MeltingPoint !== undefined && Particle.dataset.hotType !== undefined) {
+                const Temp = parseFloat(Particle.dataset.temp);
             
-                if (!Particle.dataset.offsetX || !Particle.dataset.offsetY) {
-                    InitializeParticle(Particle);
-                }
-            
-                const ParticleRect = Particle.getBoundingClientRect();
-                const NewTop = ParticleRect.top + 12;
+                if (Temp > MeltingPoint) {
+                    Particle.dataset.type = Particle.dataset.hotType;
+                    Particle.dataset.radioactive = false;
 
-                const GridSize = parseInt(document.body.getAttribute("grid-size"));
-                const MaxHeight = (window.innerHeight - Buttons.offsetHeight) - ParticleRect.height;
-                const MaxWidth = window.innerWidth - ParticleRect.width;
-
-                const MeltingPoint = Particle.dataset.meltingPoint;
-                const IsCaustic = Particle.dataset.caustic === "true";
-                const IsLight = Particle.dataset.light === "true";
-                const IsExplosive = Particle.dataset.hotType === "Explosive";
-            
-                let CollisionDetected = false;
-                let CollisionTop = MaxHeight;
-            
-                if (IsLight) {
-                    const OffsetX = parseInt(Particle.dataset.offsetX, 10);
-                    const OffsetY = parseInt(Particle.dataset.offsetY, 10);
-                    const CurrentLeft = parseFloat(Particle.style.left) || Particle.offsetLeft;
-                    const CurrentTop = parseFloat(Particle.style.top) || Particle.offsetTop;
-                    Particle.style.left = `${CurrentLeft + OffsetX}px`;
-                    Particle.style.top = `${CurrentTop + OffsetY}px`;
-
-                    return;
-                }
-
-                if (MeltingPoint !== undefined && Particle.dataset.hotType !== undefined) {
-                    const Temp = parseFloat(Particle.dataset.temp);
-                
-                    if (Temp > MeltingPoint) {
-                        Particle.dataset.type = Particle.dataset.hotType;
-                        Particle.dataset.radioactive = false;
-
-                        if (IsExplosive) {
-                            TPTW.ExplodeParticle(Particle, 25);
-                        }
-                    } else {
-                        Particle.dataset.type = Particle.dataset.fixedType;
-                        Particle.dataset.radioactive = Particle.dataset.fixedRadioactive;
+                    if (IsExplosive) {
+                        TPTW.ExplodeParticle(Particle, 25);
                     }
-                }
-                
-            
-                Particles.forEach(OtherParticle => {
-                    if (OtherParticle !== Particle) {
-                        if (Particle.dataset.light === "true" || OtherParticle.dataset.light === "true") {
-                            return;
-                        }
-
-                        const OtherRect = OtherParticle.getBoundingClientRect();
-                        const Collision = (
-                            NewTop < OtherRect.bottom &&
-                            NewTop + ParticleRect.height > OtherRect.top &&
-                            ParticleRect.right > OtherRect.left &&
-                            ParticleRect.left < OtherRect.right
-                        );
-
-                        if (Collision) {
-                            CollisionDetected = true;
-                            CollisionTop = Math.min(CollisionTop, OtherRect.top - ParticleRect.height);
-                        
-                            const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
-                            const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
-                        
-                            const Temp = parseFloat(Particle.dataset.temp);
-                            const OtherTemp = parseFloat(OtherParticle.dataset.temp);
-                        
-                            if (Temp.toFixed(1) !== OtherTemp.toFixed(1)) {
-                                const AverageTemp = (Temp + OtherTemp) / 2;
-                                Particle.dataset.temp = AverageTemp.toFixed(1);
-                                OtherParticle.dataset.temp = AverageTemp.toFixed(1);
-                            }
-                        
-                            if (IsCaustic && OtherIsFlammable && !OtherIsCaustic) {
-                                TPTW.CombustElement(Particle, OtherParticle);
-                            }
-                        }
-                    }
-                });
-            
-                if (CollisionDetected) {
-                    Particle.style.top = `${CollisionTop}px`;
                 } else {
-                    if (Particle.dataset.type === "Gas") {
-                        let DisplacementAllowed = true;
+                    Particle.dataset.type = Particle.dataset.fixedType;
+                    Particle.dataset.radioactive = Particle.dataset.fixedRadioactive;
+                }
+            }
+            
+        
+            Particles.forEach(OtherParticle => {
+                if (OtherParticle !== Particle) {
+                    if (Particle.dataset.light === "true" || OtherParticle.dataset.light === "true") {
+                        return;
+                    }
 
-                        const ParticleRect = Particle.getBoundingClientRect();
+                    const OtherRect = OtherParticle.getBoundingClientRect();
+                    const Collision = (
+                        NewTop < OtherRect.bottom &&
+                        NewTop + ParticleRect.height > OtherRect.top &&
+                        ParticleRect.right > OtherRect.left &&
+                        ParticleRect.left < OtherRect.right
+                    );
 
-                        Particles.forEach(OtherParticle => {
-                            if (OtherParticle !== Particle) {
-                                const OtherType = OtherParticle.dataset.type;
-
-                                if (OtherType === "Powder" || OtherType === "Solid" || OtherType === "Liquid") {
-                                    const OtherRect = OtherParticle.getBoundingClientRect();
-
-                                    if (
-                                        ParticleRect.right > OtherRect.left &&
-                                        ParticleRect.left < OtherRect.right &&
-                                        ParticleRect.top < OtherRect.bottom &&
-                                        ParticleRect.bottom > OtherRect.top
-                                    ) {
-                                        if (OtherParticle.dataset.flammable === "true") {
-                                            TPTW.CombustElement(Particle, OtherParticle);
-                                        }
-                                    
-                                        if (OtherType === "Powder" || OtherType === "Liquid") {
-                                            const DisplacementX = ParticleRect.left - OtherRect.left;
-                                            const DisplacementY = ParticleRect.top - OtherRect.top;
-                                        
-                                            OtherParticle.style.left = `${OtherParticle.offsetLeft + DisplacementX}px`;
-                                            OtherParticle.style.top = `${OtherParticle.offsetTop + DisplacementY}px`;
-                                        }
-                                    
-                                        DisplacementAllowed = false;
-                                    }
-                                }
-                            }
-                        });
-
-                        if (DisplacementAllowed) {
-                            Particle.style.top = `${Particle.offsetTop - 6}px`;
+                    if (Collision) {
+                        CollisionDetected = true;
+                        CollisionTop = Math.min(CollisionTop, OtherRect.top - ParticleRect.height);
+                    
+                        const OtherIsCaustic = OtherParticle.dataset.caustic === "true";
+                        const OtherIsFlammable = OtherParticle.dataset.flammable === "true";
+                    
+                        const Temp = parseFloat(Particle.dataset.temp);
+                        const OtherTemp = parseFloat(OtherParticle.dataset.temp);
+                    
+                        if (Temp.toFixed(1) !== OtherTemp.toFixed(1)) {
+                            const AverageTemp = (Temp + OtherTemp) / 2;
+                            Particle.dataset.temp = AverageTemp.toFixed(1);
+                            OtherParticle.dataset.temp = AverageTemp.toFixed(1);
                         }
-                    } else if (Particle.dataset.type === "Powder") {
-                        Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
-                    } else if (Particle.dataset.type === "Liquid") {
-                        Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
-
-                        const NewLeft = Math.min(Math.round((Particle.offsetLeft + Random(GridSize * 2, -GridSize * 2)) / GridSize) * GridSize, MaxWidth);
-                        
-                        if (!Particles.some(OtherParticle => {
-                            const OtherRect = OtherParticle.getBoundingClientRect();
-                            return (
-                                OtherRect.left === NewLeft &&
-                                OtherParticle.dataset.type === "Liquid"
-                            );
-                        })) {
-                            Particle.style.left = `${NewLeft}px`;
+                    
+                        if (IsCaustic && OtherIsFlammable && !OtherIsCaustic) {
+                            TPTW.CombustElement(Particle, OtherParticle);
                         }
                     }
                 }
-            
-                Particle.dataset.previousTop = Particle.offsetTop;
-                Particle.dataset.previousLeft = Particle.offsetLeft;
             });
-        }
+        
+            if (CollisionDetected) {
+                Particle.style.top = `${CollisionTop}px`;
+            } else {
+                if (Particle.dataset.type === "Gas") {
+                    let DisplacementAllowed = true;
 
-        requestAnimationFrame(Loop);
+                    const ParticleRect = Particle.getBoundingClientRect();
+
+                    Particles.forEach(OtherParticle => {
+                        if (OtherParticle !== Particle) {
+                            const OtherRect = OtherParticle.getBoundingClientRect();
+
+                            if (
+                                ParticleRect.right > OtherRect.left &&
+                                ParticleRect.left < OtherRect.right &&
+                                ParticleRect.top < OtherRect.bottom &&
+                                ParticleRect.bottom > OtherRect.top
+                            ) {
+                                if (Particle.dataset.caustic === "true" && OtherParticle.dataset.flammable === "true") {
+                                    TPTW.CombustElement(Particle, OtherParticle);
+                                }
+                            
+                                const DisplacementX = ParticleRect.left - OtherRect.left;
+                                const DisplacementY = ParticleRect.top - OtherRect.top;
+                        
+                                OtherParticle.style.left = `${OtherParticle.offsetLeft + DisplacementX}px`;
+                                OtherParticle.style.top = `${OtherParticle.offsetTop + DisplacementY}px`;
+                        
+                                DisplacementAllowed = false;
+                            }
+                        }
+                    });
+
+                    if (DisplacementAllowed) {
+                        Particle.style.top = `${Particle.offsetTop - 6}px`;
+                    }
+                } else if (Particle.dataset.type === "Powder") {
+                    Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
+                } else if (Particle.dataset.type === "Liquid") {
+                    Particle.style.top = `${Math.min(NewTop, MaxHeight)}px`;
+
+                    const NewLeft = Math.min(Math.round((Particle.offsetLeft + Random(GridSize * 2, -GridSize * 2)) / GridSize) * GridSize, MaxWidth);
+                    
+                    if (!Particles.some(OtherParticle => {
+                        const OtherRect = OtherParticle.getBoundingClientRect();
+                        return (
+                            OtherRect.left === NewLeft &&
+                            OtherParticle.dataset.type === "Liquid"
+                        );
+                    })) {
+                        Particle.style.left = `${NewLeft}px`;
+                    }
+                }
+            }
+        
+            Particle.dataset.previousTop = Particle.offsetTop;
+            Particle.dataset.previousLeft = Particle.offsetLeft;
+        });
     }
 
-    Loop();
+    requestAnimationFrame(Loop);
 }
+
+Loop();
 
 React();

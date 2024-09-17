@@ -156,6 +156,7 @@ function Loop() {
                 const Caustic = SelectedElement.dataset.caustic === "true";
                 const Radioactive = SelectedElement.dataset.radioactive === "true";
                 const Radioactivity = SelectedElement.dataset.radioactivity ? parseFloat(SelectedElement.dataset.radioactivity) : 0;
+                const DecayParticle = Radioactive ? SelectedElement.dataset.decayParticle : "";
                 const Light = SelectedElement.dataset.light === "true";
                 const Temp = parseFloat(SelectedElement.dataset.temp) || 0;
                 const MeltingPoint = parseFloat(SelectedElement.dataset.meltingPoint) || undefined;
@@ -166,8 +167,13 @@ function Loop() {
                     Color: ElementColor,
                     Flammable: Flammable,
                     Caustic: Caustic,
-                    Radioactive: Radioactive,
-                    Radioactivity: Radioactivity,
+
+                    RadioactiveSettings: {
+                        Radioactive: Radioactive,
+                        Radioactivity: Radioactivity,
+                        DecayParticle: DecayParticle,
+                    },
+                    
                     Light: Light,
                     Temp: Temp,
                     MeltingPoint: MeltingPoint,

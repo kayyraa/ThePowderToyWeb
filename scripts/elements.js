@@ -4,7 +4,6 @@ export const Elements = [
         Color: "rgb(194, 178, 128)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 1700,
@@ -19,7 +18,6 @@ export const Elements = [
         Color: "rgb(15, 94, 156)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 32,
         MeltingPoint: 100,
@@ -34,7 +32,6 @@ export const Elements = [
         Color: "rgb(207, 16, 32)",
         Flammable: false,
         Caustic: true,
-        Radioactive: false,
         Light: false,
         Temp: 1250,
         MeltingPoint: 700,
@@ -45,11 +42,24 @@ export const Elements = [
         Flair: "Liquid"
     },
     {
+        Name: "NITR",
+        Color: "rgb(155, 255, 32)",
+        Flammable: true,
+        Caustic: false,
+        Light: false,
+        Temp: 22,
+        MeltingPoint: 90,
+        BoilingPoint: 2400,
+        ColdType: "Solid",
+        HotType: "Explosive",
+        Type: "Liquid",
+        Flair: "Liquid"
+    },
+    {
         Name: "COAL",
         Color: "rgb(68, 69, 69)",
         Flammable: true,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: window.Infinity,
@@ -61,7 +71,6 @@ export const Elements = [
         Color: "rgb(218, 109, 66)",
         Flammable: true,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: window.Infinity,
@@ -73,7 +82,6 @@ export const Elements = [
         Color: "rgb(60, 60, 60)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 1538,
@@ -88,7 +96,6 @@ export const Elements = [
         Color: "rgb(150, 150, 150)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 3422,
@@ -103,7 +110,6 @@ export const Elements = [
         Color: "rgb(145, 145, 145)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 231.9,
@@ -118,7 +124,6 @@ export const Elements = [
         Color: "rgb(225, 177, 77)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 930,
@@ -133,7 +138,6 @@ export const Elements = [
         Color: "rgb(90, 90, 90)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 780,
@@ -148,7 +152,6 @@ export const Elements = [
         Color: "rgb(60, 60, 60)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 1500,
@@ -163,7 +166,6 @@ export const Elements = [
         Color: "rgb(255, 165, 0)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 1064,
@@ -178,7 +180,6 @@ export const Elements = [
         Color: "rgb(55, 200, 200)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 3550,
@@ -193,7 +194,6 @@ export const Elements = [
         Color: "rgb(144, 144, 144)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 1668,
@@ -208,7 +208,6 @@ export const Elements = [
         Color: "rgb(255, 32, 0)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 50,
@@ -223,7 +222,6 @@ export const Elements = [
         Color: "rgb(134, 214, 216)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 0,
         MeltingPoint: 3,
@@ -238,8 +236,13 @@ export const Elements = [
         Color: "rgb(80, 96, 48)",
         Flammable: false,
         Caustic: false,
-        Radioactive: true,
-        Radioactivity: 4,
+
+        RadioactiveSettings: {
+            DecayParticle: "NEUT",
+            Radioactive: true,
+            Radioactivity: 8
+        },
+
         Light: false,
         Temp: 46,
         MeltingPoint: 254,
@@ -254,8 +257,13 @@ export const Elements = [
         Color: "rgb(112, 112, 32)",
         Flammable: false,
         Caustic: false,
-        Radioactive: true,
-        Radioactivity: 1,
+
+        RadioactiveSettings: {
+            DecayParticle: "NEUT",
+            Radioactive: true,
+            Radioactivity: 12
+        },
+
         Light: false,
         Temp: 46,
         MeltingPoint: 1132,
@@ -270,8 +278,13 @@ export const Elements = [
         Color: "rgb(100, 124, 32)",
         Flammable: false,
         Caustic: false,
-        Radioactive: true,
-        Radioactivity: 8,
+
+        RadioactiveSettings: {
+            DecayParticle: "NEUT",
+            Radioactive: true,
+            Radioactivity: 32
+        },
+
         Light: false,
         Temp: 46,
         MeltingPoint: 822,
@@ -286,8 +299,13 @@ export const Elements = [
         Color: "rgb(70, 150, 22)",
         Flammable: false,
         Caustic: false,
-        Radioactive: true,
-        Radioactivity: 2,
+
+        RadioactiveSettings: {
+            DecayParticle: "NEUT",
+            Radioactive: true,
+            Radioactivity: 48
+        },
+
         Light: false,
         Temp: 46,
         MeltingPoint: 639.4,
@@ -302,8 +320,13 @@ export const Elements = [
         Color: "rgb(57, 200, 20)",
         Flammable: false,
         Caustic: false,
-        Radioactive: true,
-        Radioactivity: 18,
+
+        RadioactiveSettings: {
+            DecayParticle: "NEUT",
+            Radioactive: true,
+            Radioactivity: 18
+        },
+
         Light: false,
         Temp: 46,
         MeltingPoint: 343,
@@ -318,8 +341,13 @@ export const Elements = [
         Color: "rgb(63, 255, 128)",
         Flammable: false,
         Caustic: false,
-        Radioactive: true,
-        Radioactivity: 64,
+
+        RadioactiveSettings: {
+            DecayParticle: "NEUT",
+            Radioactive: true,
+            Radioactivity: 54
+        },
+
         Light: false,
         Temp: 46,
         MeltingPoint: 450,
@@ -330,11 +358,52 @@ export const Elements = [
         Flair: "Radioactive Solid"
     },
     {
+        Name: "ISOZ",
+        Color: "rgb(155, 255, 155)",
+        Flammable: false,
+        Caustic: false,
+
+        RadioactiveSettings: {
+            DecayParticle: "PHOT",
+            Radioactive: true,
+            Radioactivity: 64
+        },
+
+        Light: false,
+        Temp: 46,
+        MeltingPoint: 900,
+        BoilingPoint: 1200,
+        ColdType: "Solid",
+        HotType: "Liquid",
+        Type: "Solid",
+        Flair: "Radioactive Solid"
+    },
+    {
+        Name: "ISOT",
+        Color: "rgb(50, 155, 125)",
+        Flammable: false,
+        Caustic: false,
+
+        RadioactiveSettings: {
+            DecayParticle: "PHOT",
+            Radioactive: true,
+            Radioactivity: 128
+        },
+
+        Light: false,
+        Temp: 46,
+        MeltingPoint: 1500,
+        BoilingPoint: 2200,
+        ColdType: "Solid",
+        HotType: "Liquid",
+        Type: "Solid",
+        Flair: "Super Radioactive Solid"
+    },
+    {
         Name: "NEUT",
         Color: "rgb(32, 224, 255)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: true,
         Temp: 22,
         Type: "None",
@@ -344,8 +413,7 @@ export const Elements = [
         Name: "PHOT",
         Color: "rgb(255, 255, 255)",
         Flammable: false,
-        Caustic: false,
-        Radioactive: false,
+        Caustic: false,   
         Light: true,
         Temp: 1250,
         Type: "None",
@@ -356,7 +424,6 @@ export const Elements = [
         Color: "rgb(155, 155, 155)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 1100,
@@ -371,7 +438,6 @@ export const Elements = [
         Color: "rgb(225, 225, 225)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: 801,
@@ -386,8 +452,13 @@ export const Elements = [
         Color: "rgb(155, 255, 155)",
         Flammable: true,
         Caustic: false,
-        Radioactive: true,
-        Radioactivity: 24,
+
+        RadioactiveSettings: {
+            DecayParticle: "NEUT",
+            Radioactive: true,
+            Radioactivity: 24
+        },
+
         Light: false,
         Temp: 46,
         MeltingPoint: window.Infinity,
@@ -400,7 +471,6 @@ export const Elements = [
         Color: "rgb(225, 100, 200)",
         Flammable: false,
         Caustic: true,
-        Radioactive: false,
         Light: false,
         Temp: 11326.85,
         MeltingPoint: window.Infinity,
@@ -413,7 +483,6 @@ export const Elements = [
         Color: "rgb(200, 200, 255)",
         Flammable: true,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: window.Infinity,
@@ -426,7 +495,6 @@ export const Elements = [
         Color: "rgb(80, 112, 255)",
         Flammable: true,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 22,
         MeltingPoint: window.Infinity,
@@ -439,7 +507,6 @@ export const Elements = [
         Color: "rgb(255, 50, 50)",
         Flammable: false,
         Caustic: true,
-        Radioactive: false,
         Light: false,
         Temp: 1100,
         MeltingPoint: window.Infinity,
@@ -452,7 +519,6 @@ export const Elements = [
         Color: "rgb(100, 100, 100)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 149,
         MeltingPoint: window.Infinity,
@@ -465,7 +531,6 @@ export const Elements = [
         Color: "rgb(0, 0, 0)",
         Flammable: false,
         Caustic: false,
-        Radioactive: false,
         Light: false,
         Temp: 0,
         Type: "None",

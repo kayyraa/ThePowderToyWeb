@@ -133,17 +133,50 @@ export function RgbString(RgbString) {
 }
 
 export function CombustElement(CausticPart, FlammablePart) {
+    GetAllParticles().forEach(Particle => {
+        if (Particle !== FlammablePart && Particle.dataset.flammable === "true") {
+            if (CheckCollision(FlammablePart, Particle)) {
+                CreateParticle(Elements.find(element => element.Name === "SMKE"), Particle.offsetLeft, Particle.offsetTop);
+                Particle.remove();
+            }
+        }
+    });
+
     CreateParticle(Elements.find(element => element.Name === "SMKE"), FlammablePart.offsetLeft, FlammablePart.offsetTop);
     FlammablePart.remove();
     CausticPart.remove();
 }
 
 export function ExplodeParticle(Particle, Lifetime) {
-    CreateExplosion(RgbString(Particle.dataset.color).R, RgbString(Particle.dataset.color).G, RgbString(Particle.dataset.color).B, Particle.offsetLeft, Particle.offsetTop, Lifetime);
+    CreateExplosion(Random(255, 200), Random(25, 0), Random(25, 0), Particle.offsetLeft, Particle.offsetTop, Lifetime);
     Particle.remove();
 }
 
-export function CreateParticle({ Name, Color, Flammable, Caustic, Radioactive, Radioactivity, Light, Temp, MeltingPoint, BoilingPoint, Type, ColdType, HotType }, PositionX, PositionY) {
+export function CheckCollision(E0, E1) {
+    const r1 = E0.getBoundingClientRect();
+    const r2 = E1.getBoundingClientRect();
+  
+    return !(r1.right < r2.left || 
+             r1.left > r2.right || 
+             r1.bottom < r2.top || 
+             r1.top > r2.bottom);
+}
+
+export function CreateParticle(
+    {
+        Name,
+        Color,
+        Flammable,
+        Caustic,
+        RadioactiveSettings,
+        Light,
+        Temp,
+        MeltingPoint,
+        BoilingPoint,
+        Type,
+        ColdType,
+        HotType
+    }, PositionX, PositionY) {
     const ParticleContainer = document.getElementById("ParticleContainer");
     const PowderStrength = Type !== "Solid" ? Settings.PowderEffectStrength : Settings.PowderEffectStrength / 4;
     const GridSize = parseFloat(document.body.getAttribute("grid-size"));
@@ -182,9 +215,12 @@ export function CreateParticle({ Name, Color, Flammable, Caustic, Radioactive, R
         Particle.dataset.fixedColor = TargetColor;
         Particle.dataset.flammable = Flammable.toString();
         Particle.dataset.caustic = Caustic.toString();
-        Particle.dataset.radioactive = Radioactive.toString();
-        Particle.dataset.fixedRadioactive = Radioactive.toString();
-        Particle.dataset.radioactivity = Radioactivity ? Radioactivity.toString() : "";
+
+        Particle.dataset.radioactive = RadioactiveSettings ? RadioactiveSettings.Radioactive.toString() : "false";
+        Particle.dataset.fixedRadioactive = RadioactiveSettings ? RadioactiveSettings.Radioactive.toString() : "false";
+        Particle.dataset.radioactivity = RadioactiveSettings ?  RadioactiveSettings.Radioactivity.toString() : "";
+        Particle.dataset.decayParticle = RadioactiveSettings ? RadioactiveSettings.DecayParticle : "";
+        
         Particle.dataset.light = Light.toString();
         Particle.dataset.temp = Temp.toString();
         Particle.dataset.meltingPoint = MeltingPoint !== undefined ? MeltingPoint.toString() : "";
@@ -210,7 +246,9 @@ export function CreateRawParticle(X, Y) {
 }
 
 export function CreateExplosion(R, G, B, X, Y, Lifetime) {
-    for (let Index = 0; Index < 9; Index++) {
+    const AllParticles = GetAllParticles();
+
+    for (let Index = 0; Index < Random(9, 0); Index++) {
         const XDirection = Random(5, -5);
         const YDirection = Random(5, -5);
 
@@ -227,6 +265,16 @@ export function CreateExplosion(R, G, B, X, Y, Lifetime) {
             Particle.style.top = `${Particle.offsetTop + YDirection}px`;
 
             Particle.style.opacity = 1 - Time / Lifetime;
+
+            if (false) {
+                AllParticles.forEach(OtherParticle => {
+                    if (OtherParticle !== Particle && OtherParticle.dataset.hotType === "Explosive") {
+                        if (CheckCollision(Particle, OtherParticle)) {
+                            ExplodeParticle(OtherParticle, 15);
+                        }
+                    }
+                });
+            }
 
             const ParticleRect = Particle.getBoundingClientRect();
             const TouchingPart = document.elementFromPoint(ParticleRect.left, ParticleRect.top);
