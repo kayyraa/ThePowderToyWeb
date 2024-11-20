@@ -31,6 +31,7 @@ ModsBrowser.appendChild(Titlebar);
 const ModsButton = document.createElement("div");
 ModsButton.innerHTML = "MODS";
 ModsButton.classList.add("BTN");
+ModsButton.classList.add("ModAButton");
 ModsButton.style.color = Theme.TertiaryColor;
 ModsButton.style.order = "-1";
 Buttons.appendChild(ModsButton);

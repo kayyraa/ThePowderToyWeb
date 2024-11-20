@@ -106,7 +106,7 @@ export const Elements = [
         Flair: "Solid"
     },
     {
-        Name: "STAN",
+        Name: "TIN",
         Color: "rgb(145, 145, 145)",
         Flammable: false,
         Caustic: false,
